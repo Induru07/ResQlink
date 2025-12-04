@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken'); // Tool to keep users logged in
 
 // Import the 3 Models
 const Victim = require('../models/Victim');
-const Supplier = require('../models/Supplier');
-const Admin = require('../models/Admin');
+const Supplier = require('../models/supplier');
+const Admin = require('../models/admin');
 
 // =======================
 // 1. VICTIM ROUTES
@@ -27,7 +27,7 @@ router.post('/victim/register', async (req, res) => {
 
         // Save to Database
         const newVictim = new Victim({
-            name, email, password: hashedPassword, phone, district
+            fullName: name, email, password: hashedPassword, phone, district
         });
         await newVictim.save();
 
@@ -37,24 +37,41 @@ router.post('/victim/register', async (req, res) => {
     }
 });
 
-// Login Victim
+// Login Victim (Debug Version)
 router.post('/victim/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        // Check Victim Collection ONLY
+        console.log("--------------------------------");
+        console.log("LOGIN ATTEMPT FOR:", email);
+        console.log("PASSWORD SENT:", password);
+
+        // 1. Check if user exists
         const user = await Victim.findOne({ email });
-        if (!user) return res.status(400).json({ msg: "User not found" });
+        
+        if (!user) {
+            console.log("❌ ERROR: User not found in 'victims' collection");
+            return res.status(400).json({ msg: "User email not found" });
+        }
+        console.log("✅ User found in DB:", user.name);
+        console.log("Stored Hashed Password:", user.password);
 
-        // Check Password
+        // 2. Check Password
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
+        
+        if (!isMatch) {
+            console.log("❌ ERROR: Password did not match the hash");
+            return res.status(400).json({ msg: "Wrong password" });
+        }
+        
+        console.log("✅ SUCCESS: Password Matched!");
 
-        // Send Token (Login Pass)
+        // 3. Send Token
         const token = jwt.sign({ id: user._id, role: 'victim' }, process.env.JWT_SECRET);
         res.json({ token, user: { id: user._id, name: user.name, role: 'victim' } });
 
     } catch (err) {
+        console.error("SERVER ERROR:", err.message);
         res.status(500).json({ error: err.message });
     }
 });
@@ -75,7 +92,7 @@ router.post('/supplier/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const newSupplier = new Supplier({
-            organizationName, email, password: hashedPassword, phone
+            fullName: organizationName, email, password: hashedPassword, phone
         });
         await newSupplier.save();
 
@@ -97,7 +114,7 @@ router.post('/supplier/login', async (req, res) => {
         if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
         const token = jwt.sign({ id: user._id, role: 'supplier' }, process.env.JWT_SECRET);
-        res.json({ token, user: { id: user._id, name: user.organizationName, role: 'supplier' } });
+        res.json({ token, user: { id: user._id, name: user.fullName, role: 'supplier' } });
 
     } catch (err) {
         res.status(500).json({ error: err.message });

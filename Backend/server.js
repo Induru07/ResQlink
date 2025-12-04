@@ -21,7 +21,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 // 3. Define Routes (We will create these files next)
 app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/general', require('./routes/general'));
+app.use('/api/general', require('./routes/homeRoutes'));
 
 const PORT = process.env.PORT || 5000;
 
