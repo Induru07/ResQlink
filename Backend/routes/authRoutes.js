@@ -80,10 +80,11 @@ router.post('/victim/login', async (req, res) => {
 // 2. SUPPLIER ROUTES
 // =======================
 
-// Register Supplier
+// Register Supplier (Updated)
 router.post('/supplier/register', async (req, res) => {
     try {
-        const { organizationName, email, password, phone } = req.body;
+        // We now accept address and contact person
+        const { organizationName, email, password, phone, address, contactPerson } = req.body;
         
         const existing = await Supplier.findOne({ email });
         if (existing) return res.status(400).json({ msg: "Email already used" });
@@ -92,8 +93,14 @@ router.post('/supplier/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const newSupplier = new Supplier({
-            fullName: organizationName, email, password: hashedPassword, phone
+            organizationName, 
+            email, 
+            password: hashedPassword, 
+            phone,
+            warehouseAddress: address, // Save address
+            contactPerson: contactPerson // Save contact person
         });
+        
         await newSupplier.save();
 
         res.json({ msg: "Supplier Account Created Successfully" });
@@ -101,6 +108,7 @@ router.post('/supplier/register', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
 
 // Login Supplier
 router.post('/supplier/login', async (req, res) => {

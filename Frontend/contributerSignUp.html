@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contributor Registration - ResQLink</title>
+    <style>
+        /* Reusing your clean styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #eef2f5; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; overflow: hidden; }
+        .header { background: #27ae60; color: white; padding: 25px; text-align: center; } /* Green for Suppliers */
+        .content { padding: 30px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #555; font-size: 14px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .btn { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 16px; }
+        .btn:hover { background: #219150; }
+        .alert { padding: 10px; border-radius: 5px; margin-bottom: 15px; display: none; }
+        .alert.error { background: #f8d7da; color: #721c24; }
+        .alert.success { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Contributor Portal</h1>
+            <p>Register to Donate Supplies</p>
+        </div>
+        <div class="content">
+            <div class="alert" id="alert-box"></div>
+            
+            <form id="supplier-form">
+                <div class="form-group">
+                    <label>Organization / Donor Name</label>
+                    <input type="text" id="orgName" required placeholder="e.g. Red Cross or John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Contact Person</label>
+                    <input type="text" id="contactPerson" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-group">
+                    <label>Warehouse / Pickup Address</label>
+                    <input type="text" id="address" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                
+                <button type="submit" class="btn">Register as Contributor</button>
+            </form>
+            <p style="text-align:center; margin-top:15px;"><a href="contributorSignIn.html">Already have an account? Login</a></p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('supplier-form');
+        const alertBox = document.getElementById('alert-box');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                organizationName: document.getElementById('orgName').value,
+                contactPerson: document.getElementById('contactPerson').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                // Send to Supplier Route
+                const res = await fetch('http://localhost:5000/api/auth/supplier/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    alertBox.textContent = "Registration Successful! Redirecting...";
+                    alertBox.className = "alert success";
+                    alertBox.style.display = "block";
+                    setTimeout(() => window.location.href = 'contributorSignIn.html', 1500);
+                } else {
+                    alertBox.textContent = result.msg || "Registration Failed";
+                    alertBox.className = "alert error";
+                    alertBox.style.display = "block";
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Server Error. Is Node.js running?");
+            }
+        });
+    </script>
+</body>
+</html>

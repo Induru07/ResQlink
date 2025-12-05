@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream:Frontend/chamath/index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,4 +65,227 @@
     <div id="dynamic-footer"></div>
 <script src="script.js"></script>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flood Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modal.css">
+</head>
+<body>
+  
+    <header class="header-banner-container">
+        <img src="images/header.jpg" alt="Flood Management System Banner" class="actual-header-image">
+    </header>
+    
+    <nav class="main-nav">
+        <div class="nav-container">
+            <!-- Left side - Essential Links (extreme left) -->
+            <div class="nav-left">
+                <div class="dropdown">
+                    <button class="dropbtn">
+                        <span class="lang-en">⚠️ Essential Links ▼</span>
+                        <span class="lang-si">⚠️ අත්‍යවශ්‍ය සබැඳි ▼</span>
+                        <span class="lang-ta">⚠️ அத்தியாவசிய இணைப்புகள் ▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="https://www.meteo.gov.lk" target="_blank"><span class="lang-en">Meteorology Dept (Met)</span><span class="lang-si">කාලගුණ විද්‍යා දෙපාර්තමේන්තුව</span><span class="lang-ta">வளிமண்டலவியல் திணைக்களம்</span></a>
+                        <a href="http://www.dmc.gov.lk" target="_blank"><span class="lang-en">Disaster Management Center</span><span class="lang-si">ආපදා කළමනාකරණ මධ්‍යස්ථානය</span><span class="lang-ta">அனர்த்த முகாமைத்துவ நிலையம்</span></a>
+                        <a href="http://www.irrigation.gov.lk" target="_blank"><span class="lang-en">Irrigation Dept</span><span class="lang-si">වාරිමාර්ග දෙපාර්තමේන්තුව</span><span class="lang-ta">நீர்ப்பாசனத் திணைக்களம்</span></a>
+                        <a href="https://www.redcross.lk" target="_blank"><span class="lang-en">Sri Lanka Red Cross</span><span class="lang-si">ශ්‍රී ලංකා රතු කුරුස සමාජය</span><span class="lang-ta">இலங்கை செஞ்சிலுவைச் சங்கம்</span></a>
+                        <a href="https://floodsupport.org/" target="_blank"><span class="lang-en">Flood Support</span><span class="lang-si">ගංවතුර සහන</span><span class="lang-ta">வெள்ள நிவாரணம்</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right side - Menu + Hamburger (extreme right) -->
+            <div class="nav-right">
+                <button class="nav-toggle" id="nav-toggle" aria-label="Open menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                <ul class="nav-links" id="nav-links">
+                    <li><a href="index.html" class="active"><span class="lang-en">Home</span><span class="lang-si">මුල් පිටුව</span><span class="lang-ta">முகப்பு</span></a></li>
+                    <li><a href="datamap.html"><span class="lang-en">Data Map</span><span class="lang-si">දත්ත සිතියම</span><span class="lang-ta">தரவு வரைபடம்</span></a></li>
+                    <li><a href="#" onclick="openModal('modal-contributor-login'); return false;"><span class="lang-en">Contributor</span><span class="lang-si">දායකයා</span><span class="lang-ta">பங்களிப்பாளர்</span></a></li>
+                    <li><a href="distributer.html"><span class="lang-en">Distributor</span><span class="lang-si">බෙදාහරින්නා</span><span class="lang-ta">விநியோகிப்பாளர்</span></a></li>
+                    <li><a href="#" onclick="openModal('modal-victim-login'); return false;"><span class="lang-en">Victim</span><span class="lang-si">විපතට පත් අය</span><span class="lang-ta">பாதிக்கப்பட்டவர்</span></a></li>
+                    <li><a href="admin.html"><span class="lang-en">Admin</span><span class="lang-si">පරිපාලක</span><span class="lang-ta">நிர்வாகம்</span></a></li>
+                    <li><a href="about.html"><span class="lang-en">About</span><span class="lang-si">අප ගැන</span><span class="lang-ta">எங்களைப் பற்றி</span></a></li>
+                    <li><a href="#" onclick="localStorage.removeItem('siteLang'); location.reload();" style="color:#ffcc00;font-weight:bold"><span class="lang-en">🌐 Lang</span><span class="lang-si">🌐 භාෂාව</span><span class="lang-ta">🌐 மொழி</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>     <!-- FULL MENU (Desktop: visible | Mobile: hidden until toggled) -->
+    
+
+    <main>
+        <div class="placeholder-content">
+            <p><strong>[Main content goes here]</strong></p>
+            <p>The header above should now display your full flood image.</p>
+        </div>
+    </main>
+
+    <div id="dynamic-footer"></div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- 1. VICTIM LOGIN MODAL -->
+    <div id="modal-victim-login" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Victim Sign In</h2>
+                <button class="close-modal-btn" onclick="closeModal('modal-victim-login')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-alert" id="victim-login-alert"></div>
+                <form id="victim-login-form">
+                    <div class="modal-form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="v-login-email" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Password</label>
+                        <input type="password" id="v-login-password" required>
+                    </div>
+                    <button type="submit" class="modal-btn">Sign In</button>
+                </form>
+                <div class="modal-footer">
+                    <p>Don't have an account? <a href="#" onclick="switchModal('modal-victim-login', 'modal-victim-signup')">Register Here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. VICTIM SIGNUP MODAL -->
+    <div id="modal-victim-signup" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Victim Registration</h2>
+                <button class="close-modal-btn" onclick="closeModal('modal-victim-signup')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-alert" id="victim-signup-alert"></div>
+                <form id="victim-signup-form">
+                    <div class="modal-form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="v-signup-name" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="v-signup-phone" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="v-signup-email" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Province</label>
+                        <select id="v-signup-province" required>
+                            <option value="">Select Province</option>
+                            <option value="Western">Western Province</option>
+                            <option value="Central">Central Province</option>
+                            <option value="Southern">Southern Province</option>
+                            <option value="Northern">Northern Province</option>
+                            <option value="Eastern">Eastern Province</option>
+                            <option value="North Western">North Western Province</option>
+                            <option value="North Central">North Central Province</option>
+                            <option value="Uva">Uva Province</option>
+                            <option value="Sabaragamuwa">Sabaragamuwa Province</option>
+                        </select>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>District</label>
+                        <select id="v-signup-district" required>
+                            <option value="">Select District</option>
+                        </select>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Password</label>
+                        <input type="password" id="v-signup-password" required>
+                    </div>
+                    <button type="submit" class="modal-btn">Register Account</button>
+                </form>
+                <div class="modal-footer">
+                    <p>Already have an account? <a href="#" onclick="switchModal('modal-victim-signup', 'modal-victim-login')">Sign In</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. CONTRIBUTOR LOGIN MODAL -->
+    <div id="modal-contributor-login" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header supplier-header">
+                <h2>Contributor Sign In</h2>
+                <button class="close-modal-btn" onclick="closeModal('modal-contributor-login')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-alert" id="contributor-login-alert"></div>
+                <form id="contributor-login-form">
+                    <div class="modal-form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="c-login-email" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Password</label>
+                        <input type="password" id="c-login-password" required>
+                    </div>
+                    <button type="submit" class="modal-btn supplier-btn">Sign In</button>
+                </form>
+                <div class="modal-footer">
+                    <p>New Organization? <a href="#" onclick="switchModal('modal-contributor-login', 'modal-contributor-signup')">Register Here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. CONTRIBUTOR SIGNUP MODAL -->
+    <div id="modal-contributor-signup" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header supplier-header">
+                <h2>Contributor Registration</h2>
+                <button class="close-modal-btn" onclick="closeModal('modal-contributor-signup')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-alert" id="contributor-signup-alert"></div>
+                <form id="contributor-signup-form">
+                    <div class="modal-form-group">
+                        <label>Organization Name</label>
+                        <input type="text" id="c-signup-org" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Contact Person</label>
+                        <input type="text" id="c-signup-contact" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="c-signup-phone" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="c-signup-email" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label>Password</label>
+                        <input type="password" id="c-signup-password" required>
+                    </div>
+                    <button type="submit" class="modal-btn supplier-btn">Register</button>
+                </form>
+                <div class="modal-footer">
+                    <p>Already have an account? <a href="#" onclick="switchModal('modal-contributor-signup', 'modal-contributor-login')">Sign In</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="js/script.js"></script>
+<!-- Add this at the bottom of body -->
+    <script src="js/script.js"></script>
+</body>
+>>>>>>> Stashed changes:Frontend/index.html
 </html>

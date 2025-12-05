@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream:Frontend/chamath/script.js
 document.addEventListener('DOMContentLoaded', function() {
     
     // =========================================================
@@ -253,4 +254,216 @@ function injectFooter() {
         </footer>
         `;
     }
+=======
+/* =========================================
+   1. GLOBAL VARIABLES & SETUP
+   ========================================= */
+const API_URL = 'http://localhost:5000/api'; // Your Backend URL
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- 1.1 LANGUAGE SETUP ---
+    const currentLang = localStorage.getItem('siteLang');
+    const body = document.body;
+
+    if (currentLang === 'si') {
+        body.classList.add('sinhala-mode');
+    } else if (currentLang === 'ta') {
+        body.classList.add('tamil-mode');
+    } else if (currentLang === 'en') {
+        body.classList.remove('sinhala-mode', 'tamil-mode');
+    } else {
+        // Show Language Popup for new users
+        if(!localStorage.getItem('langSelected')) createLangPopup();
+    }
+
+    // --- 1.2 MOBILE MENU ---
+    const toggle = document.getElementById('nav-toggle');
+    const menu = document.getElementById('nav-links');
+
+    if (toggle && menu) {
+        toggle.onclick = (e) => {
+            e.stopPropagation();
+            toggle.classList.toggle('active');
+            menu.classList.toggle('active');
+        };
+        
+        document.addEventListener('click', (e) => {
+            if (!menu.contains(e.target) && !toggle.contains(e.target)) {
+                toggle.classList.remove('active');
+                menu.classList.remove('active');
+            }
+        });
+    }
+
+    // --- 1.3 ATTACH FORM LISTENERS (For Index Page) ---
+    attachFormListeners();
+});
+
+/* =========================================
+   2. MODAL FUNCTIONS (Popup Logic)
+   ========================================= */
+
+// Open a Modal
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex'; // Shows the popup
+    }
+}
+
+// Close a Modal
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none'; // Hides the popup
+    }
+}
+
+// Switch (e.g. from Login -> Register)
+function switchModal(closeId, openId) {
+    closeModal(closeId);
+    openModal(openId);
+}
+
+// Close when clicking outside the box
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal-overlay')) {
+        event.target.style.display = 'none';
+    }
+}
+
+/* =========================================
+   3. AUTHENTICATION LOGIC (Connect to Backend)
+   ========================================= */
+
+function attachFormListeners() {
+    
+    // --- CONTRIBUTOR LOGIN ---
+    const cLoginForm = document.getElementById('contributor-login-form');
+    if (cLoginForm) {
+        cLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('c-login-email').value;
+            const password = document.getElementById('c-login-password').value;
+            const alertBox = document.getElementById('contributor-login-alert');
+
+            await handleAuth(
+                '/auth/supplier/login', 
+                { email, password }, 
+                alertBox, 
+                'contributor.html' // Redirect here on success
+            );
+        });
+    }
+
+    // --- CONTRIBUTOR SIGNUP ---
+    const cSignupForm = document.getElementById('contributor-signup-form');
+    if (cSignupForm) {
+        cSignupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                organizationName: document.getElementById('c-signup-org').value,
+                contactPerson: document.getElementById('c-signup-contact').value,
+                phone: document.getElementById('c-signup-phone').value,
+                email: document.getElementById('c-signup-email').value,
+                password: document.getElementById('c-signup-password').value,
+                address: "Not Provided" // Default for quick signup
+            };
+            const alertBox = document.getElementById('contributor-signup-alert');
+
+            // Register, then switch to login
+            await handleRegister('/auth/supplier/register', data, alertBox, () => {
+                switchModal('modal-contributor-signup', 'modal-contributor-login');
+                document.getElementById('contributor-login-alert').textContent = "Registration Success! Please Login.";
+                document.getElementById('contributor-login-alert').style.display = 'block';
+                document.getElementById('contributor-login-alert').className = 'modal-alert success';
+            });
+        });
+    }
+
+    // --- VICTIM LOGIN ---
+    const vLoginForm = document.getElementById('victim-login-form');
+    if (vLoginForm) {
+        vLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('v-login-email').value;
+            const password = document.getElementById('v-login-password').value;
+            const alertBox = document.getElementById('victim-login-alert');
+
+            await handleAuth(
+                '/auth/victim/login', 
+                { email, password }, 
+                alertBox, 
+                'index.html' // Victim stays on home page (or goes to dashboard)
+            );
+        });
+    }
+}
+
+// --- GENERIC LOGIN HANDLER ---
+async function handleAuth(endpoint, payload, alertElement, redirectUrl) {
+    try {
+        const res = await fetch(`${API_URL}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            // Success! Save Token
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            showAlert(alertElement, "Success! Redirecting...", "success");
+            
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 1500);
+        } else {
+            showAlert(alertElement, data.msg || "Login Failed", "error");
+        }
+    } catch (err) {
+        console.error(err);
+        showAlert(alertElement, "Server Error. Is Backend running?", "error");
+    }
+}
+
+// --- GENERIC REGISTER HANDLER ---
+async function handleRegister(endpoint, payload, alertElement, successCallback) {
+    try {
+        const res = await fetch(`${API_URL}${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            showAlert(alertElement, "Registration Successful!", "success");
+            setTimeout(successCallback, 1500);
+        } else {
+            showAlert(alertElement, data.msg || "Registration Failed", "error");
+        }
+    } catch (err) {
+        showAlert(alertElement, "Server Error", "error");
+    }
+}
+
+// --- HELPER: SHOW ALERT ---
+function showAlert(element, msg, type) {
+    if(element) {
+        element.textContent = msg;
+        element.className = `modal-alert ${type}`;
+        element.style.display = 'block';
+    }
+}
+
+// --- HELPER: LANG POPUP (From your original code) ---
+function createLangPopup() {
+    // ... (Keep your existing lang popup code here if needed) ...
+    // Or just use the hardcoded one in index.html if you prefer
+    localStorage.setItem('langSelected', 'true');
+>>>>>>> Stashed changes:Frontend/js/script.js
 }

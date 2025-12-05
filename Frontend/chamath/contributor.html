@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream:Frontend/chamath/contributor.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -315,4 +316,331 @@
     <script src="script.js"></script>
     <script src="contributor.js"></script>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contributor Portal - Flood Management</title>
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/contributor.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  
+    <header class="header-banner-container">
+        <img src="images/header.jpg" alt="Flood Management System Banner" class="actual-header-image">
+    </header>
+
+     <nav class="main-nav">
+        <div class="nav-container">
+            <!-- Left side - Essential Links (extreme left) -->
+            <div class="nav-left">
+                <div class="dropdown">
+                    <button class="dropbtn">
+                        <span class="lang-en">⚠️ Essential Links ▼</span>
+                        <span class="lang-si">⚠️ අත්‍යවශ්‍ය සබැඳි ▼</span>
+                        <span class="lang-ta">⚠️ அத்தியாவசிய இணைப்புகள் ▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="https://www.meteo.gov.lk" target="_blank"><span class="lang-en">Meteorology Dept (Met)</span><span class="lang-si">කාලගුණ විද්‍යා දෙපාර්තමේන්තුව</span><span class="lang-ta">வளிமண்டலவியல் திணைக்களம்</span></a>
+                        <a href="http://www.dmc.gov.lk" target="_blank"><span class="lang-en">Disaster Management Center</span><span class="lang-si">ආපදා කළමනාකරණ මධ්‍යස්ථානය</span><span class="lang-ta">அனர்த்த முகாமைத்துவ நிலையம்</span></a>
+                        <a href="http://www.irrigation.gov.lk" target="_blank"><span class="lang-en">Irrigation Dept</span><span class="lang-si">වාරිමාර්ග දෙපාර්තමේන්තුව</span><span class="lang-ta">நீர்ப்பாசனத் திணைக்களம்</span></a>
+                        <a href="https://www.redcross.lk" target="_blank"><span class="lang-en">Sri Lanka Red Cross</span><span class="lang-si">ශ්‍රී ලංකා රතු කුරුස සමාජය</span><span class="lang-ta">இலங்கை செஞ்சிலுவைச் சங்கம்</span></a>
+                        <a href="https://floodsupport.org/" target="_blank"><span class="lang-en">Flood Support</span><span class="lang-si">ගංවතුර සහන</span><span class="lang-ta">வெள்ள நிவாரணம்</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right side - Menu + Hamburger (extreme right) -->
+            <div class="nav-right">
+                <button class="nav-toggle" id="nav-toggle" aria-label="Open menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                <ul class="nav-links" id="nav-links">
+                    <li><a href="index.html"><span class="lang-en">Home</span><span class="lang-si">මුල් පිටුව</span><span class="lang-ta">முகப்பு</span></a></li>
+                    <li><a href="datamap.html"><span class="lang-en">Data Map</span><span class="lang-si">දත්ත සිතියම</span><span class="lang-ta">தரவு வரைபடம்</span></a></li>
+                    <li><a href="contributor.html" class="active"><span class="lang-en">Contributor</span><span class="lang-si">දායකයා</span><span class="lang-ta">பங்களிப்பாளர்</span></a></li>
+                    <li><a href="distributer.html"><span class="lang-en">Distributor</span><span class="lang-si">බෙදාහරින්නා</span><span class="lang-ta">விநியோகிப்பாளர்</span></a></li>
+                    <li><a href="victim.html"><span class="lang-en">Victim</span><span class="lang-si">විපතට පත් අය</span><span class="lang-ta">பாதிக்கப்பட்டவர்</span></a></li>
+                    <li><a href="admin.html"><span class="lang-en">Admin</span><span class="lang-si">පරිපාලක</span><span class="lang-ta">நிர்வாகம்</span></a></li>
+                    <li><a href="about.html"><span class="lang-en">About</span><span class="lang-si">අප ගැන</span><span class="lang-ta">எங்களைப் பற்றி</span></a></li>
+                    <li><a href="#" onclick="localStorage.removeItem('siteLang'); location.reload();" style="color:#ffcc00;font-weight:bold"><span class="lang-en">🌐 Lang</span><span class="lang-si">🌐 භාෂාව</span><span class="lang-ta">🌐 மொழி</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav> 
+
+    <div class="page-container" id="contributor-dashboard" style="display: none;">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="lang-en">Dashboard</span>
+                <span class="lang-si">පුවරුව</span>
+                <span class="lang-ta">டாஷ்போர்டு</span>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="#" class="sidebar-link active-side" data-target="make-contribution">
+                        <i class="fas fa-hand-holding-heart"></i>
+                        <span class="lang-en">Make Contribution</span>
+                        <span class="lang-si">දායකත්වයක් දෙන්න</span>
+                        <span class="lang-ta">பங்களிப்பைச் செய்யுங்கள்</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-target="supplier-details">
+                        <i class="fas fa-id-card"></i>
+                        <span class="lang-en">Supplier Details</span>
+                        <span class="lang-si">සැපයුම්කරු විස්තර</span>
+                        <span class="lang-ta">சப்ளையர் விவரங்கள்</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-target="supply-history">
+                        <i class="fas fa-history"></i>
+                        <span class="lang-en">Supply History</span>
+                        <span class="lang-si">සැපයුම් ඉතිහාසය</span>
+                        <span class="lang-ta">விநியோக வரலாறு</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-link" data-target="distributor-contacts">
+                        <i class="fas fa-address-book"></i>
+                        <span class="lang-en">Distributor Contacts</span>
+                        <span class="lang-si">බෙදාහරින්නා අමතන්න</span>
+                        <span class="lang-ta">விநியோகஸ்தர் தொடர்புகள்</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="content-area">
+            
+            <section id="make-contribution" class="content-section active-section">
+                <h2 class="section-title">
+                    <span class="lang-en">Make a Supply Drop</span>
+                    <span class="lang-si">සැපයුම් එකතුවක් සාදන්න</span>
+                    <span class="lang-ta">வழங்கல் தொகுப்பை உருவாக்கவும்</span>
+                </h2>
+                
+                <form id="supply-batch-form">
+                    
+                    <div id="items-list-container"></div>
+
+                    <div class="add-more-wrapper">
+                        <button type="button" id="btn-add-row">
+                            <i class="fas fa-plus"></i> 
+                            <span class="lang-en">Add Another Item</span>
+                            <span class="lang-si">තවත් අයිතමයක් එක් කරන්න</span>
+                            <span class="lang-ta">மற்றொரு பொருளைச் சேர்க்கவும்</span>
+                        </button>
+                    </div>
+
+                    <hr class="supplier-divider">
+
+                    <div class="form-actions right-align">
+                        <button type="submit" class="btn-save">
+                            <span class="lang-en">Submit Supply List</span>
+                            <span class="lang-si">ලැයිස්තුව යොමු කරන්න</span>
+                            <span class="lang-ta">பட்டியலைச் சமர்ப்பிக்கவும்</span> 
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section id="supply-history" class="content-section">
+                <h2 class="section-title">
+                    <span class="lang-en">My Supply Records</span>
+                    <span class="lang-si">මගේ සැපයුම් වාර්තා</span>
+                    <span class="lang-ta">எனது வழங்கல் பதிவுகள்</span>
+                </h2>
+                
+                <div id="history-container">
+                    </div>
+                
+                <div id="empty-history-msg" style="display:none; text-align:center; padding: 40px; color:#777;">
+                    <i class="fas fa-box-open" style="font-size: 40px; margin-bottom: 10px;"></i><br>
+                    <span class="lang-en">No supplies recorded yet.</span>
+                    <span class="lang-si">තවමත් කිසිදු සැපයුමක් වාර්තා වී නොමැත.</span>
+                    <span class="lang-ta">வழங்கல்கள் எதுவும் இதுவரை பதிவு செய்யப்படவில்லை.</span>
+                </div>
+            </section>
+
+            <div id="qr-modal-overlay" class="qr-overlay hidden-mode">
+                <div class="qr-box">
+                    <button class="qr-close-btn" id="btn-close-qr">&times;</button>
+                    
+                    <div class="qr-content-wrapper">
+                        <div class="qr-text-side">
+                            <h2>
+                                <span class="lang-en">Show this to<br>Distributor</span>
+                                <span class="lang-si">බෙදාහරින්නාට<br>පෙන්වන්න</span>
+                                <span class="lang-ta">இதை விநியோகஸ்தரிடம்<br>காட்டவும்</span>
+                            </h2>
+                            <p>
+                                <span class="lang-en">Scan to verify handover</span>
+                                <span class="lang-si">තහවුරු කරගැනීමට ස්කෑන් කරන්න</span>
+                                <span class="lang-ta">சரிபார்க்க ஸ்கேன் செய்யவும்</span>
+                            </p>
+                            <div class="qr-hint">
+                                <i class="fas fa-info-circle"></i> 
+                                <span class="lang-en">You can access this QR code again in your Supply History records.</span>
+                                <span class="lang-si">ඔබගේ සැපයුම් ඉතිහාසයෙන් ඔබට නැවත මෙම QR කේතය ලබා ගත හැක.</span>
+                                <span class="lang-ta">உங்கள் வழங்கல் வரலாற்றிலிருந்து இந்த QR குறியீட்டை மீண்டும் அணுகலாம்.</span>
+                            </div>
+                        </div>
+
+                        <div class="qr-image-side">
+                            <img id="generated-qr-code" src="" alt="QR Code">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section id="supplier-details" class="content-section">
+                
+                <div id="supplier-view-mode">
+                    
+                    <div class="supplier-header">
+                        <div class="supplier-profile-img">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBmaWxsPSIjMDAzMzRkIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI1MCIvPjwvc3ZnPg==" 
+                                alt="Supplier Profile" 
+                                id="display-profile-pic">
+                        </div>
+                        
+                        <div class="supplier-info">
+                            <h3 id="display-name">Organization Name</h3>
+                            <p id="display-desc">This is a short description of the supplier. It fits within the height of the photo and is limited to about 100 characters.</p>
+                        </div>
+
+                        <button class="edit-icon-btn" id="btn-enable-edit" title="Edit Profile">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                    </div>
+
+                    <hr class="supplier-divider">
+
+                    <div class="supplier-gallery" id="display-gallery">
+                        <div class="gallery-item">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMTUwIiBmaWxsPSIjMDAyNjMzIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIvPjwvc3ZnPg==" alt="Work 1">
+                            <button class="delete-btn" title="Remove Photo">&times;</button>
+                        </div>
+                        <div class="gallery-item">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMTUwIiBmaWxsPSIjMDAyNjMzIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIvPjwvc3ZnPg==" alt="Work 2">
+                            <button class="delete-btn" title="Remove Photo">&times;</button>
+                        </div>
+                        <div class="gallery-item">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMTUwIiBmaWxsPSIjMDAyNjMzIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIvPjwvc3ZnPg==" alt="Work 3">
+                            <button class="delete-btn" title="Remove Photo">&times;</button>
+                        </div>
+                        <div class="gallery-item">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMTUwIiBmaWxsPSIjMDAyNjMzIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjE1MCIvPjwvc3ZnPg==" alt="Work 4">
+                            <button class="delete-btn" title="Remove Photo">&times;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="supplier-edit-mode" class="hidden-mode">
+                    <h3 class="edit-mode-title">Edit Supplier Details</h3>
+                    
+                    <form id="supplier-form">
+                        <div class="form-group">
+                            <label>Profile Photo:</label>
+                            <input type="file" id="edit-profile-upload" accept="image/*">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Name / Organization:</label>
+                            <input type="text" id="edit-name" value="Organization Name" class="form-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Description (Max 100 chars):</label>
+                            <textarea id="edit-desc" maxlength="100" class="form-input" rows="3">This is a short description of the supplier.</textarea>
+                        </div>
+
+                        <hr class="supplier-divider">
+
+                        <div class="form-group">
+                            <label>Add New Gallery Photos:</label>
+                            <input type="file" id="edit-gallery-upload" multiple accept="image/*">
+                            <p class="small-hint">New photos will be added to the top of the list.</p>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" id="btn-cancel-edit" class="btn-cancel">Cancel</button>
+                            <button type="submit" class="btn-save">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+
+            </section>            
+
+            
+
+            <section id="distributor-contacts" class="content-section">
+                <h2 class="section-title">
+                    <span class="lang-en">Distributor Contacts</span>
+                    <span class="lang-si">බෙදාහරින්නාගේ සම්බන්ධතා</span>
+                    <span class="lang-ta">விநியோகஸ்தர் தொடர்புகள்</span>
+                </h2>
+                <div class="placeholder-box">
+                    <p>Contact list goes here.</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div id="dynamic-footer"></div>
+
+    <!-- LOGIN REQUIRED MESSAGE -->
+    <div id="login-required-msg" style="text-align: center; padding: 50px; display: none;">
+        <h2>Please Login to Access Contributor Dashboard</h2>
+        <p>You need to be signed in to make contributions and manage your profile.</p>
+        <button onclick="window.location.href='index.html'" style="padding: 10px 20px; background: #2a5298; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px;">Go to Home & Login</button>
+    </div>
+
+    <div id="action-modal-overlay" class="qr-overlay hidden-mode">
+        <div class="qr-box" style="max-width: 500px; text-align: center;">
+            <button class="qr-close-btn" id="btn-close-action">&times;</button>
+            
+            <h2 style="color:white; margin-bottom:10px;">
+                <span class="lang-en">Manage Record</span>
+                <span class="lang-si">වාර්තාව කළමනාකරණය</span>
+                <span class="lang-ta">பதிவை நிர்வகி</span>
+            </h2>
+            <p style="color:#ccc; margin-bottom:30px;">
+                <span class="lang-en">Do you want to update or delete this supply record?</span>
+                <span class="lang-si">ඔබට මෙම වාර්තාව යාවත්කාලීන කිරීමට හෝ මැකීමට අවශ්‍යද?</span>
+                <span class="lang-ta">இந்த பதிவை புதுப்பிக்கவா அல்லது நீக்கவா?</span>
+            </p>
+
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button id="btn-action-update" class="btn-confirm-transport" style="background:#ffcc00; color:#000;">
+                    <span class="lang-en">Update Supply</span>
+                    <span class="lang-si">යාවත්කාලීන කරන්න</span>
+                    <span class="lang-ta">புதுப்பிக்கவும்</span>
+                </button>
+                
+                <button id="btn-action-delete" class="btn-confirm-transport" style="background:#ff4444; color:#fff;">
+                    <span class="lang-en">Delete Record</span>
+                    <span class="lang-si">වාර්තාව මකන්න</span>
+                    <span class="lang-ta">பதிவை நீக்கு</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/script.js"></script>
+    <script src="js/contributor.js"></script>
+</body>
+>>>>>>> Stashed changes:Frontend/contributor.html
 </html>
