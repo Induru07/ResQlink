@@ -83,8 +83,13 @@
 
                     showAlert(`Welcome back, ${data.user.name}!`, 'success');
                     
-                    // Here you would normally redirect to the Dashboard
-                    // window.location.href = 'dashboard.html';
+                    // 3. REDIRECT TO HOME PAGE (The Fix)
+                    setTimeout(() => {
+                            window.location.href = 'index.html'; 
+                            }, 1500); // Wait 1.5 seconds so they can read the message
+
+                    //after login victim also going to same homepage
+
                 } else {
                     // ERROR (e.g., Wrong password)
                     showAlert(data.msg || 'Login failed', 'error');

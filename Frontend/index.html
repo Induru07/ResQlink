@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flood Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  
+    <header class="header-banner-container">
+        <img src="images/header.jpg" alt="Flood Management System Banner" class="actual-header-image">
+    </header>
+    
+    <nav class="main-nav">
+        <div class="nav-container">
+            <!-- Left side - Essential Links (extreme left) -->
+            <div class="nav-left">
+                <div class="dropdown">
+                    <button class="dropbtn">
+                        <span class="lang-en">⚠️ Essential Links ▼</span>
+                        <span class="lang-si">⚠️ අත්‍යවශ්‍ය සබැඳි ▼</span>
+                        <span class="lang-ta">⚠️ அத்தியாவசிய இணைப்புகள் ▼</span>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="https://www.meteo.gov.lk" target="_blank"><span class="lang-en">Meteorology Dept (Met)</span><span class="lang-si">කාලගුණ විද්‍යා දෙපාර්තමේන්තුව</span><span class="lang-ta">வளிமண்டலவியல் திணைக்களம்</span></a>
+                        <a href="http://www.dmc.gov.lk" target="_blank"><span class="lang-en">Disaster Management Center</span><span class="lang-si">ආපදා කළමනාකරණ මධ්‍යස්ථානය</span><span class="lang-ta">அனர்த்த முகாமைத்துவ நிலையம்</span></a>
+                        <a href="http://www.irrigation.gov.lk" target="_blank"><span class="lang-en">Irrigation Dept</span><span class="lang-si">වාරිමාර්ග දෙපාර්තමේන්තුව</span><span class="lang-ta">நீர்ப்பாசனத் திணைக்களம்</span></a>
+                        <a href="https://www.redcross.lk" target="_blank"><span class="lang-en">Sri Lanka Red Cross</span><span class="lang-si">ශ්‍රී ලංකා රතු කුරුස සමාජය</span><span class="lang-ta">இலங்கை செஞ்சிலுவைச் சங்கம்</span></a>
+                        <a href="https://floodsupport.org/" target="_blank"><span class="lang-en">Flood Support</span><span class="lang-si">ගංවතුර සහන</span><span class="lang-ta">வெள்ள நிவாரணம்</span></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right side - Menu + Hamburger (extreme right) -->
+            <div class="nav-right">
+                <button class="nav-toggle" id="nav-toggle" aria-label="Open menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+                <ul class="nav-links" id="nav-links">
+                    <li><a href="index.html" class="active"><span class="lang-en">Home</span><span class="lang-si">මුල් පිටුව</span><span class="lang-ta">முகப்பு</span></a></li>
+                    <li><a href="datamap.html"><span class="lang-en">Data Map</span><span class="lang-si">දත්ත සිතියම</span><span class="lang-ta">தரவு வரைபடம்</span></a></li>
+                    <li><a href="contributor.html"><span class="lang-en">Contributor</span><span class="lang-si">දායකයා</span><span class="lang-ta">பங்களிப்பாளர்</span></a></li>
+                    <li><a href="distributer.html"><span class="lang-en">Distributor</span><span class="lang-si">බෙදාහරින්නා</span><span class="lang-ta">விநியோகிப்பாளர்</span></a></li>
+                    <li><a href="victim.html"><span class="lang-en">Victim</span><span class="lang-si">විපතට පත් අය</span><span class="lang-ta">பாதிக்கப்பட்டவர்</span></a></li>
+                    <li><a href="admin.html"><span class="lang-en">Admin</span><span class="lang-si">පරිපාලක</span><span class="lang-ta">நிர்வாகம்</span></a></li>
+                    <li><a href="about.html"><span class="lang-en">About</span><span class="lang-si">අප ගැන</span><span class="lang-ta">எங்களைப் பற்றி</span></a></li>
+                    <li><a href="#" onclick="localStorage.removeItem('siteLang'); location.reload();" style="color:#ffcc00;font-weight:bold"><span class="lang-en">🌐 Lang</span><span class="lang-si">🌐 භාෂාව</span><span class="lang-ta">🌐 மொழி</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>     <!-- FULL MENU (Desktop: visible | Mobile: hidden until toggled) -->
+    
+
+    <main>
+        <div class="placeholder-content">
+            <p><strong>[Main content goes here]</strong></p>
+            <p>The header above should now display your full flood image.</p>
+        </div>
+    </main>
+
+    <div id="dynamic-footer"></div>
+<script src="js/script.js"></script>
+</body>
+</html>
+
+/* test*/
