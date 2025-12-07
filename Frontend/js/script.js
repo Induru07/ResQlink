@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     // =========================================================
-    // 1. LANGUAGE & FOOTER SETUP (Originally "Top Code")
+    // 1. LANGUAGE & FOOTER SETUP
     // =========================================================
     
     // 1.1 CHECK SAVED LANGUAGE
@@ -23,12 +23,12 @@ document.addEventListener('DOMContentLoaded', function() {
         createPopup();
     }
 
-    // 1.4 INJECT FOOTER
+    // 1.4 INJECT FOOTER & AUTH MENU
     injectFooter();
-
+    updateAuthMenu(); // <--- Initialize the Auth Menu
 
     // =========================================================
-    // 2. MOBILE MENU LOGIC (Originally "Bottom Code")
+    // 2. MOBILE MENU LOGIC
     // =========================================================
     
     const toggle = document.getElementById('nav-toggle');
@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // A. Toggle Menu Open/Close
         toggle.onclick = function(e) {
-            // This prevents the click from hitting things behind the button
             e.stopPropagation(); 
             toggle.classList.toggle('active');
             menu.classList.toggle('active');
@@ -47,12 +46,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // B. Close menu when clicking any link inside it
         const links = document.querySelectorAll('.nav-links a');
         links.forEach(function(link) {
-            // --- THE CRITICAL FIX ---
-            // We use 'addEventListener' instead of 'onclick ='
-            // This ensures we DO NOT delete the specific code inside the "Lang" button.
             link.addEventListener('click', function() {
-                toggle.classList.remove('active');
-                menu.classList.remove('active');
+                // Check if it's NOT the auth dropdown toggle itself to prevent closing on open
+                if (!link.classList.contains('auth-btn')) {
+                    toggle.classList.remove('active');
+                    menu.classList.remove('active');
+                }
             });
         });
 
@@ -85,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // =========================================================
-// 4. HELPER FUNCTIONS (Must be outside DOMContentLoaded)
+// 4. HELPER FUNCTIONS
 // =========================================================
 
 // --- CREATE POPUP ---
@@ -254,3 +253,114 @@ function injectFooter() {
         `;
     }
 }
+
+// =========================================================
+// 5. AUTH MENU FUNCTIONS (Logic Fixed for Clickability)
+// =========================================================
+
+function updateAuthMenu() {
+    const authSection = document.getElementById('auth-section');
+    if (!authSection) return;
+
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+    const role = localStorage.getItem('userRole'); 
+
+    let htmlContent = '';
+
+    if (token && role) {
+        // --- LOGGED IN STATE ---
+        let dashboardLink = '#';
+        if (role === 'victim') dashboardLink = 'victim.html';
+        else if (role === 'contributor') dashboardLink = 'contributor.html';
+        else if (role === 'distributor') dashboardLink = 'distributer.html';
+        else if (role === 'admin') dashboardLink = 'admin.html';
+
+        const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
+
+        htmlContent = `
+            <a href="javascript:void(0)" class="auth-btn" onclick="toggleAuthDropdown(event)">
+                <div class="profile-info">
+                    <small>Signed in as</small>
+                    <strong>${displayRole}</strong>
+                </div>
+                <span>▼</span>
+            </a>
+            <div class="auth-dropdown-menu" id="authDropdown">
+                <a href="${dashboardLink}">
+                    <span class="lang-en">My Dashboard</span>
+                    <span class="lang-si">මගේ ගිණුම</span>
+                    <span class="lang-ta">என் கணக்கு</span>
+                </a>
+                <a href="#" onclick="handleLogout()">
+                    <span class="lang-en">Logout</span>
+                    <span class="lang-si">ඉවත් වන්න</span>
+                    <span class="lang-ta">வெளியேறு</span>
+                </a>
+            </div>
+        `;
+    } else {
+        // --- GUEST STATE ---
+        htmlContent = `
+            <a href="javascript:void(0)" class="auth-btn" onclick="toggleAuthDropdown(event)">
+                <span class="lang-en">Sign In / Join</span>
+                <span class="lang-si">ඇතුල් වන්න</span>
+                <span class="lang-ta">உள்நுழைக</span>
+                <span>▼</span>
+            </a>
+            <div class="auth-dropdown-menu" id="authDropdown">
+                <a href="victimSignIn.html">
+                    <span class="lang-en">As Victim</span>
+                    <span class="lang-si">විපතට පත් අය</span>
+                    <span class="lang-ta">பாதிக்கப்பட்டவர்</span>
+                </a>
+                <a href="contributorSignIn.html">
+                    <span class="lang-en">As Contributor</span>
+                    <span class="lang-si">දායකයා</span>
+                    <span class="lang-ta">பங்களிப்பாளர்</span>
+                </a>
+                <a href="distributorSignIn.html">
+                    <span class="lang-en">As Distributor</span>
+                    <span class="lang-si">බෙදාහරින්නා</span>
+                    <span class="lang-ta">விநியோகிப்பாளர்</span>
+                </a>
+                <a href="adminSignIn.html">
+                    <span class="lang-en">As Admin</span>
+                    <span class="lang-si">පරිපාලක</span>
+                    <span class="lang-ta">நிர்வாகம்</span>
+                </a>
+            </div>
+        `;
+    }
+
+    authSection.innerHTML = htmlContent;
+}
+
+function handleLogout() {
+    if(confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('userRole');
+        window.location.href = "index.html";
+    }
+}
+
+// Toggle the menu open/close
+function toggleAuthDropdown(event) {
+    event.stopPropagation(); // Stop the click from closing the menu immediately
+    const dropdown = document.getElementById('authDropdown');
+    if (dropdown) {
+        dropdown.classList.toggle('show');
+    }
+}
+
+// Close the menu if the user clicks anywhere else on the screen
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('authDropdown');
+    const authBtn = document.querySelector('.auth-btn');
+    
+    // If the click is NOT inside the dropdown and NOT on the button
+    if (dropdown && authBtn && !dropdown.contains(event.target) && !authBtn.contains(event.target)) {
+        dropdown.classList.remove('show');
+    }
+});

@@ -53,7 +53,7 @@ body {
     margin-top: 0;
 }
 
-/* The Flex Container - THIS DOES THE SPLIT */
+/* The Flex Container */
 .nav-container {
     display: flex;
     justify-content: space-between; /* Pushes Left and Right apart */
@@ -134,6 +134,7 @@ body {
     margin: 0;
     padding: 0;
     gap: 15px; /* Space between menu items */
+    align-items: center;
 }
 
 .nav-links a {
@@ -193,6 +194,7 @@ body {
 
     .nav-links.active {
         max-height: 800px; /* Expand menu */
+        overflow-y: auto;
     }
 
     .nav-links li {
@@ -420,7 +422,6 @@ footer {
    ========================================= */
 
 /* The Full Screen Overlay */
-/* The Full Screen Overlay */
 .lang-modal {
     position: fixed;
     top: 0; 
@@ -560,4 +561,142 @@ body.tamil-mode .lang-si {
         width: 90%;
     }
     .map-actions { flex-direction: column; align-items: center; }
+}
+
+/* ===================================================================
+   9. AUTH MENU (Sign In / Profile) - CLICK ONLY VERSION
+   =================================================================== */
+
+/* CRITICAL: Allows dropdowns to spill out of the nav bar on Desktop */
+@media (min-width: 901px) {
+    .nav-links {
+        overflow: visible !important; 
+    }
+}
+
+/* Container */
+.auth-dropdown-container {
+    position: relative;
+    display: inline-block;
+    z-index: 10000; 
+    cursor: pointer;
+}
+
+/* The Button (Styled <a> tag) */
+.auth-btn {
+    display: flex; /* Ensures Flex layout for text and arrow */
+    align-items: center;
+    justify-content: space-between;
+    
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white !important; /* Force text white */
+    text-decoration: none !important; /* Remove link underline */
+    
+    padding: 6px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    min-width: 140px;
+    transition: all 0.3s ease;
+    
+    pointer-events: auto !important; /* Force clickability */
+}
+
+.auth-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #00d2ff;
+}
+
+/* Two-row Text Helper */
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    text-align: left;
+}
+
+.profile-info small {
+    font-size: 10px;
+    opacity: 0.7;
+    text-transform: uppercase;
+}
+
+.profile-info strong {
+    font-size: 13px;
+    color: #ffcc00; /* Gold color */
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+/* The Dropdown Menu (Hidden by default) */
+.auth-dropdown-menu {
+    display: none; 
+    position: absolute;
+    right: 0;
+    top: 100%; /* Push exactly below button */
+    
+    background-color: #fff;
+    min-width: 200px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    
+    z-index: 20000; /* Extremely High Z-Index */
+    border-radius: 5px;
+    margin-top: 5px;
+    overflow: hidden;
+    
+    pointer-events: auto !important; /* Force interaction */
+}
+
+/* --- CLICK LOGIC (Replaces Hover) --- */
+.auth-dropdown-menu.show {
+    display: block !important;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dropdown Links */
+.auth-dropdown-menu a {
+    color: #333 !important;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+
+.auth-dropdown-menu a:hover {
+    background-color: #f1f1f1;
+    color: #004d66 !important;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 900px) {
+    .auth-dropdown-container { width: 100%; padding: 10px; }
+    .auth-btn { width: 100%; justify-content: center; border: none; }
+    
+    .auth-dropdown-menu {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        background-color: #003344;
+        display: none;
+    }
+    
+    /* Ensure the .show class works on mobile too */
+    .auth-dropdown-menu.show {
+        display: block !important;
+    }
+    
+    .auth-dropdown-menu a {
+        color: #ccc !important;
+        background: transparent;
+        padding-left: 30px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
 }
