@@ -77,17 +77,23 @@
 
                 if (response.ok) {
                     // SUCCESS! 
-                    // Save the "Token" (The VIP pass) to the browser
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
 
+                    // --- ADD THIS LINE ---
+                    localStorage.setItem('userRole', 'victim'); 
+                    // (Use 'contributor', 'distributor', or 'admin' for the other login pages)
+                    // ---------------------
+
                     showAlert(`Welcome back, ${data.user.name}!`, 'success');
                     
-                    // 3. REDIRECT TO HOME PAGE (The Fix)
                     setTimeout(() => {
+                            // Redirect to their dashboard immediately, OR index.html
+                            // Since you said "redirect to home page", we go to index.
+                            // The index page will now show "Signed in as Victim".
                             window.location.href = 'index.html'; 
-                            }, 1500); // Wait 1.5 seconds so they can read the message
-
+                    }, 1500);
+                }
                     //after login victim also going to same homepage
 
                 } else {
