@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken'); // Tool to keep users logged in
 
 // Import the 3 Models
 const Victim = require('../models/Victim');
-const Supplier = require('../models/supplier');
-const Admin = require('../models/admin');
+const Supplier = require('../models/Supplier');
+const Admin = require('../models/Admin');
 
 // =======================
 // 1. VICTIM ROUTES

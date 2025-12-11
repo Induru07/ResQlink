@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }).addTo(map);
 
     // --- 3. DEFINE COLORED ICONS ---
-    
+
     // Red Icon (For Victims)
     var redIcon = new L.Icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',

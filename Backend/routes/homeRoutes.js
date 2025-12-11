@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Victim = require('../models/Victim');
-const Supplier = require('../models/supplier');
-const Admin = require('../models/admin');
+const Supplier = require('../models/Supplier');
+const Admin = require('../models/Admin');
 
 // @route   GET /api/home/stats
 // @desc    Public data for the Home Page
