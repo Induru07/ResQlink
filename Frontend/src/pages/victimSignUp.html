@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Victim Portal - Sign Up</title>
+    <link rel="stylesheet" href="../../styles/victim-auth.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Emergency Victim Portal</h1>
+            <p>Create your account</p>
+        </div>
+        
+        <div class="content">
+            <div class="alert" id="signup-alert"></div>
+            
+            <form id="registration-form">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Province</label>
+                    <select id="province" required>
+                        <option value="">Select Province</option>
+                            <option value="Western">Western Province</option>
+                            <option value="Central">Central Province</option>
+                            <option value="Southern">Southern Province</option>
+                            <option value="Northern">Northern Province</option>
+                            <option value="Eastern">Eastern Province</option>
+                            <option value="North Western">North Western Province</option>
+                            <option value="North Central">North Central Province</option>
+                            <option value="Uva">Uva Province</option>
+                            <option value="Sabaragamuwa">Sabaragamuwa Province</option>
+                        </select>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>District</label>
+                    <select id="district" required>
+                        <option value="">Select District</option>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Incident Type</label>
+                    <select id="incident">
+                        <option value="Flood">Flood</option>
+                        <option value="Landslide">Landslide</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirm-password" required>
+                </div>
+                
+                <button type="submit" class="btn">Register Account</button>
+            </form>
+            <p style="text-align:center; margin-top:15px;"><a href="victimSignIn.html">Back to Login</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Simple District Logic for Demo
+        const districtsData = {
+            'Western': ['Colombo', 'Gampaha', 'Kalutara'],
+            'Central': ['Kandy', 'Matale', 'Nuwara Eliya'],
+            'Southern': ['Galle', 'Matara', 'Hambantota'],
+            'Northern': ['Jaffna', 'Kilinochchi', 'Mannar', 'Mullaitivu', 'Vavuniya'],
+            'Eastern': ['Trincomalee', 'Batticaloa', 'Ampara'],
+            'North Western': ['Kurunegala', 'Puttalam'],
+            'North Central': ['Anuradhapura', 'Polonnaruwa'],
+            'Uva': ['Badulla', 'Monaragala'],
+            'Sabaragamuwa': ['Ratnapura', 'Kegalle']
+        };
+        
+        const provinceSelect = document.getElementById('province');
+        const districtSelect = document.getElementById('district');
+        const signupAlert = document.getElementById('signup-alert');
+
+        provinceSelect.addEventListener('change', function() {
+            districtSelect.innerHTML = '<option value="">Select District</option>';
+            if (this.value && districtsData[this.value]) {
+                districtsData[this.value].forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.textContent = d;
+                    districtSelect.appendChild(opt);
+                });
+            }
+        });
+
+        function showAlert(msg, type) {
+            signupAlert.textContent = msg;
+            signupAlert.className = `alert ${type}`;
+            signupAlert.style.display = 'block';
+        }
+
+        // --- THE CONNECT TO BACKEND PART ---
+        document.getElementById('registration-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm-password').value;
+
+            if(password !== confirm) {
+                return showAlert("Passwords do not match", "error");
+            }
+
+            const userData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: password,
+                phone: document.getElementById('phone').value,
+                district: districtSelect.value,
+                // Extra fields for your specific schema
+                province: provinceSelect.value,
+                incident: document.getElementById('incident').value
+            };
+
+            try {
+                // Sending data to your Node.js Server
+                const res = await fetch('http://localhost:5000/api/auth/victim/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                const data = await res.json();
+
+                if(res.ok) {
+                    showAlert("Registration Successful! Redirecting...", "success");
+                    setTimeout(() => window.location.href = 'victimSignIn.html', 1500);
+                } else {
+                    showAlert(data.msg || "Error registering", "error");
+                }
+            } catch (err) {
+                console.error(err);
+                showAlert("Cannot connect to Backend Server. Is it running?", "error");
+            }
+        });
+    </script>
+</body>
+</html>
