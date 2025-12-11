@@ -35,22 +35,23 @@ document.addEventListener('DOMContentLoaded', async function() {
         const response = await fetch('http://localhost:5000/api/map/data');
         const data = await response.json();
 
-        // Check if we got victims back
         if (data.victims && data.victims.length > 0) {
-            
-            // Loop through every victim and add a marker
             data.victims.forEach(v => {
-                // Create the marker at the victim's lat/lng
+                const phoneLine = v.phone ? `<a href="tel:${v.phone}" class="map-call">📞 Call: ${v.phone}</a>` : '';
+                const emailLine = v.email ? `<div class="map-line">✉️ ${v.email}</div>` : '';
+                const addressLine = v.address ? `<div class="map-line">📍 ${v.address}</div>` : '';
+
                 L.marker([v.lat, v.lng], {icon: redIcon})
                     .addTo(map)
                     .bindPopup(`
-                        <div style="font-family: Arial, sans-serif; text-align: center;">
-                            <h4 style="color: #dc3545; margin: 0 0 5px 0;">SOS REQUEST</h4>
-                            <b style="font-size: 14px;">${v.name}</b><br>
-                            <span style="font-size: 12px; color: #666;">Needs: ${v.needs}</span><br>
-                            <a href="tel:${v.phone}" style="display: inline-block; margin-top: 5px; padding: 5px 10px; background: #28a745; color: white; text-decoration: none; border-radius: 3px;">
-                                📞 Call: ${v.phone}
-                            </a>
+                        <div class="map-popup">
+                            <div class="map-title">SOS REQUEST</div>
+                            <div class="map-name">${v.name || 'Unknown'}</div>
+                            <div class="map-line">ID: ${v.victimId || 'N/A'}</div>
+                            ${addressLine}
+                            ${emailLine}
+                            <div class="map-line">Needs: ${v.needs || 'Help Needed'}</div>
+                            ${phoneLine}
                         </div>
                     `);
             });

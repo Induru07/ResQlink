@@ -1,17 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const Victim = require('../models/Victim');
+const VictimAuth = require('../models/VictimAuth');
+const VictimProfile = require('../models/VictimProfile');
+const VictimNeeds = require('../models/VictimNeeds');
 
 // @route   GET /api/map/data
-// @desc    Send all victim locations to the map
+// @desc    Send victim locations + contact + needs to the map
 router.get('/data', async (req, res) => {
     try {
-        // 1. Get all victims from MongoDB
-        const victims = await Victim.find().select('name needs district phone');
+        // 1. Get auth, profiles, and needs
+        const authList = await VictimAuth.find();
+        const profiles = await VictimProfile.find();
+        const needsList = await VictimNeeds.find();
 
-        // 2. Format them for the Map (Leaflet.js)
-        // NOTE: Since your Sign Up form doesn't capture GPS (Lat/Lng) yet,
-        // we will use "Approximate" locations for the districts just to show it works.
+        // 2. Build quick lookups
+        const profileByVictimId = new Map(profiles.map(p => [p.victimId, p]));
+        const needsByVictimId = new Map(needsList.map(n => [n.victimId, n]));
+
+        // 3. Format them for the Map (Leaflet.js)
         const districtCoords = {
             'Colombo': { lat: 6.9271, lng: 79.8612 },
             'Gampaha': { lat: 7.0840, lng: 79.9939 },
@@ -41,20 +47,40 @@ router.get('/data', async (req, res) => {
             'Western': { lat: 6.9271, lng: 79.8612 }//fallback bro
         };
 
-        const mapData = victims.map(v => {
-            const coords = districtCoords[v.district] || { lat: 7.8731, lng: 80.7718 }; // Default to center if unknown
-            
+        const mapData = authList.map(auth => {
+            const profile = profileByVictimId.get(auth.victimId) || {};
+            const needsDoc = needsByVictimId.get(auth.victimId);
+
+            // Prefer precise coords from profile; fallback to district centroid
+            const districtKey = auth.district || profile.district;
+            const baseCoords = profile.location && profile.location.latitude && profile.location.longitude
+                ? { lat: profile.location.latitude, lng: profile.location.longitude }
+                : (districtCoords[districtKey] || { lat: 7.8731, lng: 80.7718 });
+
             // Add a small random offset so dots don't stack exactly on top of each other
             const offsetLat = (Math.random() - 0.5) * 0.05;
             const offsetLng = (Math.random() - 0.5) * 0.05;
 
+            // Build needs summary from items booleans
+            let needsText = 'Help Needed';
+            if (needsDoc && needsDoc.items) {
+                const active = Object.entries(needsDoc.items)
+                    .filter(([, val]) => !!val)
+                    .map(([key]) => key)
+                    .map(k => k.replace(/([A-Z])/g, ' $1'))
+                    .map(k => k.charAt(0).toUpperCase() + k.slice(1));
+                if (active.length) needsText = active.join(', ');
+            }
+
             return {
-                lat: coords.lat + offsetLat,
-                lng: coords.lng + offsetLng,
-                people: v.familyCount || 1, // Default to 1 if missing
-                needs: Object.keys(v.needs || {}).filter(k => v.needs[k]).join(', ') || "Help Needed",
-                name: v.name,
-                phone: v.phone
+                lat: baseCoords.lat + offsetLat,
+                lng: baseCoords.lng + offsetLng,
+                name: auth.fullName,
+                victimId: auth.victimId,
+                phone: profile.phone,
+                email: auth.email,
+                address: profile.address,
+                needs: needsText
             };
         });
 
