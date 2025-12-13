@@ -1,6 +1,7 @@
 /* --- datamap.js (Connected to Backend) --- */
 
 document.addEventListener('DOMContentLoaded', async function() {
+    const API = window.API_BASE || 'http://localhost:5000';
     
     // 1. Initialize Map (Centered on Sri Lanka)
     // Coordinates: [Latitude, Longitude], Zoom Level
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     try {
         // This URL must match your running Node.js server
-        const response = await fetch('http://localhost:5000/api/map/data');
+        const response = await fetch(`${API}/api/map/data`);
         const data = await response.json();
 
         if (data.victims && data.victims.length > 0) {

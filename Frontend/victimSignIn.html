@@ -48,6 +48,7 @@
         </div>
     </div>
 
+    <script src="js/config.js"></script>
     <script>
         const loginForm = document.getElementById('login-form');
         const loginAlert = document.getElementById('login-alert');
@@ -67,7 +68,8 @@
             
             try {
                 // Sending credentials to your Node.js Server
-                const response = await fetch('http://localhost:5000/api/auth/victim/login', {
+                const API = window.API_BASE || 'http://localhost:5000';
+                const response = await fetch(`${API}/api/auth/victim/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })

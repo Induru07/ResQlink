@@ -17,7 +17,8 @@ connectDB();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+const allowedOrigins = [process.env.CLIENT_URL, process.env.SIGNUP_URL].filter(Boolean);
+app.use(cors({ origin: allowedOrigins.length ? allowedOrigins : true, credentials: true }));
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));

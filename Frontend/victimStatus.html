@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Status</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>.card{border:1px solid #ddd;border-radius:8px;padding:12px;margin:8px 0}</style>
+</head>
+<body>
+  <nav class="main-nav">
+    <div class="nav-container">
+      <div class="nav-right">
+        <ul class="nav-links" id="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="datamap.html">Data Map</a></li>
+          <li><a href="about.html">About</a></li>
+          <li class="auth-dropdown-container" id="auth-section"></li>
+          <li><a href="#" onclick="localStorage.removeItem('siteLang'); location.reload();">🌐 Lang</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="max-width:800px;margin:20px auto">
+    <h2>My Status</h2>
+    <div id="status"></div>
+  </main>
+
+  <div id="dynamic-footer"></div>
+  <script src="js/script.js"></script>
+  <script src="js/config.js"></script>
+  <script>
+    async function loadStatus(){
+      const victimId = localStorage.getItem('victimId');
+      if(!victimId){
+        document.getElementById('status').innerHTML = '<p>No victimId found. Please sign in.</p>';
+        return;
+      }
+      try{
+        const API = window.API_BASE || 'http://localhost:5000';
+        const res = await fetch(`${API}/api/auth/victim/profile/${victimId}`);
+        if(!res.ok){
+          const data = await res.json();
+          document.getElementById('status').innerHTML = `<p>${data.msg||'Profile not found'}</p>`;
+          return;
+        }
+        const { auth, profile, needs } = await res.json();
+        const items = (needs&&needs.items)||{};
+        const active = Object.entries(items).filter(([,v])=>!!v).map(([k])=>k);
+        document.getElementById('status').innerHTML = `
+          <div class='card'><strong>Name:</strong> ${auth.fullName} (${auth.victimId})<br/><strong>Email:</strong> ${auth.email}<br/><strong>Phone:</strong> ${(profile&&profile.phone)||''}</div>
+          <div class='card'><strong>Address:</strong> ${(profile&&profile.address)||''}</div>
+          <div class='card'><strong>Needs:</strong> ${active.length?active.join(', '):'None'}</div>
+        `;
+      }catch(err){
+        document.getElementById('status').innerHTML = '<p>Server error. Is backend running?</p>';
+      }
+    }
+    loadStatus();
+  </script>
+</body>
+</html>

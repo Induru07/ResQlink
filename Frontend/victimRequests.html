@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Requests</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .req-card{border:1px solid #ddd;border-radius:8px;padding:12px;margin:8px 0}
+    .muted{color:#666;font-size:0.9em}
+  </style>
+</head>
+<body>
+  <nav class="main-nav">
+    <div class="nav-container">
+      <div class="nav-right">
+        <ul class="nav-links" id="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="datamap.html">Data Map</a></li>
+          <li><a href="about.html">About</a></li>
+          <li class="auth-dropdown-container" id="auth-section"></li>
+          <li><a href="#" onclick="localStorage.removeItem('siteLang'); location.reload();">🌐 Lang</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="max-width:800px;margin:20px auto">
+    <h2>My Requests</h2>
+    <div id="requests"></div>
+  </main>
+
+  <div id="dynamic-footer"></div>
+  <script src="js/script.js"></script>
+  <script src="js/config.js"></script>
+  <script>
+    async function loadRequests(){
+      const victimId = localStorage.getItem('victimId');
+      if(!victimId){
+        document.getElementById('requests').innerHTML = '<p class="muted">No victimId found. Please sign in.</p>';
+        return;
+      }
+      try{
+        const API = window.API_BASE || 'http://localhost:5000';
+        const res = await fetch(`${API}/api/needs/${victimId}`);
+        if(!res.ok){
+          const data = await res.json();
+          document.getElementById('requests').innerHTML = `<p class="muted">${data.msg||'No requests created yet.'}</p>`;
+          return;
+        }
+        const needs = await res.json();
+        const items = needs.items || {};
+        const active = Object.entries(items).filter(([,v])=>!!v).map(([k])=>k);
+        document.getElementById('requests').innerHTML = `
+          <div class='req-card'>
+            <div><strong>Status:</strong> ${needs.status}</div>
+            <div><strong>Requested:</strong> ${active.length?active.join(', '):'None'}</div>
+            <div class='muted'>Requested on: ${new Date(needs.requestDate).toLocaleString()}</div>
+            ${needs.description?`<div class='muted'>Note: ${needs.description}</div>`:''}
+          </div>
+        `;
+      }catch(err){
+        document.getElementById('requests').innerHTML = '<p class="muted">Server error. Is backend running?</p>';
+      }
+    }
+    loadRequests();
+  </script>
+</body>
+</html>
