@@ -5,5 +5,3 @@
   var isProd = /resqlink\.org$|resqlink\.com$/i.test(host) || /onrender\.com$/i.test(host);
   window.API_BASE = isProd ? renderApi : 'http://localhost:5000';
 })();
-  window.API_BASE = isProd ? renderApi : 'http://localhost:5000';
-})();
