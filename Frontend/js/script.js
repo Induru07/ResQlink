@@ -1,3 +1,5 @@
+const API_URL = 'https://resqlink-ovm6.onrender.com'
+
 document.addEventListener('DOMContentLoaded', function() {
     
     // =========================================================
