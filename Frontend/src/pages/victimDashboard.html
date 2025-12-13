@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Needs - Flood Relief</title>
+    <title>My Dashboard - Flood Relief</title>
     <link rel="stylesheet" href="../styles/style.css">
     <style>
         .dashboard-container { max-width: 900px; margin: 80px auto 20px; padding: 0 20px; }
@@ -30,6 +30,17 @@
         .status-pending { background: #6c757d; color: white; }
         .status-in-progress { background: #007bff; color: white; }
         .status-resolved { background: #28a745; color: white; }
+        .dashboard-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ddd; flex-wrap: wrap; }
+        .tab-btn { padding: 12px 24px; background: #f8f9fa; border: none; cursor: pointer; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.3s; }
+        .tab-btn.active { background: #667eea; color: white; border-bottom-color: #667eea; }
+        .tab-btn:hover { background: #e9ecef; }
+        .tab-btn.active:hover { background: #667eea; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .request-item, .status-item { background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 12px; border-left: 4px solid #667eea; }
+        .request-item h4, .status-item h4 { margin-top: 0; color: #333; }
+        .request-item p, .status-item p { margin: 8px 0; color: #666; font-size: 14px; }
+        .empty-state { text-align: center; padding: 40px 20px; color: #999; }
     </style>
 </head>
 <body>
@@ -37,9 +48,8 @@
         <div class="nav-container">
             <div class="nav-right">
                 <ul class="nav-links" id="nav-links">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a href="../../index.html">Home</a></li>
                     <li><a href="datamap.html">Data Map</a></li>
-                    <li><a href="victimStatus.html">My Status</a></li>
                     <li class="auth-dropdown-container" id="auth-section"></li>
                     <li><a href="#" onclick="localStorage.removeItem('siteLang'); location.reload();">🌐 Lang</a></li>
                 </ul>
@@ -51,89 +61,110 @@
         <button class="emergency-btn" onclick="triggerEmergency()">🚨 EMERGENCY SOS</button>
 
         <div class="section-card">
-            <h2>My Relief Needs <span id="current-status"></span></h2>
-            <div id="alert" class="alert"></div>
-            
-            <form id="needs-form">
-                <h3 style="margin-top: 0;">Critical Items</h3>
-                <div class="checkbox-grid">
-                    <div class="checkbox-item critical">
-                        <input type="checkbox" id="shelter" name="shelter">
-                        <label for="shelter">Shelter / Temporary Housing</label>
-                    </div>
-                    <div class="checkbox-item critical">
-                        <input type="checkbox" id="medicine" name="medicine">
-                        <label for="medicine">Medicine</label>
-                    </div>
-                    <div class="checkbox-item critical">
-                        <input type="checkbox" id="infantCare" name="infantCare">
-                        <label for="infantCare">Infant Care (milk, diapers)</label>
-                    </div>
-                    <div class="checkbox-item critical">
-                        <input type="checkbox" id="medicalSupport" name="medicalSupport">
-                        <label for="medicalSupport">Medical Support (wheelchair, oxygen)</label>
-                    </div>
-                </div>
+            <div class="dashboard-tabs">
+                <button class="tab-btn active" data-tab="needs">My Needs</button>
+                <button class="tab-btn" data-tab="requests">My Requests</button>
+                <button class="tab-btn" data-tab="status">Status Updates</button>
+            </div>
 
-                <h3>High Priority Items</h3>
-                <div class="checkbox-grid">
-                    <div class="checkbox-item high">
-                        <input type="checkbox" id="dryRations" name="dryRations">
-                        <label for="dryRations">Dry Rations</label>
+            <!-- NEEDS TAB -->
+            <div id="needs" class="tab-content active">
+                <h2>My Relief Needs <span id="current-status"></span></h2>
+                <div id="alert" class="alert"></div>
+                
+                <form id="needs-form">
+                    <h3 style="margin-top: 0;">Critical Items</h3>
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item critical">
+                            <input type="checkbox" id="shelter" name="shelter">
+                            <label for="shelter">Shelter / Temporary Housing</label>
+                        </div>
+                        <div class="checkbox-item critical">
+                            <input type="checkbox" id="medicine" name="medicine">
+                            <label for="medicine">Medicine</label>
+                        </div>
+                        <div class="checkbox-item critical">
+                            <input type="checkbox" id="infantCare" name="infantCare">
+                            <label for="infantCare">Infant Care (milk, diapers)</label>
+                        </div>
+                        <div class="checkbox-item critical">
+                            <input type="checkbox" id="medicalSupport" name="medicalSupport">
+                            <label for="medicalSupport">Medical Support (wheelchair, oxygen)</label>
+                        </div>
                     </div>
-                    <div class="checkbox-item high">
-                        <input type="checkbox" id="cookedFood" name="cookedFood">
-                        <label for="cookedFood">Cooked Food</label>
-                    </div>
-                    <div class="checkbox-item high">
-                        <input type="checkbox" id="water" name="water">
-                        <label for="water">Water</label>
-                    </div>
-                </div>
 
-                <h3>Moderate Priority Items</h3>
-                <div class="checkbox-grid">
-                    <div class="checkbox-item moderate">
-                        <input type="checkbox" id="clothes" name="clothes">
-                        <label for="clothes">Clothes</label>
+                    <h3>High Priority Items</h3>
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item high">
+                            <input type="checkbox" id="dryRations" name="dryRations">
+                            <label for="dryRations">Dry Rations</label>
+                        </div>
+                        <div class="checkbox-item high">
+                            <input type="checkbox" id="cookedFood" name="cookedFood">
+                            <label for="cookedFood">Cooked Food</label>
+                        </div>
+                        <div class="checkbox-item high">
+                            <input type="checkbox" id="water" name="water">
+                            <label for="water">Water</label>
+                        </div>
                     </div>
-                    <div class="checkbox-item moderate">
-                        <input type="checkbox" id="sanitaryItems" name="sanitaryItems">
-                        <label for="sanitaryItems">Sanitary Items</label>
-                    </div>
-                </div>
 
-                <h3 style="margin-top: 20px;">Special Conditions</h3>
-                <div class="checkbox-grid">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="hasDisability" name="hasDisability">
-                        <label for="hasDisability">Has Disability</label>
+                    <h3>Moderate Priority Items</h3>
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item moderate">
+                            <input type="checkbox" id="clothes" name="clothes">
+                            <label for="clothes">Clothes</label>
+                        </div>
+                        <div class="checkbox-item moderate">
+                            <input type="checkbox" id="sanitaryItems" name="sanitaryItems">
+                            <label for="sanitaryItems">Sanitary Items</label>
+                        </div>
                     </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="isPregnant" name="isPregnant">
-                        <label for="isPregnant">Pregnant</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="isElderly" name="isElderly">
-                        <label for="isElderly">Elderly (65+)</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="hasInfant" name="hasInfant">
-                        <label for="hasInfant">Has Infant (0-2 years)</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="hasChronicIllness" name="hasChronicIllness">
-                        <label for="hasChronicIllness">Chronic Illness</label>
-                    </div>
-                </div>
 
-                <div class="form-group" style="margin-top: 20px;">
-                    <label>Additional Details (medicine names, clothing sizes, etc.)</label>
-                    <textarea id="description" rows="4" placeholder="e.g., Need insulin, size L clothes, baby formula"></textarea>
-                </div>
+                    <h3 style="margin-top: 20px;">Special Conditions</h3>
+                    <div class="checkbox-grid">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="hasDisability" name="hasDisability">
+                            <label for="hasDisability">Has Disability</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="isPregnant" name="isPregnant">
+                            <label for="isPregnant">Pregnant</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="isElderly" name="isElderly">
+                            <label for="isElderly">Elderly (65+)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="hasInfant" name="hasInfant">
+                            <label for="hasInfant">Has Infant (0-2 years)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="hasChronicIllness" name="hasChronicIllness">
+                            <label for="hasChronicIllness">Chronic Illness</label>
+                        </div>
+                    </div>
 
-                <button type="submit" class="btn">Update My Needs</button>
-            </form>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label>Additional Details (medicine names, clothing sizes, etc.)</label>
+                        <textarea id="description" rows="4" placeholder="e.g., Need insulin, size L clothes, baby formula"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn">Update My Needs</button>
+                </form>
+            </div>
+
+            <!-- REQUESTS TAB -->
+            <div id="requests" class="tab-content">
+                <h2>My Relief Requests</h2>
+                <div id="requests-list" class="requests-container"></div>
+            </div>
+
+            <!-- STATUS TAB -->
+            <div id="status" class="tab-content">
+                <h2>Status Updates</h2>
+                <div id="status-list" class="status-container"></div>
+            </div>
         </div>
     </div>
 
@@ -149,10 +180,33 @@
             window.location.href = 'victimSignIn.html';
         }
 
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                
+                // Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                
+                // Show selected tab
+                document.getElementById(tabName).classList.add('active');
+                this.classList.add('active');
+
+                // Load data for requests and status when tabs are clicked
+                if (tabName === 'requests') {
+                    loadRequests();
+                } else if (tabName === 'status') {
+                    loadStatus();
+                }
+            });
+        });
+
         function showAlert(msg, type) {
             const alert = document.getElementById('alert');
             alert.textContent = msg;
             alert.className = `alert ${type}`;
+            alert.style.display = 'block';
             setTimeout(() => alert.style.display = 'none', 5000);
         }
 
@@ -184,6 +238,61 @@
                 }
             } catch (err) {
                 console.error('Error loading needs:', err);
+            }
+        }
+
+        // Load requests
+        async function loadRequests() {
+            try {
+                const res = await fetch(`${API}/api/requests/${victimId}`);
+                if (res.ok) {
+                    const requests = await res.json();
+                    const container = document.getElementById('requests-list');
+
+                    if (!requests || requests.length === 0) {
+                        container.innerHTML = '<div class="empty-state">No requests yet. Submit your needs to get started!</div>';
+                        return;
+                    }
+
+                    container.innerHTML = requests.map(req => `
+                        <div class="request-item">
+                            <h4>Request #${req.id}</h4>
+                            <p><strong>Items:</strong> ${Object.keys(req.items || {}).filter(k => req.items[k]).join(', ') || 'None'}</p>
+                            <p><strong>Status:</strong> <span class="status-badge status-${req.status}">${req.status?.toUpperCase()}</span></p>
+                            <p><strong>Submitted:</strong> ${new Date(req.createdAt).toLocaleDateString()}</p>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Error loading requests:', err);
+                document.getElementById('requests-list').innerHTML = '<div class="empty-state">Unable to load requests</div>';
+            }
+        }
+
+        // Load status updates
+        async function loadStatus() {
+            try {
+                const res = await fetch(`${API}/api/status/${victimId}`);
+                if (res.ok) {
+                    const updates = await res.json();
+                    const container = document.getElementById('status-list');
+
+                    if (!updates || updates.length === 0) {
+                        container.innerHTML = '<div class="empty-state">No status updates yet. Check back soon!</div>';
+                        return;
+                    }
+
+                    container.innerHTML = updates.map(update => `
+                        <div class="status-item">
+                            <h4>${update.title}</h4>
+                            <p>${update.message}</p>
+                            <p style="font-size: 12px; color: #999;"><strong>Updated:</strong> ${new Date(update.createdAt).toLocaleDateString()}</p>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Error loading status:', err);
+                document.getElementById('status-list').innerHTML = '<div class="empty-state">Unable to load status updates</div>';
             }
         }
 

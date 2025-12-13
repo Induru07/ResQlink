@@ -357,8 +357,9 @@ function applyRoleNavigation() {
     };
 
     if (role === 'victim') {
-        nav.insertBefore(makeItem('victimRequests.html', 'Requests'), document.getElementById('auth-section'));
-        nav.insertBefore(makeItem('victimStatus.html', 'My Status'), document.getElementById('auth-section'));
+        // Requests and Status features moved to victim dashboard
+        // nav.insertBefore(makeItem('victimRequests.html', 'Requests'), document.getElementById('auth-section'));
+        // nav.insertBefore(makeItem('victimStatus.html', 'My Status'), document.getElementById('auth-section'));
     } else if (role === 'contributor') {
         nav.insertBefore(makeItem('contributorLog.html', 'Contributor Log'), document.getElementById('auth-section'));
     }
