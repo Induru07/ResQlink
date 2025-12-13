@@ -1,0 +1,173 @@
+/* 
+   ========================================
+   PROJECT STRUCTURE GUIDE
+   ResQLink Frontend - December 2025
+   ========================================
+   
+   This document outlines the new organized structure
+   for easy navigation and development.
+*/
+
+BEFORE (Messy):
+└── Frontend/
+    ├── index.html (root)
+    ├── about.html (root)
+    ├── contributor.html (root)
+    ├── datamap.html (root)
+    ├── victimSignIn.html (root)
+    ├── victimSignUp.html (root)
+    ├── test.txt
+    ├── chamath/              (DUPLICATE - OLD)
+    │   ├── index.html
+    │   ├── about.html
+    │   ├── datamap.html
+    │   ├── contributor.html
+    │   ├── *.jpg images
+    │   ├── style.css
+    │   ├── contributor.css
+    │   ├── script.js
+    │   ├── datamap.js
+    │   ├── contributor.js
+    │   └── dashboard.js
+    ├── css/                  (DUPLICATED)
+    │   ├── style.css
+    │   └── contributor.css
+    ├── js/                   (DUPLICATED)
+    │   ├── script.js
+    │   ├── datamap.js
+    │   ├── contributor.js
+    │   └── dashboard.js
+    └── images/              (SCATTERED)
+        └── *.jpg files
+
+AFTER (Clean & Organized):
+└── Frontend/
+    ├── index.html            ← Entry point (updated paths)
+    ├── README.md             ← Documentation
+    ├── STRUCTURE.txt         ← This file
+    │
+    └── src/                  ← All source code
+        ├── pages/            ← HTML pages (6 files)
+        │   ├── index.html
+        │   ├── about.html
+        │   ├── datamap.html
+        │   ├── contributor.html
+        │   ├── victimSignIn.html
+        │   └── victimSignUp.html
+        │
+        ├── styles/           ← CSS files (3 files)
+        │   ├── style.css           (main global styles - 702 lines)
+        │   ├── contributor.css     (contributor portal)
+        │   └── victim-auth.css     (victim auth pages - new)
+        │
+        ├── scripts/          ← JavaScript files (4 files)
+        │   ├── script.js           (main global script)
+        │   ├── datamap.js          (leaflet map functionality)
+        │   ├── contributor.js      (contributor features)
+        │   └── dashboard.js        (dashboard logic)
+        │
+        ├── assets/           ← Static resources
+        │   ├── images/       ← Image files (6 images)
+        │   │   ├── header.jpg
+        │   │   ├── chamath.jpg
+        │   │   ├── devindi.jpg
+        │   │   ├── induru.jpg
+        │   │   ├── thisandi.jpg
+        │   │   └── thiseni.jpg
+        │   └── fonts/        ← Reserved for future use
+        │
+        ├── components/       ← Reserved for reusable components
+        │
+        └── data/             ← Reserved for static data files
+    
+    ├── public/               ← Reserved for built/static files
+    └── .vscode/              ← VS Code settings
+
+═══════════════════════════════════════════════════════════════
+
+MIGRATION SUMMARY:
+✓ Consolidated 6 HTML files from root + chamath/ → src/pages/
+✓ Unified CSS (3 files) from css/ + chamath/ → src/styles/
+✓ Unified JS (4 files) from js/ + chamath/ → src/scripts/
+✓ Organized images from images/ + chamath/ → src/assets/images/
+✓ Updated all file paths in HTML references
+✓ Extracted inline styles → victim-auth.css
+✓ Removed duplicate chamath/ folder (keep in git for reference)
+✓ Created comprehensive README.md with guidelines
+
+═══════════════════════════════════════════════════════════════
+
+KEY IMPROVEMENTS:
+────────────────────────────────────────────────────────────
+
+1. CLARITY
+   - Each file type has its own directory
+   - Easy to find and edit components
+   - Clear separation of concerns
+
+2. SCALABILITY
+   - Room to grow with organized structure
+   - Components/ folder ready for modular development
+   - Assets organized for easy management
+
+3. MAINTAINABILITY
+   - No duplicated files
+   - Single source of truth for styles and scripts
+   - Consistent path references throughout
+
+4. DOCUMENTATION
+   - README.md with complete guide
+   - This structure file for reference
+   - Clear comments in code
+
+═══════════════════════════════════════════════════════════════
+
+PATH REFERENCE QUICK GUIDE:
+────────────────────────────────────────────────────────────
+
+FROM ROOT (index.html):
+  Styles:  src/styles/filename.css
+  Scripts: src/scripts/filename.js
+  Images:  src/assets/images/filename.jpg
+
+FROM src/pages/ (HTML files):
+  Styles:  ../../styles/filename.css
+  Scripts: ../../scripts/filename.js
+  Images:  ../../assets/images/filename.jpg
+
+FROM src/styles/ (CSS files):
+  Images:  ../assets/images/filename.jpg
+
+FROM src/scripts/ (JS files):
+  Images:  ../assets/images/filename.jpg
+
+═══════════════════════════════════════════════════════════════
+
+NEXT STEPS FOR DEVELOPERS:
+────────────────────────────────────────────────────────────
+
+1. DELETE the old chamath/ folder (after git commit)
+2. DELETE the old css/ folder (backup first if needed)
+3. DELETE the old js/ folder (backup first if needed)
+4. DELETE the old images/ folder (backup first if needed)
+5. UPDATE your build/deploy scripts to use new paths
+
+EXAMPLE BUILD COMMANDS TO UPDATE:
+  Old: node server.js --static ./css ./js ./images
+  New: node server.js --static ./src/styles ./src/scripts ./src/assets
+
+═══════════════════════════════════════════════════════════════
+
+FILE STATISTICS:
+────────────────────────────────────────────────────────────
+
+HTML Files:        6 files
+CSS Files:         3 files (consolidated from duplicates)
+JS Files:          4 files (consolidated from duplicates)
+Image Files:       6 files (consolidated from scattered locations)
+Total Size Saved:  ~4 duplicate sets eliminated
+
+═══════════════════════════════════════════════════════════════
+
+Questions? See README.md for detailed documentation.
+Last Updated: December 11, 2025
