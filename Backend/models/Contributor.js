@@ -29,7 +29,13 @@ const ContributorSchema = new mongoose.Schema({
         required: true 
     },
     
-    // Type & Verification
+    // Role & Type
+    role: {
+        type: String,
+        enum: ['donor', 'collection-point-manager'],
+        required: true,
+        default: 'donor'
+    },
     contributorType: { 
         type: String, 
         enum: ['individual', 'organization', 'ngo', 'religious', 'corporate'],

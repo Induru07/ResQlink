@@ -20,9 +20,23 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // --- 3. DEFINE COLORED ICONS ---
 
-    // Red Icon (For Victims)
+    // Red Icon (Critical - shelter, medicine, disabilities)
     var redIcon = new L.Icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+    });
+
+    // Orange Icon (High - food, water)
+    var orangeIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+    });
+
+    // Yellow Icon (Moderate - clothing, hygiene)
+    var yellowIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
         iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
     });
@@ -42,23 +56,40 @@ document.addEventListener('DOMContentLoaded', async function() {
         const response = await fetch(`${API}/api/map/data`);
         const data = await response.json();
 
-        // Victim markers
+        // Victim markers with color coding
         if (data.victims && data.victims.length > 0) {
             data.victims.forEach(v => {
+                // Select icon based on urgency
+                let victimIcon = yellowIcon;
+                if (v.urgency === 'critical') victimIcon = redIcon;
+                else if (v.urgency === 'high') victimIcon = orangeIcon;
+
                 const phoneLine = v.phone ? `<a href="tel:${v.phone}" class="map-call">📞 Call: ${v.phone}</a>` : '';
                 const emailLine = v.email ? `<div class="map-line">✉️ ${v.email}</div>` : '';
                 const addressLine = v.address ? `<div class="map-line">📍 ${v.address}</div>` : '';
+                
+                // Urgency badge
+                const urgencyColor = v.urgency === 'critical' ? '#dc3545' : (v.urgency === 'high' ? '#ff8c00' : '#ffc107');
+                const urgencyBadge = `<span style="background:${urgencyColor}; color:white; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:bold;">${v.urgency?.toUpperCase()}</span>`;
+                
+                // Status badge
+                const statusColor = v.status === 'resolved' ? '#28a745' : (v.status === 'in-progress' ? '#007bff' : '#6c757d');
+                const statusBadge = `<span style="background:${statusColor}; color:white; padding:3px 8px; border-radius:10px; font-size:11px; margin-left:5px;">${v.status?.toUpperCase()}</span>`;
+                
+                const emergencyFlag = v.isEmergency ? '<div style="color:#dc3545; font-weight:bold; margin-top:5px;">🚨 EMERGENCY</div>' : '';
 
-                L.marker([v.lat, v.lng], {icon: redIcon})
+                L.marker([v.lat, v.lng], {icon: victimIcon})
                     .addTo(victimLayer)
                     .bindPopup(`
                         <div class="map-popup">
                             <div class="map-title">SOS REQUEST</div>
                             <div class="map-name">${v.name || 'Unknown'}</div>
                             <div class="map-line">ID: ${v.victimId || 'N/A'}</div>
+                            <div style="margin: 8px 0;">${urgencyBadge}${statusBadge}</div>
+                            ${emergencyFlag}
                             ${addressLine}
                             ${emailLine}
-                            <div class="map-line">Needs: ${v.needs || 'Help Needed'}</div>
+                            <div class="map-line"><strong>Needs:</strong> ${v.needs || 'Help Needed'}</div>
                             ${phoneLine}
                         </div>
                     `);

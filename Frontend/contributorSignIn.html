@@ -100,12 +100,20 @@
                 if (res.ok) {
                     // Store authentication data
                     localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
                     localStorage.setItem('userRole', 'contributor');
                     localStorage.setItem('contributorId', result.user.contributorId);
                     localStorage.setItem('contributorName', result.user.name);
+                    localStorage.setItem('contributorRole', result.user.contributorRole);
                     
                     showAlert('Login successful! Redirecting...', 'success');
-                    setTimeout(() => window.location.href = 'contributorLog.html', 1000);
+                    
+                    // Redirect based on contributor role
+                    const dashboardUrl = result.user.contributorRole === 'donor' 
+                        ? 'donorDashboard.html' 
+                        : 'contributorLog.html';
+                    
+                    setTimeout(() => window.location.href = dashboardUrl, 1000);
                 } else {
                     showAlert(result.msg || 'Login failed', 'error');
                 }

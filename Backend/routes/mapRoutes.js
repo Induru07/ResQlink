@@ -84,7 +84,10 @@ router.get('/data', async (req, res) => {
                 phone: profile.phone,
                 email: auth.email,
                 address: profile.address,
-                needs: needsText
+                needs: needsText,
+                urgency: needsDoc?.urgency || 'moderate',
+                status: needsDoc?.status || 'pending',
+                isEmergency: needsDoc?.isEmergency || false
             };
         });
 

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Victim Requests</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-container { max-width: 1200px; margin: 80px auto 20px; padding: 0 20px; }
+        .section-card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-btn { padding: 10px 20px; border: 2px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .filter-btn.active { background: #667eea; color: white; border-color: #667eea; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        table th { background: #f8f9fa; font-weight: 600; position: sticky; top: 0; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .urgency-critical { background: #dc3545; color: white; }
+        .urgency-high { background: #ff8c00; color: white; }
+        .urgency-moderate { background: #ffc107; color: #333; }
+        .status-pending { background: #6c757d; color: white; }
+        .status-in-progress { background: #007bff; color: white; }
+        .status-resolved { background: #28a745; color: white; }
+        .action-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; margin: 2px; }
+        .btn-progress { background: #007bff; color: white; }
+        .btn-resolved { background: #28a745; color: white; }
+        .btn-pending { background: #6c757d; color: white; }
+        .emergency-flag { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-right">
+                <ul class="nav-links" id="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="datamap.html">Data Map</a></li>
+                    <li><a href="#" id="logout-btn">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="section-card">
+            <h2>Victim Relief Requests Management</h2>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All Requests</button>
+                <button class="filter-btn" data-filter="critical">Critical</button>
+                <button class="filter-btn" data-filter="high">High Priority</button>
+                <button class="filter-btn" data-filter="moderate">Moderate</button>
+                <button class="filter-btn" data-filter="pending" style="border-color: #6c757d; color: #6c757d;">Pending</button>
+                <button class="filter-btn" data-filter="in-progress" style="border-color: #007bff; color: #007bff;">In Progress</button>
+                <button class="filter-btn" data-filter="resolved" style="border-color: #28a745; color: #28a745;">Resolved</button>
+            </div>
+
+            <div class="table-container">
+                <table id="requests-table">
+                    <thead>
+                        <tr>
+                            <th>Victim ID</th>
+                            <th>Urgency</th>
+                            <th>Status</th>
+                            <th>Emergency</th>
+                            <th>Items Needed</th>
+                            <th>Special Conditions</th>
+                            <th>Requested</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requests-body">
+                        <tr><td colspan="8" style="text-align:center;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        const API = window.API_BASE || 'http://localhost:5000';
+        let allRequests = [];
+        let currentFilter = 'all';
+
+        // Check admin session
+        function checkAdminSession() {
+            const adminSession = localStorage.getItem('adminSession');
+            if (!adminSession) {
+                window.location.href = 'adminLogin.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Logout function
+        document.getElementById('logout-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminSession');
+            window.location.href = 'adminLogin.html';
+        });
+
+        // Load all requests
+        async function loadRequests() {
+            try {
+                const res = await fetch(`${API}/api/needs`);
+                if (!res.ok) throw new Error('Failed to load');
+                
+                allRequests = await res.json();
+                renderRequests();
+            } catch (err) {
+                console.error('Error loading requests:', err);
+                document.getElementById('requests-body').innerHTML = '<tr><td colspan="8" style="text-align:center; color:#dc3545;">Failed to load requests</td></tr>';
+            }
+        }
+
+        // Render requests based on filter
+        function renderRequests() {
+            let filtered = allRequests;
+
+            if (currentFilter === 'critical' || currentFilter === 'high' || currentFilter === 'moderate') {
+                filtered = allRequests.filter(r => r.urgency === currentFilter);
+            } else if (currentFilter === 'pending' || currentFilter === 'in-progress' || currentFilter === 'resolved') {
+                filtered = allRequests.filter(r => r.status === currentFilter);
+            }
+
+            if (filtered.length === 0) {
+                document.getElementById('requests-body').innerHTML = '<tr><td colspan="8" style="text-align:center; color:#666;">No requests found</td></tr>';
+                return;
+            }
+
+            const rows = filtered.map(req => {
+                const items = Object.entries(req.items || {})
+                    .filter(([,v]) => v)
+                    .map(([k]) => k.replace(/([A-Z])/g, ' $1').trim())
+                    .join(', ') || 'None';
+
+                const conditions = Object.entries(req.specialConditions || {})
+                    .filter(([,v]) => v)
+                    .map(([k]) => k.replace(/([A-Z])/g, ' $1').trim())
+                    .join(', ') || 'None';
+
+                const emergency = req.isEmergency ? '<span class="emergency-flag">🚨 YES</span>' : 'No';
+
+                return `
+                    <tr>
+                        <td><strong>${req.victimId}</strong></td>
+                        <td><span class="badge urgency-${req.urgency}">${req.urgency?.toUpperCase()}</span></td>
+                        <td><span class="badge status-${req.status}">${req.status?.toUpperCase()}</span></td>
+                        <td>${emergency}</td>
+                        <td style="max-width: 200px;">${items}</td>
+                        <td style="max-width: 150px;">${conditions}</td>
+                        <td>${new Date(req.requestDate).toLocaleDateString()}</td>
+                        <td>
+                            <button class="action-btn btn-pending" onclick="updateStatus('${req.victimId}', 'pending')">Pending</button>
+                            <button class="action-btn btn-progress" onclick="updateStatus('${req.victimId}', 'in-progress')">In Progress</button>
+                            <button class="action-btn btn-resolved" onclick="updateStatus('${req.victimId}', 'resolved')">Resolved</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('requests-body').innerHTML = rows;
+        }
+
+        // Update status
+        async function updateStatus(victimId, newStatus) {
+            const adminName = prompt('Enter your name (admin/officer):');
+            if (!adminName) return;
+
+            const notes = prompt('Add response notes (optional):');
+
+            try {
+                const res = await fetch(`${API}/api/needs/${victimId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: newStatus,
+                        respondedBy: adminName,
+                        responseNotes: notes || ''
+                    })
+                });
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    alert(`Status updated to ${newStatus}`);
+                    loadRequests();
+                } else {
+                    alert(result.msg || 'Failed to update status');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Cannot connect to server');
+            }
+        }
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderRequests();
+            });
+        });
+
+        // Check session and load
+        if (checkAdminSession()) {
+            loadRequests();
+        }
+    </script>
+</body>
+</html>

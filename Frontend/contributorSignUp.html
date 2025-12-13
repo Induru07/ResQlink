@@ -52,6 +52,15 @@
             <div class="alert" id="alert"></div>
             
             <form id="registration-form">
+                <div class="form-group full">
+                    <label>I want to *</label>
+                    <select id="role" required>
+                        <option value="">Select your role</option>
+                        <option value="donor">Donate relief items (Donor)</option>
+                        <option value="collection-point-manager">Manage a collection point</option>
+                    </select>
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label>Name / Organization *</label>
@@ -146,6 +155,59 @@
                     </div>
                 </div>
 
+                <!-- Collection Point Details (for managers only) -->
+                <div id="collection-point-section" style="display: none;">
+                    <h3 style="margin: 20px 0 15px; color: #667eea;">📍 Collection Point Details</h3>
+                    <div class="form-group full">
+                        <label>Collection Point Name *</label>
+                        <input type="text" id="pointName" placeholder="e.g., Town Hall Relief Center">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>District *</label>
+                            <input type="text" id="pointDistrict" placeholder="District">
+                        </div>
+                        <div class="form-group">
+                            <label>Address *</label>
+                            <input type="text" id="pointAddress" placeholder="Street, City">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Latitude</label>
+                            <input type="number" id="pointLat" step="0.000001" placeholder="e.g., 7.8731">
+                        </div>
+                        <div class="form-group">
+                            <label>Longitude</label>
+                            <input type="number" id="pointLng" step="0.000001" placeholder="e.g., 80.7718">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Operating Hours *</label>
+                            <input type="text" id="pointHours" placeholder="e.g., Daily 9 AM - 6 PM">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Phone</label>
+                            <input type="tel" id="pointPhone" placeholder="+94 7x xxx xxxx">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Contact Email</label>
+                            <input type="email" id="pointEmail" placeholder="email@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Capacity Note</label>
+                            <input type="text" id="pointCapacity" placeholder="e.g., Can store 2 tons">
+                        </div>
+                    </div>
+                    <div class="form-group full">
+                        <label>Additional Notes</label>
+                        <textarea id="pointNotes" rows="2" placeholder="Any special instructions or details"></textarea>
+                    </div>
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label>Password *</label>
@@ -181,6 +243,29 @@
         };
 
         let serviceAreas = [];
+
+        // Role-based field visibility
+        document.getElementById('role').addEventListener('change', function() {
+            const role = this.value;
+            const cpSection = document.getElementById('collection-point-section');
+            const serviceAreaGroup = document.querySelector('.form-group.full:has(#service-areas)');
+            const vehicleCheckbox = document.getElementById('hasVehicle').parentElement.parentElement;
+            const storageCheckbox = document.getElementById('hasStorage').parentElement.parentElement;
+
+            if (role === 'collection-point-manager') {
+                cpSection.style.display = 'block';
+                // Hide donor-specific fields
+                if (serviceAreaGroup) serviceAreaGroup.style.display = 'none';
+                if (vehicleCheckbox) vehicleCheckbox.style.display = 'none';
+                if (storageCheckbox) storageCheckbox.style.display = 'none';
+            } else if (role === 'donor') {
+                cpSection.style.display = 'none';
+                // Show donor fields
+                if (serviceAreaGroup) serviceAreaGroup.style.display = 'block';
+                if (vehicleCheckbox) vehicleCheckbox.style.display = 'block';
+                if (storageCheckbox) storageCheckbox.style.display = 'block';
+            }
+        });
 
         document.getElementById('province-select').addEventListener('change', function() {
             const districtSelect = document.getElementById('district-select');
@@ -249,6 +334,11 @@
         document.getElementById('registration-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const role = document.getElementById('role').value;
+            if (!role) {
+                return showAlert('Please select your role', 'error');
+            }
+
             const password = document.getElementById('password').value;
             const confirm = document.getElementById('confirmPassword').value;
 
@@ -256,27 +346,58 @@
                 return showAlert('Passwords do not match', 'error');
             }
 
-            if (serviceAreas.length === 0) {
+            // Donors need service areas, managers need collection point details
+            if (role === 'donor' && serviceAreas.length === 0) {
                 return showAlert('Please add at least one service area', 'error');
+            }
+
+            if (role === 'collection-point-manager') {
+                const pointName = document.getElementById('pointName').value;
+                const pointDistrict = document.getElementById('pointDistrict').value;
+                const pointAddress = document.getElementById('pointAddress').value;
+                const pointHours = document.getElementById('pointHours').value;
+
+                if (!pointName || !pointDistrict || !pointAddress || !pointHours) {
+                    return showAlert('Please fill all required collection point fields', 'error');
+                }
             }
 
             const hasVehicle = document.getElementById('hasVehicle').checked;
             const hasStorage = document.getElementById('hasStorage').checked;
 
             const data = {
+                role: role,
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
                 password: password,
                 phone: document.getElementById('phone').value,
                 contributorType: document.getElementById('contributorType').value,
-                serviceAreas: serviceAreas,
-                hasVehicle: hasVehicle,
-                vehicleType: hasVehicle ? document.getElementById('vehicleType').value : null,
-                vehicleCapacity: hasVehicle ? document.getElementById('vehicleCapacity').value : null,
-                hasStorage: hasStorage,
-                storageAddress: hasStorage ? document.getElementById('storageAddress').value : null,
-                storageCapacity: hasStorage ? document.getElementById('storageCapacity').value : null
+                serviceAreas: role === 'donor' ? serviceAreas : [],
+                hasVehicle: role === 'donor' ? hasVehicle : false,
+                vehicleType: (role === 'donor' && hasVehicle) ? document.getElementById('vehicleType').value : null,
+                vehicleCapacity: (role === 'donor' && hasVehicle) ? document.getElementById('vehicleCapacity').value : null,
+                hasStorage: role === 'donor' ? hasStorage : false,
+                storageAddress: (role === 'donor' && hasStorage) ? document.getElementById('storageAddress').value : null,
+                storageCapacity: (role === 'donor' && hasStorage) ? document.getElementById('storageCapacity').value : null
             };
+
+            // Add collection point data for managers
+            if (role === 'collection-point-manager') {
+                data.collectionPoint = {
+                    name: document.getElementById('pointName').value,
+                    district: document.getElementById('pointDistrict').value,
+                    address: document.getElementById('pointAddress').value,
+                    coordinates: {
+                        latitude: parseFloat(document.getElementById('pointLat').value) || 0,
+                        longitude: parseFloat(document.getElementById('pointLng').value) || 0
+                    },
+                    hours: document.getElementById('pointHours').value,
+                    contactPhone: document.getElementById('pointPhone').value || data.phone,
+                    contactEmail: document.getElementById('pointEmail').value || data.email,
+                    capacityNote: document.getElementById('pointCapacity').value || '',
+                    notes: document.getElementById('pointNotes').value || ''
+                };
+            }
 
             try {
                 const API = window.API_BASE || 'http://localhost:5000';

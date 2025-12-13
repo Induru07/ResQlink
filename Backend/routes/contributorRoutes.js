@@ -54,6 +54,7 @@ const generateDistributionId = async () => {
 router.post('/register', async (req, res) => {
     try {
         const {
+            role,
             name,
             email,
             password,
@@ -67,10 +68,11 @@ router.post('/register', async (req, res) => {
             storageAddress,
             storageCapacity,
             availableDays,
-            availableHours
+            availableHours,
+            collectionPoint
         } = req.body;
 
-        if (!name || !email || !password || !phone) {
+        if (!name || !email || !password || !phone || !role) {
             return res.status(400).json({ msg: 'Missing required fields' });
         }
 
@@ -86,25 +88,47 @@ router.post('/register', async (req, res) => {
 
         const contributor = await Contributor.create({
             contributorId,
+            role,
             name,
             email,
             password: hashedPassword,
             phone,
             contributorType,
-            serviceAreas,
-            hasVehicle,
+            serviceAreas: serviceAreas || [],
+            hasVehicle: hasVehicle || false,
             vehicleType,
             vehicleCapacity,
-            hasStorage,
+            hasStorage: hasStorage || false,
             storageAddress,
             storageCapacity,
             availableDays,
             availableHours
         });
 
+        // If collection-point-manager, create the collection point
+        let collectionPointId = null;
+        if (role === 'collection-point-manager' && collectionPoint) {
+            collectionPointId = await generateCollectionPointId();
+            await CollectionPoint.create({
+                collectionPointId,
+                name: collectionPoint.name,
+                managedByContributorId: contributorId,
+                district: collectionPoint.district,
+                address: collectionPoint.address,
+                coordinates: collectionPoint.coordinates,
+                hours: collectionPoint.hours,
+                contactPhone: collectionPoint.contactPhone || phone,
+                contactEmail: collectionPoint.contactEmail || email,
+                capacityNote: collectionPoint.capacityNote || '',
+                notes: collectionPoint.notes || '',
+                isActive: true
+            });
+        }
+
         res.json({ 
             msg: 'Contributor registered successfully', 
             contributorId,
+            collectionPointId,
             id: contributor._id 
         });
     } catch (err) {
@@ -133,7 +157,7 @@ router.post('/login', async (req, res) => {
         await contributor.save();
 
         const token = jwt.sign(
-            { id: contributor._id, contributorId: contributor.contributorId, role: 'contributor' },
+            { id: contributor._id, contributorId: contributor.contributorId, contributorRole: contributor.role, role: 'contributor' },
             process.env.JWT_SECRET
         );
 
@@ -144,6 +168,7 @@ router.post('/login', async (req, res) => {
                 contributorId: contributor.contributorId,
                 name: contributor.name,
                 role: 'contributor',
+                contributorRole: contributor.role,
                 verificationStatus: contributor.verificationStatus
             }
         });
