@@ -7,7 +7,10 @@
     <style>
         /* Keeping your original styles */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        body { background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; padding-top: 80px; }
+        .compact-nav { position: fixed; top: 0; left: 0; right: 0; display: flex; gap: 12px; justify-content: center; align-items: center; padding: 12px 16px; background: #2a5298; color: #fff; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+        .compact-nav a { color: #f9fbff; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .compact-nav a:hover { text-decoration: underline; }
         .container { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; overflow: hidden; }
         .header { background: #2a5298; color: white; padding: 25px; text-align: center; }
         .content { padding: 30px; }
@@ -21,6 +24,12 @@
     </style>
 </head>
 <body>
+    <div class="compact-nav">
+        <a href="index.html">Home</a>
+        <a href="datamap.html">Data Map</a>
+        <a href="victimSignUp.html">Victim Sign Up</a>
+        <a href="contributorSignIn.html">Contributors</a>
+    </div>
     <div class="container">
         <div class="header">
             <h1>ResQlink Portal</h1>

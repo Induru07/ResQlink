@@ -25,6 +25,8 @@
   <main class="container" style="max-width:800px;margin:20px auto">
     <h2>My Status</h2>
     <div id="status"></div>
+    <h3 style="margin-top:20px">Incoming Handovers</h3>
+    <div id="notifications"></div>
   </main>
 
   <div id="dynamic-footer"></div>
@@ -58,6 +60,28 @@
       }
     }
     loadStatus();
+
+    async function loadNotifications(){
+      const victimId = localStorage.getItem('victimId');
+      if(!victimId) return;
+      try{
+        const API = window.API_BASE || 'http://localhost:5000';
+        const res = await fetch(`${API}/api/contributor/notifications/victim/${victimId}`);
+        const data = await res.json();
+        const list = (data.notifications||[]).map(n=>`
+          <div class='card'>
+            <div><strong>${n.title||'Incoming items'}</strong> <span class='muted'>${new Date(n.createdAt).toLocaleString()}</span></div>
+            <div>${n.message||''}</div>
+            <div><strong>Items:</strong> ${(n.items||[]).map(i=>`${i.itemName} (${i.quantity}${i.unit})`).join(', ')||'N/A'}</div>
+            <div class='muted'>Contributor: ${n.contributorName||n.contributorId||''} ${n.contributorPhone?('| '+n.contributorPhone):''}</div>
+          </div>
+        `).join('') || '<p class="muted">No notifications</p>';
+        document.getElementById('notifications').innerHTML = list;
+      }catch(err){
+        document.getElementById('notifications').innerHTML = '<p class="muted">Failed to load notifications</p>';
+      }
+    }
+    loadNotifications();
   </script>
 </body>
 </html>

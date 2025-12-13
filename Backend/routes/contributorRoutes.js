@@ -8,6 +8,10 @@ const Contributor = require('../models/Contributor');
 const Collection = require('../models/Collection');
 const Inventory = require('../models/Inventory');
 const Distribution = require('../models/Distribution');
+const CollectionPoint = require('../models/CollectionPoint');
+const Notification = require('../models/Notification');
+const VictimAuth = require('../models/VictimAuth');
+const Contributor = require('../models/Contributor');
 
 // ========================================
 // HELPER FUNCTIONS
@@ -23,6 +27,12 @@ const generateContributorId = async () => {
 const generateCollectionId = async () => {
     const count = await Collection.countDocuments();
     return `COLL${(count + 1).toString().padStart(4, '0')}`;
+};
+
+// Generate unique collectionPointId
+const generateCollectionPointId = async () => {
+    const count = await CollectionPoint.countDocuments();
+    return `CP${(count + 1).toString().padStart(3, '0')}`;
 };
 
 // Generate unique inventoryId
@@ -207,7 +217,10 @@ router.post('/collection', async (req, res) => {
             donorEmail,
             isAnonymous,
             photos,
-            notes
+            notes,
+            handoverType,
+            handoverRef,
+            handoverEta
         } = req.body;
 
         if (!contributorId || !items || items.length === 0) {
@@ -215,6 +228,19 @@ router.post('/collection', async (req, res) => {
         }
 
         const collectionId = await generateCollectionId();
+
+        // Validate handover target
+        if (handoverType === 'collection-point') {
+            const exists = await CollectionPoint.findOne({ collectionPointId: handoverRef });
+            if (!exists) {
+                return res.status(400).json({ msg: 'Selected collection point not found' });
+            }
+        } else if (handoverType === 'victim') {
+            const exists = await VictimAuth.findOne({ victimId: handoverRef });
+            if (!exists) {
+                return res.status(400).json({ msg: 'Victim ID not found' });
+            }
+        }
 
         const collection = await Collection.create({
             collectionId,
@@ -227,7 +253,10 @@ router.post('/collection', async (req, res) => {
             donorEmail,
             isAnonymous,
             photos,
-            notes
+            notes,
+            handoverType,
+            handoverRef,
+            handoverEta
         });
 
         // Update contributor's total collections
@@ -244,6 +273,25 @@ router.post('/collection', async (req, res) => {
             await addToInventory(contributorId, item, collectionId);
         }
 
+        // Create notification for target
+        try {
+            const contributor = await Contributor.findOne({ contributorId }).select('name phone email contributorId');
+            await Notification.create({
+                targetType: handoverType,
+                targetRef: handoverRef,
+                title: handoverType === 'victim' ? 'Incoming Relief Items' : 'Incoming Drop-off',
+                message: `Contributor ${contributor?.name || contributorId} plans a handover.`,
+                items: (items || []).map(i => ({ itemName: i.itemName, quantity: i.quantity, unit: i.unit, category: i.category })),
+                contributorId,
+                contributorName: contributor?.name,
+                contributorPhone: contributor?.phone,
+                contributorEmail: contributor?.email,
+                status: 'pending'
+            });
+        } catch (notifyErr) {
+            console.error('Notification create error:', notifyErr.message);
+        }
+
         res.json({ 
             msg: 'Collection logged successfully', 
             collectionId,
@@ -251,6 +299,105 @@ router.post('/collection', async (req, res) => {
         });
     } catch (err) {
         console.error('Log collection error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ========================================
+// 2a. COLLECTION POINTS (Drop-off sites)
+// ========================================
+
+// Create a new collection point
+router.post('/collection-point', async (req, res) => {
+    try {
+        const {
+            name,
+            managedByContributorId,
+            contactPhone,
+            contactEmail,
+            address,
+            district,
+            coordinates,
+            hours,
+            capacityNote,
+            notes
+        } = req.body;
+
+        if (!name || !managedByContributorId || !district) {
+            return res.status(400).json({ msg: 'Missing required fields' });
+        }
+
+        const collectionPointId = await generateCollectionPointId();
+        const point = await CollectionPoint.create({
+            collectionPointId,
+            name,
+            managedByContributorId,
+            contactPhone,
+            contactEmail,
+            address,
+            district,
+            coordinates,
+            hours,
+            capacityNote,
+            notes
+        });
+
+        res.json({ msg: 'Collection point created', collectionPointId, point });
+    } catch (err) {
+        console.error('Create collection point error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// List collection points (optionally by district)
+router.get('/collection-points', async (req, res) => {
+    try {
+        const { district } = req.query;
+        const query = district ? { district } : {};
+        const points = await CollectionPoint.find(query).sort({ district: 1, name: 1 });
+        res.json({ points, count: points.length });
+    } catch (err) {
+        console.error('List collection points error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// List collection points managed by a contributor
+router.get('/collection-points/:contributorId', async (req, res) => {
+    try {
+        const { contributorId } = req.params;
+        const points = await CollectionPoint.find({ managedByContributorId: contributorId }).sort({ name: 1 });
+        res.json({ points, count: points.length });
+    } catch (err) {
+        console.error('List contributor points error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// ========================================
+// 2b. NOTIFICATIONS LISTING
+// ========================================
+
+// List notifications for a collection point
+router.get('/notifications/collection-point/:collectionPointId', async (req, res) => {
+    try {
+        const { collectionPointId } = req.params;
+        const notifs = await Notification.find({ targetType: 'collection-point', targetRef: collectionPointId }).sort({ createdAt: -1 });
+        res.json({ notifications: notifs, count: notifs.length });
+    } catch (err) {
+        console.error('List notifications (collection point) error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// List notifications for a victim
+router.get('/notifications/victim/:victimId', async (req, res) => {
+    try {
+        const { victimId } = req.params;
+        const notifs = await Notification.find({ targetType: 'victim', targetRef: victimId }).sort({ createdAt: -1 });
+        res.json({ notifications: notifs, count: notifs.length });
+    } catch (err) {
+        console.error('List notifications (victim) error:', err.message);
         res.status(500).json({ error: err.message });
     }
 });

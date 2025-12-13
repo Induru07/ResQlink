@@ -3,15 +3,19 @@ const router = express.Router();
 const VictimAuth = require('../models/VictimAuth');
 const VictimProfile = require('../models/VictimProfile');
 const VictimNeeds = require('../models/VictimNeeds');
+const CollectionPoint = require('../models/CollectionPoint');
 
 // @route   GET /api/map/data
 // @desc    Send victim locations + contact + needs to the map
 router.get('/data', async (req, res) => {
     try {
-        // 1. Get auth, profiles, and needs
-        const authList = await VictimAuth.find();
-        const profiles = await VictimProfile.find();
-        const needsList = await VictimNeeds.find();
+        // 1. Get auth, profiles, needs, and collections
+        const [authList, profiles, needsList, collectionPoints] = await Promise.all([
+            VictimAuth.find(),
+            VictimProfile.find(),
+            VictimNeeds.find(),
+            CollectionPoint.find({ isActive: true })
+        ]);
 
         // 2. Build quick lookups
         const profileByVictimId = new Map(profiles.map(p => [p.victimId, p]));
@@ -84,7 +88,32 @@ router.get('/data', async (req, res) => {
             };
         });
 
-        res.json({ victims: mapData });
+        // 5. Format collection points for map
+        const collectionsData = collectionPoints.map(cp => {
+            const districtKey = cp.district;
+            const baseCoords = (cp.coordinates && cp.coordinates.latitude && cp.coordinates.longitude)
+                ? { lat: cp.coordinates.latitude, lng: cp.coordinates.longitude }
+                : (districtCoords[districtKey] || { lat: 7.8731, lng: 80.7718 });
+
+            const offsetLat = (Math.random() - 0.5) * 0.02;
+            const offsetLng = (Math.random() - 0.5) * 0.02;
+
+            return {
+                lat: baseCoords.lat + offsetLat,
+                lng: baseCoords.lng + offsetLng,
+                collectionPointId: cp.collectionPointId,
+                name: cp.name,
+                district: cp.district,
+                address: cp.address,
+                contactPhone: cp.contactPhone,
+                contactEmail: cp.contactEmail,
+                hours: cp.hours,
+                capacityNote: cp.capacityNote,
+                notes: cp.notes
+            };
+        });
+
+        res.json({ victims: mapData, collections: collectionsData });
 
     } catch (err) {
         console.error(err);

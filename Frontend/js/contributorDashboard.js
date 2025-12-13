@@ -13,7 +13,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadStats();
     await loadInventory();
     await loadHistory();
+    await loadCollectionPoints();
     setCurrentDateTime();
+    setupHandoverUI();
+    setupCreateCollectionPoint();
 });
 
 // Load contributor stats
@@ -83,6 +86,150 @@ async function loadInventory() {
     }
 }
 
+// Load available collection points (optionally filtered by selected district)
+async function loadCollectionPoints() {
+    try {
+        const district = document.getElementById('collectionDistrict')?.value || '';
+        const url = district ? `${API}/api/contributor/collection-points?district=${encodeURIComponent(district)}` : `${API}/api/contributor/collection-points`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (res.ok) {
+            const select = document.getElementById('handoverCollectionPoint');
+            if (select) {
+                select.innerHTML = '<option value="">Select a collection point</option>' +
+                    (data.points || []).map(p => `<option value="${p.collectionPointId}">${p.name} (${p.district})</option>`).join('');
+            }
+        }
+    } catch (err) {
+        console.error('Error loading collection points:', err);
+    }
+}
+
+function setupHandoverUI() {
+    const typeSel = document.getElementById('handoverType');
+    const cpGroup = document.getElementById('handover-collection-point-group');
+    const vicGroup = document.getElementById('handover-victim-group');
+    const districtInput = document.getElementById('collectionDistrict');
+
+    typeSel?.addEventListener('change', () => {
+        const v = typeSel.value;
+        if (v === 'collection-point') {
+            cpGroup.style.display = '';
+            vicGroup.style.display = 'none';
+        } else {
+            cpGroup.style.display = 'none';
+            vicGroup.style.display = '';
+        }
+    });
+
+    districtInput?.addEventListener('change', () => {
+        loadCollectionPoints();
+    });
+
+    // Victim autocomplete
+    const vicInput = document.getElementById('handoverVictimId');
+    const attachAutocomplete = () => {
+        let timer;
+        vicInput?.addEventListener('input', () => {
+            clearTimeout(timer);
+            const query = vicInput.value.trim();
+            const district = document.getElementById('collectionDistrict')?.value || '';
+            if (!query && !district) return;
+            timer = setTimeout(async () => {
+                try {
+                    const url = new URL(`${API}/api/auth/victim/search`);
+                    if (query) url.searchParams.set('query', query);
+                    if (district) url.searchParams.set('district', district);
+                    const res = await fetch(url.toString());
+                    const data = await res.json();
+                    if (res.ok) {
+                        renderVictimSuggestions(data.victims || []);
+                    }
+                } catch (err) {
+                    console.error('Victim search error', err);
+                }
+            }, 250);
+        });
+    };
+    attachAutocomplete();
+}
+
+function renderVictimSuggestions(victims) {
+    let list = document.getElementById('victim-suggestions');
+    if (!list) {
+        list = document.createElement('div');
+        list.id = 'victim-suggestions';
+        list.style.cssText = 'background:#fff;border:1px solid #ddd;border-radius:6px;max-height:180px;overflow:auto;margin-top:6px;';
+        const parent = document.getElementById('handover-victim-group');
+        parent?.appendChild(list);
+    }
+    list.innerHTML = victims.map(v => `
+        <div class="suggestion-item" data-id="${v.victimId}" style="padding:8px;cursor:pointer;border-bottom:1px solid #eee;">
+            <strong>${v.victimId}</strong> - ${v.fullName || ''} ${v.email ? '('+v.email+')' : ''}
+        </div>
+    `).join('') || '<div style="padding:8px;color:#666;">No matches</div>';
+    list.querySelectorAll('.suggestion-item').forEach(el => {
+        el.addEventListener('click', () => {
+            const id = el.getAttribute('data-id');
+            const input = document.getElementById('handoverVictimId');
+            if (input) input.value = id;
+            list.innerHTML = '';
+        });
+    });
+}
+
+function setupCreateCollectionPoint() {
+    const btn = document.getElementById('createCollectionPointBtn');
+    btn?.addEventListener('click', async () => {
+        const name = document.getElementById('pointName').value.trim();
+        const address = document.getElementById('pointAddress').value.trim();
+        const hours = document.getElementById('pointHours').value.trim();
+        const contactPhone = document.getElementById('pointPhone').value.trim();
+        const contactEmail = document.getElementById('pointEmail').value.trim();
+        const capacityNote = document.getElementById('pointCapacity').value.trim();
+        const districtFallback = document.getElementById('collectionDistrict')?.value.trim() || '';
+        const district = (document.getElementById('pointDistrict').value.trim()) || districtFallback;
+
+        if (!name || !district) {
+            return showAlert('collection-alert', 'Please provide name and district for the collection point', 'error');
+        }
+
+        try {
+            const res = await fetch(`${API}/api/contributor/collection-point`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name,
+                    managedByContributorId: contributorId,
+                    contactPhone,
+                    contactEmail,
+                    address,
+                    district,
+                    hours,
+                    capacityNote
+                })
+            });
+            const result = await res.json();
+            if (res.ok) {
+                showAlert('collection-alert', `Collection point created: ${result.collectionPointId}`, 'success');
+                // Refresh dropdown and select newly created point
+                await loadCollectionPoints();
+                const select = document.getElementById('handoverCollectionPoint');
+                if (select) {
+                    select.value = result.collectionPointId;
+                }
+                const typeSel = document.getElementById('handoverType');
+                if (typeSel) typeSel.value = 'collection-point';
+            } else {
+                showAlert('collection-alert', result.msg || 'Failed to create collection point', 'error');
+            }
+        } catch (err) {
+            console.error('Create collection point error:', err);
+            showAlert('collection-alert', 'Cannot connect to server', 'error');
+        }
+    });
+}
+
 // Render inventory table
 function renderInventory(data) {
     const summaryHtml = Object.entries(data.summary || {}).map(([cat, qty]) => 
@@ -142,8 +289,37 @@ async function loadHistory() {
         
         renderCollectionsHistory(collections.collections || []);
         renderDistributionsHistory(distributions.distributions || []);
+
+        // Load notifications for contributor managed points
+        await loadPointNotifications();
     } catch (err) {
         console.error('Error loading history:', err);
+    }
+}
+
+async function loadPointNotifications(){
+    try{
+        // Get points managed by this contributor
+        const res = await fetch(`${API}/api/contributor/collection-points/${contributorId}`);
+        const data = await res.json();
+        const points = data.points || [];
+        const allNotifs = [];
+        for(const p of points){
+            const r = await fetch(`${API}/api/contributor/notifications/collection-point/${p.collectionPointId}`);
+            const d = await r.json();
+            (d.notifications||[]).forEach(n=>allNotifs.push({ pointName: p.name, pointId: p.collectionPointId, notif: n }));
+        }
+        const html = allNotifs.map(({pointName, pointId, notif})=>
+            `<div class="alert warning">
+                <strong>${pointName}</strong> (${pointId}) — ${new Date(notif.createdAt).toLocaleString()}<br/>
+                ${notif.title || 'Incoming items'}: ${(notif.items||[]).map(i=>`${i.itemName} (${i.quantity}${i.unit})`).join(', ') || 'N/A'}<br/>
+                From: ${notif.contributorName||notif.contributorId||''} ${notif.contributorPhone?('| '+notif.contributorPhone):''}
+            </div>`
+        ).join('') || '<p>No incoming handovers for your points.</p>';
+        const container = document.getElementById('point-notifications');
+        if (container) container.innerHTML = html;
+    }catch(err){
+        console.error('Error loading point notifications:', err);
     }
 }
 
@@ -252,6 +428,21 @@ document.getElementById('collection-form')?.addEventListener('submit', async (e)
         return showAlert('collection-alert', 'Please add at least one item', 'error');
     }
     
+    // Validate handover target selection
+    const handoverTypeSel = document.getElementById('handoverType');
+    const handoverTypeVal = handoverTypeSel?.value || 'collection-point';
+    if (handoverTypeVal === 'collection-point') {
+        const cpVal = document.getElementById('handoverCollectionPoint').value;
+        if (!cpVal) {
+            return showAlert('collection-alert', 'Please select a collection point or create one', 'error');
+        }
+    } else {
+        const vicVal = document.getElementById('handoverVictimId').value.trim();
+        if (!vicVal) {
+            return showAlert('collection-alert', 'Please enter a victim ID for handover', 'error');
+        }
+    }
+
     const data = {
         contributorId,
         items,
@@ -261,7 +452,12 @@ document.getElementById('collection-form')?.addEventListener('submit', async (e)
             district: document.getElementById('collectionDistrict').value
         },
         donorName: document.getElementById('donorName').value,
-        notes: document.getElementById('collectionNotes').value
+        notes: document.getElementById('collectionNotes').value,
+        handoverType: handoverTypeVal,
+        handoverRef: (handoverTypeVal === 'collection-point')
+            ? document.getElementById('handoverCollectionPoint').value
+            : document.getElementById('handoverVictimId').value,
+        handoverEta: document.getElementById('handoverEta').value
     };
     
     try {

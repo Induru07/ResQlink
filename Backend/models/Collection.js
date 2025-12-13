@@ -63,6 +63,15 @@ const CollectionSchema = new mongoose.Schema({
         enum: ['collected', 'in-storage', 'partially-distributed', 'fully-distributed'],
         default: 'collected'
     },
+
+    // Planned handover target
+    handoverType: {
+        type: String,
+        enum: ['collection-point', 'victim'],
+        default: 'collection-point'
+    },
+    handoverRef: String, // collectionPointId or victimId
+    handoverEta: Date,
     
     // Documentation
     photos: [String], // URLs to uploaded photos
