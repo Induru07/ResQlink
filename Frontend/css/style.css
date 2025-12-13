@@ -700,3 +700,24 @@ body.tamil-mode .lang-si {
         border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 }
+/* =========================================
+   9. github,linked in & RESPONSIVENESS
+   ========================================= */
+
+   .modal-icons {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+
+.modal-icons img {
+    width: 100px;
+    height:40px;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.modal-icons img:hover {
+    opacity: 1;
+}

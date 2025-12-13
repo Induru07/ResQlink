@@ -63,13 +63,26 @@
             
             <div class="team-grid">
                 <!-- Added onclick event to trigger the modal -->
-                <div class="developer-card" onclick="openModal('Adeesha W. G. I', 'images/induru.jpg')">
+                <div class="developer-card" onclick="openModal(
+                    'Adeesha W. G. I',
+                    'images/induru.jpg',
+                    'Backend Developer',
+                    'Handles server-side logic, databases, and API development.'
+                )">
                     <div class="dev-role">Backend Developer</div>
                     <div class="dev-name">Adeesha W. G. I</div>
-                    <div class="click-hint">(Click to view)</div>
+                    <div class="click-hint">(Click to view)</div>   
+
                 </div>
 
-                <div class="developer-card" onclick="openModal('Jayasinghe M. D. S. C', 'images/chamath.jpg')">
+                <div class="developer-card" onclick="openModal(
+                    'Chamath Jayasinghe',
+                    'images/chamath.jpg',
+                    'Frontend Developer & Graphic Designer',
+                    'Focused on making the site visually attractive, user-friendly, and easy to understand.',
+                    'https://www.linkedin.com/in/mdscj',
+                    'https://github.com/MDSCJ')">
+
                     <div class="dev-role">Frontend Developer</div>
                     <div class="dev-name">Jayasinghe M. D. S. C</div>
                     <div class="click-hint">(Click to view)</div>
@@ -103,10 +116,16 @@
             <div class="modal-inner">
                 <img id="modalImg" class="modal-img" src="" alt="Developer Photo">
                 <h2 id="modalName" style="margin-bottom: 10px;">Name</h2>
-                <p style="color: #aaa;">Full Stack Developer</p>
-                <p style="font-size: 0.9rem; margin-top: 15px; color: #888;">
-                    Part of the core team ensuring the Flood Management System runs smoothly.
-                </p>
+                <p id="modalRole" style="color:#aaa;"></p>
+                <p id="modalDesc" style="font-size:0.9rem; margin-top:15px; color:#888;"></p>
+                <div class="modal-icons">
+                    <a id="modalLinkedIn" href="#" target="_blank" aria-label="LinkedIn">
+                        <img src="images/linkedin.png" alt="LinkedIn">
+                    </a>
+                    <a id="modalGithub" href="#" target="_blank" aria-label="GitHub">
+                        <img src="images/github.png" alt="GitHub">
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -118,12 +137,24 @@
         const modal = document.getElementById("profileModal");
         const modalImg = document.getElementById("modalImg");
         const modalName = document.getElementById("modalName");
+        const modalRole = document.getElementById("modalRole");
+        const modalDesc = document.getElementById("modalDesc");
+        const modalLinkedIn = document.getElementById("modalLinkedIn");
+        const modalGithub = document.getElementById("modalGithub");
 
-        function openModal(name, imgSrc) {
+
+
+        function openModal(name, imgSrc, role, desc, linkedin, github) {
             modal.style.display = "flex";
             modalName.innerText = name;
             modalImg.src = imgSrc;
+            modalRole.innerText = role;
+            modalDesc.innerText = desc;
+
+            modalLinkedIn.href = linkedin;
+            modalGithub.href = github;
         }
+
 
         function closeModal() {
             modal.style.display = "none";
