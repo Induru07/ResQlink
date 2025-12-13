@@ -275,11 +275,12 @@ function updateAuthMenu() {
 
     if (token && role) {
         // --- LOGGED IN STATE ---
+        // Use correct dashboard targets with base-aware paths
         let dashboardLink = '#';
-        if (role === 'victim') dashboardLink = 'victim.html';
-        else if (role === 'contributor') dashboardLink = 'contributor.html';
-        else if (role === 'distributor') dashboardLink = 'distributer.html';
-        else if (role === 'admin') dashboardLink = 'admin.html';
+        if (role === 'victim') dashboardLink = base + 'victimDashboard.html';
+        else if (role === 'contributor') dashboardLink = base + 'contributorLog.html';
+        else if (role === 'distributor') dashboardLink = base + 'distributorDashboard.html';
+        else if (role === 'admin') dashboardLink = base + 'adminDashboard.html';
 
         const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
 
@@ -373,7 +374,8 @@ function handleLogout() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         localStorage.removeItem('userRole');
-        window.location.href = "index.html";
+        const home = window.location.pathname.includes('/src/pages/') ? '../../index.html' : 'index.html';
+        window.location.href = home;
     }
 }
 
