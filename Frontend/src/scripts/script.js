@@ -265,6 +265,8 @@ function updateAuthMenu() {
     const authSection = document.getElementById('auth-section');
     if (!authSection) return;
 
+    const base = window.location.pathname.includes('/src/pages/') ? '../' : 'src/pages/';
+
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
     const role = localStorage.getItem('userRole'); 
@@ -312,19 +314,19 @@ function updateAuthMenu() {
                 <span>▼</span>
             </a>
             <div class="auth-dropdown-menu" id="authDropdown">
-                <a href="victimSignIn.html">
+                <a href="${base}victimSignIn.html">
                     <span class="lang-en">Victim - Sign In</span>
                 </a>
-                <a href="victimSignUp.html">
+                <a href="${base}victimSignUp.html">
                     <span class="lang-en">Victim - Sign Up</span>
                 </a>
-                <a href="contributorSignIn.html">
+                <a href="${base}contributorSignIn.html">
                     <span class="lang-en">Contributor - Sign In</span>
                 </a>
-                <a href="distributorSignIn.html">
+                <a href="${base}distributorSignIn.html">
                     <span class="lang-en">Distributor - Sign In</span>
                 </a>
-                <a href="adminSignIn.html">
+                <a href="${base}adminSignIn.html">
                     <span class="lang-en">Admin - Sign In</span>
                 </a>
             </div>
@@ -361,7 +363,8 @@ function applyRoleNavigation() {
         // nav.insertBefore(makeItem('victimRequests.html', 'Requests'), document.getElementById('auth-section'));
         // nav.insertBefore(makeItem('victimStatus.html', 'My Status'), document.getElementById('auth-section'));
     } else if (role === 'contributor') {
-        nav.insertBefore(makeItem('contributorLog.html', 'Contributor Log'), document.getElementById('auth-section'));
+        const base = window.location.pathname.includes('/src/pages/') ? '' : 'src/pages/';
+        nav.insertBefore(makeItem(base + 'contributorLog.html', 'Contributor Log'), document.getElementById('auth-section'));
     }
 }
 
