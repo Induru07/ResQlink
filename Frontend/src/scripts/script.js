@@ -265,7 +265,8 @@ function updateAuthMenu() {
     const authSection = document.getElementById('auth-section');
     if (!authSection) return;
 
-    const base = window.location.pathname.includes('/src/pages/') ? '../' : 'src/pages/';
+    // When inside /src/pages/, links are sibling files (no prefix). From root, prefix with src/pages/
+    const base = window.location.pathname.includes('/src/pages/') ? '' : 'src/pages/';
 
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
