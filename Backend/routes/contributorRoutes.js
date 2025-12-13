@@ -11,7 +11,6 @@ const Distribution = require('../models/Distribution');
 const CollectionPoint = require('../models/CollectionPoint');
 const Notification = require('../models/Notification');
 const VictimAuth = require('../models/VictimAuth');
-const Contributor = require('../models/Contributor');
 
 // ========================================
 // HELPER FUNCTIONS
