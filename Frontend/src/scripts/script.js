@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 1.4 INJECT FOOTER
     injectFooter();
+    applyRoleNavigation();
 
 
     // =========================================================
@@ -253,4 +254,83 @@ function injectFooter() {
         </footer>
         `;
     }
+}
+
+// Add/remove nav links based on role (src version)
+function applyRoleNavigation() {
+    const nav = document.getElementById('nav-links');
+    if (!nav) return;
+
+    // Remove previous role items
+    nav.querySelectorAll('.role-item').forEach(el => el.remove());
+
+    const role = localStorage.getItem('userRole');
+    const token = localStorage.getItem('token');
+    if (!token || !role) return;
+
+    const makeItem = (href, label) => {
+        const li = document.createElement('li');
+        li.className = 'role-item';
+        const a = document.createElement('a');
+        a.href = href;
+        a.textContent = label;
+        li.appendChild(a);
+        return li;
+    };
+
+    if (role === 'victim') {
+        nav.insertBefore(makeItem('../../victimRequests.html', 'Requests'), document.getElementById('auth-section'));
+        nav.insertBefore(makeItem('../../victimStatus.html', 'My Status'), document.getElementById('auth-section'));
+    } else if (role === 'contributor') {
+        nav.insertBefore(makeItem('../../contributorLog.html', 'Contributor Log'), document.getElementById('auth-section'));
+    }
+}
+
+// Update guest auth dropdown to include sign up options
+function updateAuthMenu() {
+    const authSection = document.getElementById('auth-section');
+    if (!authSection) return;
+
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('userRole');
+    let htmlContent = '';
+
+    if (token && role) {
+        let dashboardLink = '#';
+        if (role === 'victim') dashboardLink = '../../victimStatus.html';
+        else if (role === 'contributor') dashboardLink = '../../contributorLog.html';
+        else if (role === 'distributor') dashboardLink = '../../distributor.html';
+        else if (role === 'admin') dashboardLink = '../../admin.html';
+
+        const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
+        htmlContent = `
+            <a href="javascript:void(0)" class="auth-btn" onclick="toggleAuthDropdown(event)">
+                <div class="profile-info">
+                    <small>Signed in as</small>
+                    <strong>${displayRole}</strong>
+                </div>
+                <span>▼</span>
+            </a>
+            <div class="auth-dropdown-menu" id="authDropdown">
+                <a href="${dashboardLink}">My Dashboard</a>
+                <a href="#" onclick="(function(){localStorage.removeItem('token');localStorage.removeItem('user');localStorage.removeItem('userRole');location.href='../../index.html';})()">Logout</a>
+            </div>
+        `;
+    } else {
+        htmlContent = `
+            <a href="javascript:void(0)" class="auth-btn" onclick="toggleAuthDropdown(event)">
+                <span>Sign In / Sign Up</span>
+                <span>▼</span>
+            </a>
+            <div class="auth-dropdown-menu" id="authDropdown">
+                <a href="../../victimSignIn.html">Victim - Sign In</a>
+                <a href="../../victimSignUp.html">Victim - Sign Up</a>
+                <a href="../../contributorSignIn.html">Contributor - Sign In</a>
+                <a href="../../distributorSignIn.html">Distributor - Sign In</a>
+                <a href="../../adminSignIn.html">Admin - Sign In</a>
+            </div>
+        `;
+    }
+
+    authSection.innerHTML = htmlContent;
 }
