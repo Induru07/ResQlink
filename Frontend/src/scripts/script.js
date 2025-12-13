@@ -1,4 +1,4 @@
-const API_URL = "https://resqlink-ovm6.onrender.com"
+const API_URL = window.API_BASE || 'http://localhost:5000';
 
 document.addEventListener('DOMContentLoaded', function() {
     
