@@ -563,6 +563,7 @@ body.tamil-mode .lang-si {
     .map-actions { flex-direction: column; align-items: center; }
 }
 
+<<<<<<< Updated upstream
 /* ===================================================================
    9. AUTH MENU (Sign In / Profile) - CLICK ONLY VERSION
    =================================================================== */
@@ -699,4 +700,36 @@ body.tamil-mode .lang-si {
         padding-left: 30px;
         border-bottom: 1px solid rgba(255,255,255,0.05);
     }
+}
+=======
+>>>>>>> Stashed changes
+/* =========================================
+   9. github,linked in & RESPONSIVENESS
+   ========================================= */
+
+   .modal-icons {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+<<<<<<< Updated upstream
+    gap: 25px;
+}
+
+.modal-icons img {
+    width: 100px;
+    height:40px;
+=======
+    gap: 15px;
+}
+
+.modal-icons img {
+    width: 64px;
+    height: 64px;
+>>>>>>> Stashed changes
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.modal-icons img:hover {
+    opacity: 1;
 }
