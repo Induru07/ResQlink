@@ -563,7 +563,6 @@ body.tamil-mode .lang-si {
     .map-actions { flex-direction: column; align-items: center; }
 }
 
-<<<<<<< Updated upstream
 /* ===================================================================
    9. AUTH MENU (Sign In / Profile) - CLICK ONLY VERSION
    =================================================================== */
@@ -701,35 +700,49 @@ body.tamil-mode .lang-si {
         border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 }
-=======
->>>>>>> Stashed changes
 /* =========================================
    9. github,linked in & RESPONSIVENESS
    ========================================= */
 
-   .modal-icons {
-    margin-top: 25px;
+.modal-icons {
+    /* Change 'auto' to a pixel value to force a gap */
+    margin-top: 40px;  
+    
+    margin-bottom: 40px;
     display: flex;
     justify-content: center;
-<<<<<<< Updated upstream
-    gap: 25px;
+    gap: 50px;
 }
+
 
 .modal-icons img {
     width: 100px;
     height:40px;
-=======
-    gap: 15px;
-}
 
-.modal-icons img {
-    width: 64px;
-    height: 64px;
->>>>>>> Stashed changes
     cursor: pointer;
     opacity: 0.8;
 }
 
 .modal-icons img:hover {
     opacity: 1;
+}
+/* STYLING FOR THE DESCRIPTION BOX */
+#modalDesc {
+    /* 1. The Beveled Minimal Box Look */
+    background: rgba(255, 255, 255, 0.05); /* Dark glass effect */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Thin beveled border */
+    border-radius: 10px; /* Soft corners */
+    padding: 15px; /* Space inside the box */
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5); /* Inner depth */
+
+    /* 2. The Spacing (Forces icons away) */
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 50px; /* <--- This creates the large gap you want */
+
+    /* 3. Text Styling */
+    color: #b5b5b5;
+    font-size: 0.75rem;
+    line-height: 1.6;
 }
