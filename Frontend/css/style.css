@@ -352,10 +352,11 @@ main {
 
 .modal-inner {
     background: #111;
-    padding: 30px;
+    padding: 20px;
     border-radius: 13px;
     text-align: center;
     color: white;
+    box-sizing: border-box;
 }
 
 @keyframes popIn {
@@ -370,6 +371,7 @@ main {
     object-fit: cover;
     border: 3px solid #00d2ff;
     margin-bottom: 20px;
+    margin-top: 20px;
     box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
 }
 
@@ -385,6 +387,34 @@ main {
 }
 
 .close-btn:hover { color: #fff; }
+
+/* =========================================
+   9. github,linked in & RESPONSIVENESS
+   ========================================= */
+
+.modal-icons {
+    /* FORCE small gap only */
+    margin-top: 10px !important; 
+    margin-bottom: 0px;
+    
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+
+.modal-icons img {
+    width: 100px;
+    height:40px;
+    margin-top: 25px;
+    margin-bottom: 0px;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.modal-icons img:hover {
+    opacity: 1;
+}
 
 /* =========================================
    6. FOOTER
@@ -700,49 +730,21 @@ body.tamil-mode .lang-si {
         border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 }
-/* =========================================
-   9. github,linked in & RESPONSIVENESS
-   ========================================= */
 
-.modal-icons {
-    /* Change 'auto' to a pixel value to force a gap */
-    margin-top: 40px;  
-    
-    margin-bottom: 40px;
-    display: flex;
-    justify-content: center;
-    gap: 50px;
-}
-
-
-.modal-icons img {
-    width: 100px;
-    height:40px;
-
-    cursor: pointer;
-    opacity: 0.8;
-}
-
-.modal-icons img:hover {
-    opacity: 1;
-}
 /* STYLING FOR THE DESCRIPTION BOX */
 #modalDesc {
-    /* 1. The Beveled Minimal Box Look */
-    background: rgba(255, 255, 255, 0.05); /* Dark glass effect */
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Thin beveled border */
-    border-radius: 10px; /* Soft corners */
-    padding: 15px; /* Space inside the box */
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.5); /* Inner depth */
-
-    /* 2. The Spacing (Forces icons away) */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
     display: block;
     width: 100%;
-    margin-top: 20px;
-    margin-bottom: 50px; /* <--- This creates the large gap you want */
-
-    /* 3. Text Styling */
     color: #b5b5b5;
     font-size: 0.75rem;
     line-height: 1.6;
+
+    /* FORCE margin to zero to test */
+    margin-top: 20px;
+    margin-bottom: 0px !important; 
 }
