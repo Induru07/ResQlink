@@ -4,9 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Victim Portal - Sign In</title>
-    <link rel="stylesheet" href="../styles/victim-auth.css">
+    <link rel="stylesheet" href="../styles/victim-signin.css">
 </head>
 <body>
+    <div class="compact-nav">
+        <a href="../../index.html">Home</a>
+        <a href="datamap.html">Data Map</a>
+        <a href="victimSignUp.html">Victim Sign Up</a>
+        <a href="contributorSignIn.html">Contributors</a>
+    </div>
     <div class="container">
         <div class="header">
             <h1>ResQlink Portal</h1>
@@ -34,6 +40,7 @@
         </div>
     </div>
 
+    <script src="../scripts/config.js"></script>
     <script>
         const loginForm = document.getElementById('login-form');
         const loginAlert = document.getElementById('login-alert');
@@ -53,7 +60,8 @@
             
             try {
                 // Sending credentials to your Node.js Server
-                const response = await fetch('http://localhost:5000/api/auth/victim/login', {
+                const API = window.API_BASE || 'http://localhost:5000';
+                const response = await fetch(`${API}/api/auth/victim/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
@@ -62,28 +70,17 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // SUCCESS! 
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
-
-                    // --- ADD THIS LINE ---
-                    localStorage.setItem('userRole', 'victim'); 
-                    // (Use 'contributor', 'distributor', or 'admin' for the other login pages)
-                    // ---------------------
+                    localStorage.setItem('victimId', data.user?.victimId || '');
+                    localStorage.setItem('userRole', 'victim');
 
                     showAlert(`Welcome back, ${data.user.name}!`, 'success');
-                    
-                    setTimeout(() => {
-                            // Redirect to their dashboard immediately, OR index.html
-                            // Since you said "redirect to home page", we go to index.
-                            // The index page will now show "Signed in as Victim".
-                            window.location.href = 'index.html'; 
-                    }, 1500);
-                }
-                    //after login victim also going to same homepage
 
+                    setTimeout(() => {
+                        window.location.href = 'victimDashboard.html';
+                    }, 1200);
                 } else {
-                    // ERROR (e.g., Wrong password)
                     showAlert(data.msg || 'Login failed', 'error');
                 }
             } catch (error) {

@@ -8,12 +8,13 @@ Frontend/
 ├── README.md               ← Full documentation
 ├── STRUCTURE.txt           ← Detailed structure guide
 │
-└── src/                    ← All your code here
-    ├── pages/              ← HTML pages (6 files)
+├── css/                    ← Stylesheets (canonical)
+├── js/                     ← JavaScript (canonical)
+├── images/                 ← Images (canonical)
+└── src/                    ← Legacy assets/styles (kept for now)
     ├── styles/             ← CSS files (3 files)
-    ├── scripts/            ← JavaScript files (4 files)
     └── assets/
-        └── images/         ← Images (6 files)
+        └── images/         ← Images
 ```
 
 ## 🚀 How to Use
@@ -27,33 +28,33 @@ Frontend/
 
 **Add a new page:**
 ```
-1. Create: src/pages/mypage.html
-2. In HTML, link CSS:   <link rel="stylesheet" href="../../styles/style.css">
-3. In HTML, link JS:    <script src="../../scripts/script.js"></script>
-4. In HTML, link image: <img src="../../assets/images/photo.jpg">
+1. Create: Frontend/mypage.html
+2. In HTML, link CSS:   <link rel="stylesheet" href="css/style.css">
+3. In HTML, link JS:    <script src="js/script.js"></script>
+4. In HTML, link image: <img src="images/photo.jpg">
 ```
 
 **Add a new style:**
 ```
-1. Create: src/styles/mypage.css
-2. In HTML:             <link rel="stylesheet" href="../../styles/mypage.css">
+1. Create: css/mypage.css
+2. In HTML:             <link rel="stylesheet" href="css/mypage.css">
 ```
 
 **Add a new script:**
 ```
-1. Create: src/scripts/mypage.js
-2. In HTML:             <script src="../../scripts/mypage.js"></script>
+1. Create: js/mypage.js
+2. In HTML:             <script src="js/mypage.js"></script>
 ```
 
 **Add a new image:**
 ```
-1. Copy image to:       src/assets/images/myimage.jpg
-2. In HTML:             <img src="../../assets/images/myimage.jpg">
+1. Copy image to:       images/myimage.jpg
+2. In HTML:             <img src="images/myimage.jpg">
 ```
 
 ## 📋 File List
 
-### Pages (src/pages/)
+### Pages (root Frontend/)
 - ✅ index.html - Homepage
 - ✅ about.html - About page  
 - ✅ datamap.html - Interactive map
@@ -66,7 +67,7 @@ Frontend/
 - ✅ contributor.css - Contributor portal styles
 - ✅ victim-auth.css - Login/signup styles (NEW)
 
-### Scripts (src/scripts/)
+### Scripts (js/)
 - ✅ script.js - Main JavaScript
 - ✅ datamap.js - Map functionality
 - ✅ contributor.js - Contributor features
@@ -108,18 +109,11 @@ Frontend/
 
 ## 🔗 Common Paths
 
-From **HTML files** in `src/pages/`:
+From **root HTML files** in `Frontend/`:
 ```
-CSS:    ../../styles/style.css
-JS:     ../../scripts/script.js
-Image:  ../../assets/images/header.jpg
-```
-
-From **Root index.html**:
-```
-CSS:    src/styles/style.css
-JS:     src/scripts/script.js
-Image:  src/assets/images/header.jpg
+CSS:    css/style.css
+JS:     js/script.js
+Image:  images/header.jpg
 ```
 
 ## ❓ Need Help?
@@ -131,13 +125,10 @@ Image:  src/assets/images/header.jpg
 
 ## ✅ Verification Checklist
 
-- [x] New src/ folder created
-- [x] All HTML files moved and updated
-- [x] All CSS files consolidated
-- [x] All JS files consolidated  
-- [x] All images organized
-- [x] All paths corrected
-- [x] Documentation created
+- [x] Root `css/`, `js/`, `images/` in use
+- [x] HTML pages at Frontend root
+- [x] Paths updated to root folders
+- [x] Documentation updated
 - [x] Ready for development!
 
 ---

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contributor Registration - ResQLink</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; padding-top: 80px; }
+        .compact-nav { position: fixed; top: 0; left: 0; right: 0; display: flex; gap: 12px; justify-content: center; align-items: center; padding: 12px 16px; background: rgba(24, 27, 49, 0.75); backdrop-filter: blur(6px); z-index: 1000; }
+        .compact-nav a { color: #f3f4ff; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .compact-nav a:hover { text-decoration: underline; }
+        .container { background: white; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 100%; max-width: 600px; overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .content { padding: 35px; max-height: 70vh; overflow-y: auto; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group.full { grid-column: 1 / -1; }
+        label { display: block; margin-bottom: 6px; color: #333; font-weight: 500; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 11px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 14px; transition: border 0.3s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+        .checkbox-group input[type="checkbox"] { width: auto; }
+        .btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 10px; transition: transform 0.2s; }
+        .btn:hover { transform: translateY(-2px); }
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 18px; display: none; font-size: 14px; }
+        .alert.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .service-area-item { background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .service-area-item button { background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .add-area-btn { background: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; margin-top: 8px; }
+        .footer-link { text-align: center; margin-top: 20px; font-size: 14px; color: #666; }
+        .footer-link a { color: #667eea; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="compact-nav">
+        <a href="../../index.html">Home</a>
+        <a href="datamap.html">Data Map</a>
+        <a href="contributorSignIn.html">Contributor Sign In</a>
+        <a href="contributorLog.html">Dashboard</a>
+    </div>
+    <div class="container">
+        <div class="header">
+            <h1>🤝 Become a Contributor</h1>
+            <p>Join our relief network to help flood victims</p>
+        </div>
+        
+        <div class="content">
+            <div class="alert" id="alert"></div>
+            
+            <form id="registration-form">
+                <div class="form-group full">
+                    <label>I want to *</label>
+                    <select id="role" required>
+                        <option value="">Select your role</option>
+                        <option value="donor">Donate relief items (Donor)</option>
+                        <option value="collection-point-manager">Manage a collection point</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Name / Organization *</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contributor Type *</label>
+                        <select id="contributorType" required>
+                            <option value="individual">Individual</option>
+                            <option value="organization">Organization</option>
+                            <option value="ngo">NGO</option>
+                            <option value="religious">Religious Institution</option>
+                            <option value="corporate">Corporate</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <label>Service Areas *</label>
+                    <div id="service-areas"></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+                        <select id="province-select">
+                            <option value="">Select Province</option>
+                            <option value="Western">Western</option>
+                            <option value="Central">Central</option>
+                            <option value="Southern">Southern</option>
+                            <option value="Northern">Northern</option>
+                            <option value="Eastern">Eastern</option>
+                            <option value="North Western">North Western</option>
+                            <option value="North Central">North Central</option>
+                            <option value="Uva">Uva</option>
+                            <option value="Sabaragamuwa">Sabaragamuwa</option>
+                        </select>
+                        <select id="district-select">
+                            <option value="">Select District</option>
+                        </select>
+                    </div>
+                    <button type="button" class="add-area-btn" onclick="addServiceArea()">+ Add Service Area</button>
+                </div>
+
+                <div class="form-group full">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="hasVehicle">
+                        <label for="hasVehicle" style="margin: 0;">I have a vehicle for transportation</label>
+                    </div>
+                </div>
+
+                <div class="form-row" id="vehicle-details" style="display: none;">
+                    <div class="form-group">
+                        <label>Vehicle Type</label>
+                        <select id="vehicleType">
+                            <option value="">Select Type</option>
+                            <option value="bike">Motorcycle/Bike</option>
+                            <option value="car">Car</option>
+                            <option value="van">Van</option>
+                            <option value="truck">Truck</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Vehicle Capacity</label>
+                        <input type="text" id="vehicleCapacity" placeholder="e.g., 500kg or 10 boxes">
+                    </div>
+                </div>
+
+                <div class="form-group full">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="hasStorage">
+                        <label for="hasStorage" style="margin: 0;">I have storage/warehouse space</label>
+                    </div>
+                </div>
+
+                <div class="form-row" id="storage-details" style="display: none;">
+                    <div class="form-group">
+                        <label>Storage Address</label>
+                        <input type="text" id="storageAddress">
+                    </div>
+                    <div class="form-group">
+                        <label>Storage Capacity</label>
+                        <input type="text" id="storageCapacity" placeholder="e.g., 5 tons">
+                    </div>
+                </div>
+
+                <!-- Collection Point Details (for managers only) -->
+                <div id="collection-point-section" style="display: none;">
+                    <h3 style="margin: 20px 0 15px; color: #667eea;">📍 Collection Point Details</h3>
+                    <div class="form-group full">
+                        <label>Collection Point Name *</label>
+                        <input type="text" id="pointName" placeholder="e.g., Town Hall Relief Center">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>District *</label>
+                            <input type="text" id="pointDistrict" placeholder="District">
+                        </div>
+                        <div class="form-group">
+                            <label>Address *</label>
+                            <input type="text" id="pointAddress" placeholder="Street, City">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Latitude</label>
+                            <input type="number" id="pointLat" step="0.000001" placeholder="e.g., 7.8731">
+                        </div>
+                        <div class="form-group">
+                            <label>Longitude</label>
+                            <input type="number" id="pointLng" step="0.000001" placeholder="e.g., 80.7718">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Operating Hours *</label>
+                            <input type="text" id="pointHours" placeholder="e.g., Daily 9 AM - 6 PM">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Phone</label>
+                            <input type="tel" id="pointPhone" placeholder="+94 7x xxx xxxx">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Contact Email</label>
+                            <input type="email" id="pointEmail" placeholder="email@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Capacity Note</label>
+                            <input type="text" id="pointCapacity" placeholder="e.g., Can store 2 tons">
+                        </div>
+                    </div>
+                    <div class="form-group full">
+                        <label>Additional Notes</label>
+                        <textarea id="pointNotes" rows="2" placeholder="Any special instructions or details"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password *</label>
+                        <input type="password" id="confirmPassword" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">Register as Contributor</button>
+            </form>
+
+            <div class="footer-link">
+                Already have an account? <a href="contributorSignIn.html">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="../scripts/config.js"></script>
+    <script>
+        const districtsData = {
+            'Western': ['Colombo', 'Gampaha', 'Kalutara'],
+            'Central': ['Kandy', 'Matale', 'Nuwara Eliya'],
+            'Southern': ['Galle', 'Matara', 'Hambantota'],
+            'Northern': ['Jaffna', 'Kilinochchi', 'Mannar', 'Mullaitivu', 'Vavuniya'],
+            'Eastern': ['Trincomalee', 'Batticaloa', 'Ampara'],
+            'North Western': ['Kurunegala', 'Puttalam'],
+            'North Central': ['Anuradhapura', 'Polonnaruwa'],
+            'Uva': ['Badulla', 'Monaragala'],
+            'Sabaragamuwa': ['Ratnapura', 'Kegalle']
+        };
+
+        let serviceAreas = [];
+
+        // Role-based field visibility
+        document.getElementById('role').addEventListener('change', function() {
+            const role = this.value;
+            const cpSection = document.getElementById('collection-point-section');
+            const serviceAreaGroup = document.querySelector('.form-group.full:has(#service-areas)');
+            const vehicleCheckbox = document.getElementById('hasVehicle').parentElement.parentElement;
+            const storageCheckbox = document.getElementById('hasStorage').parentElement.parentElement;
+
+            if (role === 'collection-point-manager') {
+                cpSection.style.display = 'block';
+                // Hide donor-specific fields
+                if (serviceAreaGroup) serviceAreaGroup.style.display = 'none';
+                if (vehicleCheckbox) vehicleCheckbox.style.display = 'none';
+                if (storageCheckbox) storageCheckbox.style.display = 'none';
+            } else if (role === 'donor') {
+                cpSection.style.display = 'none';
+                // Show donor fields
+                if (serviceAreaGroup) serviceAreaGroup.style.display = 'block';
+                if (vehicleCheckbox) vehicleCheckbox.style.display = 'block';
+                if (storageCheckbox) storageCheckbox.style.display = 'block';
+            }
+        });
+
+        document.getElementById('province-select').addEventListener('change', function() {
+            const districtSelect = document.getElementById('district-select');
+            districtSelect.innerHTML = '<option value="">Select District</option>';
+            if (this.value && districtsData[this.value]) {
+                districtsData[this.value].forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.textContent = d;
+                    districtSelect.appendChild(opt);
+                });
+            }
+        });
+
+        document.getElementById('hasVehicle').addEventListener('change', function() {
+            document.getElementById('vehicle-details').style.display = this.checked ? 'grid' : 'none';
+        });
+
+        document.getElementById('hasStorage').addEventListener('change', function() {
+            document.getElementById('storage-details').style.display = this.checked ? 'grid' : 'none';
+        });
+
+        function addServiceArea() {
+            const province = document.getElementById('province-select').value;
+            const district = document.getElementById('district-select').value;
+            
+            if (!province || !district) {
+                showAlert('Please select both province and district', 'error');
+                return;
+            }
+
+            if (serviceAreas.some(a => a.province === province && a.district === district)) {
+                showAlert('This service area is already added', 'error');
+                return;
+            }
+
+            serviceAreas.push({ province, district });
+            renderServiceAreas();
+            document.getElementById('province-select').value = '';
+            document.getElementById('district-select').innerHTML = '<option value="">Select District</option>';
+        }
+
+        function removeServiceArea(index) {
+            serviceAreas.splice(index, 1);
+            renderServiceAreas();
+        }
+
+        function renderServiceAreas() {
+            const container = document.getElementById('service-areas');
+            container.innerHTML = serviceAreas.map((area, index) => `
+                <div class="service-area-item">
+                    <span>${area.province} - ${area.district}</span>
+                    <button type="button" onclick="removeServiceArea(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function showAlert(msg, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = msg;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 5000);
+        }
+
+        document.getElementById('registration-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const role = document.getElementById('role').value;
+            if (!role) {
+                return showAlert('Please select your role', 'error');
+            }
+
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+
+            if (password !== confirm) {
+                return showAlert('Passwords do not match', 'error');
+            }
+
+            // Donors need service areas, managers need collection point details
+            if (role === 'donor' && serviceAreas.length === 0) {
+                return showAlert('Please add at least one service area', 'error');
+            }
+
+            if (role === 'collection-point-manager') {
+                const pointName = document.getElementById('pointName').value;
+                const pointDistrict = document.getElementById('pointDistrict').value;
+                const pointAddress = document.getElementById('pointAddress').value;
+                const pointHours = document.getElementById('pointHours').value;
+
+                if (!pointName || !pointDistrict || !pointAddress || !pointHours) {
+                    return showAlert('Please fill all required collection point fields', 'error');
+                }
+            }
+
+            const hasVehicle = document.getElementById('hasVehicle').checked;
+            const hasStorage = document.getElementById('hasStorage').checked;
+
+            const data = {
+                role: role,
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: password,
+                phone: document.getElementById('phone').value,
+                contributorType: document.getElementById('contributorType').value,
+                serviceAreas: role === 'donor' ? serviceAreas : [],
+                hasVehicle: role === 'donor' ? hasVehicle : false,
+                vehicleType: (role === 'donor' && hasVehicle) ? document.getElementById('vehicleType').value : null,
+                vehicleCapacity: (role === 'donor' && hasVehicle) ? document.getElementById('vehicleCapacity').value : null,
+                hasStorage: role === 'donor' ? hasStorage : false,
+                storageAddress: (role === 'donor' && hasStorage) ? document.getElementById('storageAddress').value : null,
+                storageCapacity: (role === 'donor' && hasStorage) ? document.getElementById('storageCapacity').value : null
+            };
+
+            // Add collection point data for managers
+            if (role === 'collection-point-manager') {
+                data.collectionPoint = {
+                    name: document.getElementById('pointName').value,
+                    district: document.getElementById('pointDistrict').value,
+                    address: document.getElementById('pointAddress').value,
+                    coordinates: {
+                        latitude: parseFloat(document.getElementById('pointLat').value) || 0,
+                        longitude: parseFloat(document.getElementById('pointLng').value) || 0
+                    },
+                    hours: document.getElementById('pointHours').value,
+                    contactPhone: document.getElementById('pointPhone').value || data.phone,
+                    contactEmail: document.getElementById('pointEmail').value || data.email,
+                    capacityNote: document.getElementById('pointCapacity').value || '',
+                    notes: document.getElementById('pointNotes').value || ''
+                };
+            }
+
+            try {
+                const API = window.API_BASE || 'http://localhost:5000';
+                const res = await fetch(`${API}/api/contributor/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    showAlert(`Registration successful! Your ID: ${result.contributorId}. Redirecting...`, 'success');
+                    setTimeout(() => window.location.href = 'contributorSignIn.html', 2000);
+                } else {
+                    showAlert(result.msg || 'Registration failed', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                showAlert('Cannot connect to server', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

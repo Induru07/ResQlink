@@ -44,7 +44,7 @@
                 </button>
                 
                 <ul class="nav-links" id="nav-links">
-                    <li><a href="index.html" class="active"><span class="lang-en">Home</span><span class="lang-si">මුල් පිටුව</span><span class="lang-ta">முகப்பு</span></a></li>
+                    <li><a href="../../index.html" class="active"><span class="lang-en">Home</span><span class="lang-si">මුල් පිටුව</span><span class="lang-ta">முகப்பு</span></a></li>
                     <li><a href="datamap.html"><span class="lang-en">Data Map</span><span class="lang-si">දත්ත සිතියම</span><span class="lang-ta">தரவு வரைபடம்</span></a></li>
                     <li><a href="about.html"><span class="lang-en">About</span><span class="lang-si">අප ගැන</span><span class="lang-ta">எங்களைப் பற்றி</span></a></li>
 
@@ -58,23 +58,8 @@
     </nav> 
 
     <div class="map-actions">
-        <a href="contributor.html" class="action-btn btn-contributor">
-            <span class="lang-en">Become a Contributor</span>
-            <span class="lang-si">දායකයෙකු වන්න</span>
-            <span class="lang-ta">பங்களிப்பாளராக மாறுங்கள்</span>
-        </a>
-
-        <a href="traveler.html" class="action-btn btn-distributor">
-            <span class="lang-en">Become a Distributor</span>
-            <span class="lang-si">බෙදාහරින්නෙකු වන්න</span>
-            <span class="lang-ta">விநியோகிப்பாளராக மாறுங்கள்</span>
-        </a>
-
-        <a href="victimSignIn.html" class="action-btn btn-victim">
-            <span class="lang-en">I'm a Victim (Help)</span>
-            <span class="lang-si">මම විපතට පත්වූවෙක්මි</span>
-            <span class="lang-ta">நான் பாதிக்கப்பட்டவன்</span>
-        </a>
+        <button id="show-victims" type="button" class="action-btn btn-victim active">Show Victim Locations</button>
+        <button id="show-collections" type="button" class="action-btn btn-contributor">Show Collection Points</button>
     </div>
 
     <main style="padding: 0;"> <div id="map"></div>
@@ -83,9 +68,10 @@
     <div id="dynamic-footer"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
+
+    <!-- Config sets window.API_BASE for API calls -->
+    <script src="../scripts/config.js"></script>
     <script src="../scripts/script.js"></script>
-    
     <script src="../scripts/datamap.js"></script>
 
 </body>

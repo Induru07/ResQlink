@@ -114,6 +114,36 @@ router.get('/victim/profile/:victimId', async (req, res) => {
     }
 });
 
+// Victim search (id/name/email), optional district filter
+router.get('/victim/search', async (req, res) => {
+    try {
+        const { query, district } = req.query;
+        const q = (query || '').trim();
+        if (!q && !district) {
+            return res.status(400).json({ msg: 'Provide query or district' });
+        }
+
+        const orConds = [];
+        if (q) {
+            orConds.push(
+                { victimId: new RegExp(q, 'i') },
+                { email: new RegExp(q, 'i') },
+                { fullName: new RegExp(q, 'i') }
+            );
+        }
+
+        const filter = {};
+        if (orConds.length) filter.$or = orConds;
+        if (district) filter.district = new RegExp(`^${district}$`, 'i');
+
+        const victims = await VictimAuth.find(filter).limit(20).select('victimId fullName email district');
+        res.json({ victims });
+    } catch (err) {
+        console.error('Victim search error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // =======================
 // 2. SUPPLIER ROUTES
 // =======================
