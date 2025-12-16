@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     injectFooter();
     updateAuthMenu(); // <--- Initialize the Auth Menu
     applyRoleNavigation(); // <--- Add role-based tabs
+    fetchStats(); // <--- Fetch Live Stats
 
     // =========================================================
     // 2. MOBILE MENU LOGIC
@@ -399,3 +400,49 @@ document.addEventListener('click', function(event) {
         dropdown.classList.remove('show');
     }
 });
+
+// =========================================================
+// STATS DASHBOARD LOGIC
+// =========================================================
+async function fetchStats() {
+    try {
+        console.log("Fetching stats from:", `${API_URL}/api/general/stats`);
+        const response = await fetch(`${API_URL}/api/general/stats`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Stats received:", data);
+        
+        if (data.stats) {
+            animateValue("stat-total-users", 0, data.stats.totalUsers || 0, 2000);
+            animateValue("stat-victims-danger", 0, data.stats.victimsInDanger || 0, 2000);
+            animateValue("stat-victims-helped", 0, data.stats.victimsHelped || 0, 2000);
+            animateValue("stat-total-victims", 0, data.stats.totalVictims || 0, 2000);
+            animateValue("stat-total-contributors", 0, data.stats.totalContributors || 0, 2000);
+            animateValue("stat-collection-points", 0, data.stats.totalCollectionPoints || 0, 2000);
+        }
+    } catch (error) {
+        console.error("Error fetching stats:", error);
+        // Optional: Show error in the UI
+        const cards = document.querySelectorAll('.stat-card h3');
+        cards.forEach(card => card.innerText = "-");
+    }
+}
+
+function animateValue(id, start, end, duration) {
+    const obj = document.getElementById(id);
+    if (!obj) return;
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = Math.floor(progress * (end - start) + start);
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
+}
