@@ -700,3 +700,69 @@ body.tamil-mode .lang-si {
         border-bottom: 1px solid rgba(255,255,255,0.05);
     }
 }
+
+/* =========================================
+   STATS DASHBOARD
+   ========================================= */
+.hero-section {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.hero-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #004d66;
+}
+
+.stats-container {
+    padding: 40px 20px;
+    background-color: #fff;
+    text-align: center;
+}
+
+.stats-container h2 {
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.stat-card {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card h3 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #004d66;
+}
+
+.stat-card p {
+    color: #666;
+    font-weight: bold;
+}
+
+.stat-card.danger h3 {
+    color: #e74c3c;
+}
+
+.stat-card.success h3 {
+    color: #27ae60;
+}
