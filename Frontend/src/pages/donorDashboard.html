@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor Dashboard - ResQLink</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        body { background: #f4f6fb; margin: 0; padding: 0; }
+        .compact-nav { position: fixed; top: 0; left: 0; right: 0; display: flex; gap: 12px; justify-content: center; align-items: center; padding: 12px 16px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%); color: #fff; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .compact-nav a { color: #f9fbff; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .compact-nav a:hover { text-decoration: underline; }
+        .dashboard-container { max-width: 1400px; margin: 80px auto 20px; padding: 0 20px; }
+        .dashboard-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 25px; }
+        .dashboard-header h1 { font-size: 28px; margin-bottom: 8px; }
+        .dashboard-header p { opacity: 0.9; }
+        .section-card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .section-card h2 { margin-bottom: 20px; color: #333; }
+        #map { height: 500px; width: 100%; border-radius: 8px; }
+        .map-controls { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .map-btn { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .map-btn:hover { background: #5568d3; }
+        .map-btn.active { background: #28a745; }
+        .donation-form { display: none; margin-top: 20px; padding: 20px; background: #f9fafc; border-radius: 8px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        .btn { padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn:hover { background: #5568d3; }
+        .btn-success { background: #28a745; }
+        .btn-danger { background: #dc3545; }
+        .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 15px; display: none; }
+        .alert.success { background: #d4edda; color: #155724; }
+        .alert.error { background: #f8d7da; color: #721c24; }
+        .item-row { display: grid; grid-template-columns: 1fr 1fr 120px 100px 40px; gap: 10px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="compact-nav">
+        <a href="../../index.html">Home</a>
+        <a href="datamap.html">Data Map</a>
+        <a href="contributorSignIn.html">Sign Out</a>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>🎁 Donor Dashboard</h1>
+            <p id="welcome-msg">Welcome, Donor!</p>
+        </div>
+
+        <div class="section-card">
+            <h2>📍 Find Drop-off Location or Victim</h2>
+            <p style="color: #666; margin-bottom: 15px;">Select a collection point to drop off your donation, or choose a victim to deliver directly.</p>
+            
+            <div class="map-controls">
+                <button class="map-btn active" id="show-points">Show Collection Points</button>
+                <button class="map-btn" id="show-victims">Show Victims Needing Help</button>
+                <button class="map-btn btn-success" id="log-donation-btn" style="display:none;">Log Donation</button>
+            </div>
+
+            <div id="map"></div>
+
+            <div class="donation-form" id="donation-form">
+                <h3>Log Your Donation</h3>
+                <div class="alert" id="donation-alert"></div>
+                <form id="submit-donation">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Target Type</label>
+                            <input type="text" id="targetType" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Target ID</label>
+                            <input type="text" id="targetId" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Target Name</label>
+                            <input type="text" id="targetName" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Expected Delivery (ETA)</label>
+                            <input type="datetime-local" id="deliveryEta" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Your Collection Address</label>
+                        <input type="text" id="collectionAddress" placeholder="Where are you collecting from?" required>
+                    </div>
+
+                    <h4 style="margin: 15px 0 10px;">Items to Donate</h4>
+                    <div id="items-container">
+                        <div class="item-row">
+                            <select class="item-category" required>
+                                <option value="">Category</option>
+                                <option value="food">Food</option>
+                                <option value="water">Water</option>
+                                <option value="clothing">Clothing</option>
+                                <option value="medicine">Medicine</option>
+                                <option value="hygiene">Hygiene Products</option>
+                                <option value="shelter">Shelter Materials</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <input type="text" class="item-name" placeholder="Item Name" required>
+                            <input type="number" class="item-quantity" placeholder="Qty" required min="0.01" step="0.01">
+                            <input type="text" class="item-unit" placeholder="Unit" required>
+                            <button type="button" onclick="removeItem(this)" class="btn btn-danger" style="padding: 8px;">✕</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addItemRow()" class="btn btn-success" style="margin-bottom: 15px;">+ Add Item</button>
+
+                    <div class="form-group">
+                        <label>Notes (Optional)</label>
+                        <textarea id="notes" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn">Submit Donation</button>
+                    <button type="button" class="btn" onclick="cancelDonation()" style="background: #6c757d; margin-left: 10px;">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="../scripts/config.js"></script>
+    <script>
+        const API = window.API_BASE || 'http://localhost:5000';
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const contributorId = localStorage.getItem('contributorId');
+
+        if (!contributorId) {
+            alert('Please sign in first');
+            window.location.href = 'contributorSignIn.html';
+        }
+
+        document.getElementById('welcome-msg').textContent = `Welcome, ${user.name || 'Donor'}!`;
+
+        // Initialize map
+        const map = L.map('map').setView([7.8731, 80.7718], 8);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        const pointsLayer = L.layerGroup().addTo(map);
+        const victimsLayer = L.layerGroup();
+
+        const greenIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+        });
+
+        const redIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+        });
+
+        let selectedTarget = null;
+
+        // Load map data
+        async function loadMapData() {
+            try {
+                const res = await fetch(`${API}/api/map/data`);
+                const data = await res.json();
+
+                // Collection points
+                if (data.collections) {
+                    data.collections.forEach(c => {
+                        const marker = L.marker([c.lat, c.lng], {icon: greenIcon})
+                            .addTo(pointsLayer)
+                            .bindPopup(`
+                                <div style="font-family: Arial; max-width: 200px;">
+                                    <strong style="color: #28a745;">${c.name || 'Collection Point'}</strong><br>
+                                    <small>${c.district || ''}</small><br>
+                                    ${c.address || ''}<br>
+                                    ${c.hours ? `<strong>Hours:</strong> ${c.hours}<br>` : ''}
+                                    ${c.contactPhone ? `📞 ${c.contactPhone}<br>` : ''}
+                                    <button onclick="selectTarget('collection-point', '${c.collectionPointId}', '${c.name}')" 
+                                            style="margin-top: 8px; padding: 6px 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                        Select This Point
+                                    </button>
+                                </div>
+                            `);
+                    });
+                }
+
+                // Victims
+                if (data.victims) {
+                    data.victims.forEach(v => {
+                        const marker = L.marker([v.lat, v.lng], {icon: redIcon})
+                            .addTo(victimsLayer)
+                            .bindPopup(`
+                                <div style="font-family: Arial; max-width: 200px;">
+                                    <strong style="color: #dc3545;">SOS: ${v.name || 'Victim'}</strong><br>
+                                    <small>ID: ${v.victimId}</small><br>
+                                    ${v.address || ''}<br>
+                                    ${v.needs ? `<strong>Needs:</strong> ${v.needs}<br>` : ''}
+                                    ${v.phone ? `📞 ${v.phone}<br>` : ''}
+                                    <button onclick="selectTarget('victim', '${v.victimId}', '${v.name}')" 
+                                            style="margin-top: 8px; padding: 6px 12px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                        Deliver to This Victim
+                                    </button>
+                                </div>
+                            `);
+                    });
+                }
+            } catch (err) {
+                console.error('Map data error:', err);
+            }
+        }
+
+        // Toggle layers
+        document.getElementById('show-points').addEventListener('click', function() {
+            if (!map.hasLayer(pointsLayer)) map.addLayer(pointsLayer);
+            if (map.hasLayer(victimsLayer)) map.removeLayer(victimsLayer);
+            this.classList.add('active');
+            document.getElementById('show-victims').classList.remove('active');
+        });
+
+        document.getElementById('show-victims').addEventListener('click', function() {
+            if (!map.hasLayer(victimsLayer)) map.addLayer(victimsLayer);
+            if (map.hasLayer(pointsLayer)) map.removeLayer(pointsLayer);
+            this.classList.add('active');
+            document.getElementById('show-points').classList.remove('active');
+        });
+
+        // Select target
+        window.selectTarget = function(type, id, name) {
+            selectedTarget = { type, id, name };
+            document.getElementById('targetType').value = type === 'collection-point' ? 'Collection Point' : 'Victim';
+            document.getElementById('targetId').value = id;
+            document.getElementById('targetName').value = name;
+            document.getElementById('log-donation-btn').style.display = 'inline-block';
+            document.getElementById('donation-form').style.display = 'none';
+        };
+
+        document.getElementById('log-donation-btn').addEventListener('click', function() {
+            if (!selectedTarget) {
+                alert('Please select a target first');
+                return;
+            }
+            document.getElementById('donation-form').style.display = 'block';
+        });
+
+        window.cancelDonation = function() {
+            document.getElementById('donation-form').style.display = 'none';
+        };
+
+        window.addItemRow = function() {
+            const container = document.getElementById('items-container');
+            const newRow = document.querySelector('.item-row').cloneNode(true);
+            newRow.querySelectorAll('input, select').forEach(el => el.value = '');
+            container.appendChild(newRow);
+        };
+
+        window.removeItem = function(btn) {
+            if (document.querySelectorAll('.item-row').length > 1) {
+                btn.closest('.item-row').remove();
+            }
+        };
+
+        function showAlert(msg, type) {
+            const alert = document.getElementById('donation-alert');
+            alert.textContent = msg;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 5000);
+        }
+
+        document.getElementById('submit-donation').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!selectedTarget) {
+                return showAlert('Please select a target', 'error');
+            }
+
+            const items = [];
+            document.querySelectorAll('.item-row').forEach(row => {
+                const cat = row.querySelector('.item-category').value;
+                const name = row.querySelector('.item-name').value;
+                const qty = row.querySelector('.item-quantity').value;
+                const unit = row.querySelector('.item-unit').value;
+                if (cat && name && qty && unit) {
+                    items.push({ category: cat, itemName: name, quantity: parseFloat(qty), unit });
+                }
+            });
+
+            if (items.length === 0) {
+                return showAlert('Please add at least one item', 'error');
+            }
+
+            const data = {
+                contributorId,
+                collectionDate: new Date().toISOString(),
+                collectionLocation: {
+                    address: document.getElementById('collectionAddress').value,
+                    district: 'N/A',
+                    coordinates: { latitude: 0, longitude: 0 }
+                },
+                items,
+                handoverType: selectedTarget.type,
+                handoverRef: selectedTarget.id,
+                handoverEta: document.getElementById('deliveryEta').value || null,
+                notes: document.getElementById('notes').value || '',
+                donorInfo: { isAnonymous: false }
+            };
+
+            try {
+                const res = await fetch(`${API}/api/contributor/collection`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    showAlert(`Donation logged successfully! Collection ID: ${result.collectionId}`, 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showAlert(result.msg || 'Failed to log donation', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                showAlert('Cannot connect to server', 'error');
+            }
+        });
+
+        loadMapData();
+    </script>
+</body>
+</html>

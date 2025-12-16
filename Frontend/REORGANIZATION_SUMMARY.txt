@@ -6,6 +6,16 @@
 ║                                                                    ║
 ╚════════════════════════════════════════════════════════════════════╝
 
+Update (Dec 13, 2025):
+- Removed duplicated `src/pages/` HTML files and `src/scripts/` JS files.
+- Canonical structure:
+  • Root HTML pages in `Frontend/` (e.g., `index.html`, `about.html`, `datamap.html`)
+  • Styles in `Frontend/css/`
+  • Scripts in `Frontend/js/`
+  • Images in `Frontend/images/`
+  Path examples from root HTML:
+  • CSS: `css/style.css` | JS: `js/script.js` | Image: `images/header.jpg`
+
 
 📊 SUMMARY OF CHANGES
 ═══════════════════════════════════════════════════════════════════════
@@ -137,21 +147,10 @@ Reserved Directories:
 🔧 QUICK REFERENCE - PATH USAGE
 ═══════════════════════════════════════════════════════════════════════
 
-From Root index.html:
-  CSS:    <link rel="stylesheet" href="src/styles/style.css">
-  JS:     <script src="src/scripts/script.js"></script>
-  Image:  <img src="src/assets/images/header.jpg">
-
-From src/pages/*.html:
-  CSS:    <link rel="stylesheet" href="../../styles/style.css">
-  JS:     <script src="../../scripts/script.js"></script>
-  Image:  <img src="../../assets/images/header.jpg">
-
-From src/styles/*.css:
-  Image:  url(../assets/images/header.jpg)
-
-From src/scripts/*.js:
-  Image Path: ../assets/images/header.jpg
+From root HTML files:
+  CSS:    <link rel="stylesheet" href="css/style.css">
+  JS:     <script src="js/script.js"></script>
+  Image:  <img src="images/header.jpg">
 
 
 📚 DOCUMENTATION FILES

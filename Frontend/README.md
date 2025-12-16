@@ -3,6 +3,18 @@
 ## Overview
 This is a clean, organized frontend project for the ResQLink Flood Management System. The code is now properly organized for easy maintenance and scalability.
 
+## Update (Dec 13, 2025)
+- The `src/pages/` and `src/scripts/` duplicates have been removed.
+- Canonical locations:
+	- HTML pages: `Frontend/` (root) — e.g., `index.html`, `about.html`, `datamap.html`, `contributor.html`, `victimSignIn.html`, `victimSignUp.html`
+	- Styles: `Frontend/css/`
+	- Scripts: `Frontend/js/`
+	- Images: `Frontend/images/`
+- Path examples from a root HTML page:
+	- CSS: `<link rel="stylesheet" href="css/style.css">`
+	- JS: `<script src="js/script.js"></script>`
+	- Image: `<img src="images/header.jpg" alt="">`
+
 ## Directory Structure
 
 ```
@@ -40,7 +52,7 @@ Frontend/
 │   └── components/              # Reusable components (reserved for future use)
 │
 ├── public/                       # Static files to serve (reserved for build output)
-├── index.html                    # Main entry point (serves src/pages/index.html)
+├── index.html                    # Main entry point (root HTML)
 └── README.md                     # This file
 
 ```
@@ -58,10 +70,10 @@ Frontend/
 ## File Locations Guide
 
 ### Adding New Pages
-1. Create `.html` file in `src/pages/`
-2. Link CSS: `<link rel="stylesheet" href="../../styles/filename.css">`
-3. Link JS: `<script src="../../scripts/filename.js"></script>`
-4. Images: `<img src="../../assets/images/filename.jpg">`
+1. Create `.html` file in `Frontend/` (root)
+2. Link CSS: `<link rel="stylesheet" href="css/filename.css">`
+3. Link JS: `<script src="js/filename.js"></script>`
+4. Images: `<img src="images/filename.jpg">`
 
 ### Adding New Styles
 1. Create `.css` file in `src/styles/`
@@ -69,26 +81,20 @@ Frontend/
 3. Import in the HTML file: `<link rel="stylesheet" href="../../styles/pagename.css">`
 
 ### Adding New Scripts
-1. Create `.js` file in `src/scripts/`
+1. Create `.js` file in `Frontend/js/`
 2. If it's page-specific, name it after the page: `pagename.js`
-3. Import in the HTML file: `<script src="../../scripts/pagename.js"></script>`
+3. Import in the HTML file: `<script src="js/pagename.js"></script>`
 
 ### Adding New Images
-1. Place images in `src/assets/images/`
-2. Reference in HTML: `<img src="../../assets/images/filename.jpg">`
+1. Place images in `Frontend/images/`
+2. Reference in HTML: `<img src="images/filename.jpg">`
 
 ## Path Reference Table
 
-From **`src/pages/`** (HTML files):
-- CSS files: `../../styles/`
-- JS files: `../../scripts/`
-- Images: `../../assets/images/`
-
-From **`src/styles/`** (CSS files):
-- Images: `../assets/images/`
-
-From **`src/scripts/`** (JS files):
-- Images: `../assets/images/`
+From **root HTML files** (`Frontend/`):
+- CSS files: `css/`
+- JS files: `js/`
+- Images: `images/`
 
 ## Best Practices
 

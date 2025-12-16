@@ -1,3 +1,5 @@
+const API_URL = window.API_BASE || 'http://localhost:5000';
+
 document.addEventListener('DOMContentLoaded', function() {
     
     // =========================================================
@@ -26,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 1.4 INJECT FOOTER & AUTH MENU
     injectFooter();
     updateAuthMenu(); // <--- Initialize the Auth Menu
+    applyRoleNavigation(); // <--- Add role-based tabs
 
     // =========================================================
     // 2. MOBILE MENU LOGIC
@@ -303,37 +306,62 @@ function updateAuthMenu() {
         // --- GUEST STATE ---
         htmlContent = `
             <a href="javascript:void(0)" class="auth-btn" onclick="toggleAuthDropdown(event)">
-                <span class="lang-en">Sign In / Join</span>
-                <span class="lang-si">ඇතුල් වන්න</span>
-                <span class="lang-ta">உள்நுழைக</span>
+                <span class="lang-en">Sign In / Sign Up</span>
+                <span class="lang-si">ඇතුල් වන්න / ලියාපදිංචි වන්න</span>
+                <span class="lang-ta">உள்நுழை / பதிவு செய்</span>
                 <span>▼</span>
             </a>
             <div class="auth-dropdown-menu" id="authDropdown">
                 <a href="victimSignIn.html">
-                    <span class="lang-en">As Victim</span>
-                    <span class="lang-si">විපතට පත් අය</span>
-                    <span class="lang-ta">பாதிக்கப்பட்டவர்</span>
+                    <span class="lang-en">Victim - Sign In</span>
+                </a>
+                <a href="victimSignUp.html">
+                    <span class="lang-en">Victim - Sign Up</span>
                 </a>
                 <a href="contributorSignIn.html">
-                    <span class="lang-en">As Contributor</span>
-                    <span class="lang-si">දායකයා</span>
-                    <span class="lang-ta">பங்களிப்பாளர்</span>
+                    <span class="lang-en">Contributor - Sign In</span>
                 </a>
                 <a href="distributorSignIn.html">
-                    <span class="lang-en">As Distributor</span>
-                    <span class="lang-si">බෙදාහරින්නා</span>
-                    <span class="lang-ta">விநியோகிப்பாளர்</span>
+                    <span class="lang-en">Distributor - Sign In</span>
                 </a>
                 <a href="adminSignIn.html">
-                    <span class="lang-en">As Admin</span>
-                    <span class="lang-si">පරිපාලක</span>
-                    <span class="lang-ta">நிர்வாகம்</span>
+                    <span class="lang-en">Admin - Sign In</span>
                 </a>
             </div>
         `;
     }
 
     authSection.innerHTML = htmlContent;
+}
+
+// Add/remove nav links based on role
+function applyRoleNavigation() {
+    const nav = document.getElementById('nav-links');
+    if (!nav) return;
+
+    // Clean previous role-specific items
+    nav.querySelectorAll('.role-item').forEach(el => el.remove());
+
+    const role = localStorage.getItem('userRole');
+    const token = localStorage.getItem('token');
+    if (!token || !role) return; // guest sees base tabs only
+
+    const makeItem = (href, label) => {
+        const li = document.createElement('li');
+        li.className = 'role-item';
+        const a = document.createElement('a');
+        a.href = href;
+        a.textContent = label;
+        li.appendChild(a);
+        return li;
+    };
+
+    if (role === 'victim') {
+        nav.insertBefore(makeItem('victimRequests.html', 'Requests'), document.getElementById('auth-section'));
+        nav.insertBefore(makeItem('victimStatus.html', 'My Status'), document.getElementById('auth-section'));
+    } else if (role === 'contributor') {
+        nav.insertBefore(makeItem('contributorLog.html', 'Contributor Log'), document.getElementById('auth-section'));
+    }
 }
 
 function handleLogout() {

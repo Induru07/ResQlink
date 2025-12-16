@@ -41,14 +41,28 @@
                 </button>
                 
                 <ul class="nav-links" id="nav-links">
-                    <li><a href="src/pages/index.html" class="active"><span class="lang-en">Home</span><span class="lang-si">මුල් පිටුව</span><span class="lang-ta">முகப்பு</span></a></li>
+                    <li><a href="index.html" class="active"><span class="lang-en">Home</span><span class="lang-si">මුල් පිටුව</span><span class="lang-ta">முகப்பு</span></a></li>
                     <li><a href="src/pages/datamap.html"><span class="lang-en">Data Map</span><span class="lang-si">දත්ත සිතියම</span><span class="lang-ta">தரவு வரைபடம்</span></a></li>
                     <li><a href="src/pages/about.html"><span class="lang-en">About</span><span class="lang-si">අප ගැන</span><span class="lang-ta">எங்களைப் பற்றி</span></a></li>
 
                     <li class="auth-dropdown-container" id="auth-section">
-                        </li>
+                        <div class="dropdown">
+                            <button class="dropbtn">
+                                <span class="lang-en">Sign In ▼</span>
+                                <span class="lang-si">පද්ධතියට පිවිසෙන්න ▼</span>
+                                <span class="lang-ta">உள்நுழை ▼</span>
+                            </button>
+                            <div class="dropdown-content">
+                                <a href="src/pages/victimSignIn.html"><span class="lang-en">Victim Sign In</span><span class="lang-si">පීඩිත පිවිසුම</span><span class="lang-ta">பாதிக்கப்பட்டவர் உள்நுழை</span></a>
+                                <a href="src/pages/victimSignUp.html"><span class="lang-en">Victim Sign Up</span><span class="lang-si">පීඩිත ලියාපදිංචිය</span><span class="lang-ta">பாதிக்கப்பட்டவர் பதிவு</span></a>
+                                <a href="src/pages/contributorSignIn.html"><span class="lang-en">Contributor Sign In</span><span class="lang-si">උපකරන්නෙකු පිවිසුම</span><span class="lang-ta">தொண்டு செய்பவர் உள்நுழை</span></a>
+                                <a href="src/pages/contributorSignUp.html"><span class="lang-en">Contributor Sign Up</span><span class="lang-si">උපකරන්නෙකු ලියාපදිංචිය</span><span class="lang-ta">தொண்டு செய்பவர் பதிவு</span></a>
+                                <a href="src/pages/adminSignIn.html"><span class="lang-en">Admin Sign In</span><span class="lang-si">පරිපාලක පිවිසුම</span><span class="lang-ta">நிர்வாகி உள்நுழை</span></a>
+                            </div>
+                        </div>
+                    </li>
 
-                    <li><a href="#" onclick="localStorage.removeItem('siteLang'); location.reload();" style="color:#ffcc00;font-weight:bold"><span class="lang-en">🌐 Lang</span><span class="lang-si">🌐 භාෂාව</span><span class="lang-ta">🌐 மொழி</span></a></li>
+                    <li><a href="#" onclick="localStorage.removeItem('siteLang'); location.reload();" style="color:#ffcc00;font-weight:bold"><span class="lang-en">🌐 Lang</span><span class="lang-si">🌐 භාෂාව</span><span class="lang-ta">🌐 மொழි</span></a></li>
                 </ul>
             </div>
         </div>
@@ -66,5 +80,3 @@
 <script src="src/scripts/script.js"></script>
 </body>
 </html>
-
-/* test*/

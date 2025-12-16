@@ -8,6 +8,18 @@
    for easy navigation and development.
 */
 
+UPDATE (Dec 13, 2025):
+- `src/pages/` and `src/scripts/` duplicates have been removed to avoid confusion.
+- Canonical locations now:
+  • HTML pages in `Frontend/` (root)
+  • CSS in `Frontend/css/`
+  • JS in `Frontend/js/`
+  • Images in `Frontend/images/`
+  Path examples from root HTML:
+  • CSS: `css/style.css`
+  • JS: `js/script.js`
+  • Image: `images/header.jpg`
+
 BEFORE (Messy):
 └── Frontend/
     ├── index.html (root)
@@ -125,21 +137,10 @@ KEY IMPROVEMENTS:
 PATH REFERENCE QUICK GUIDE:
 ────────────────────────────────────────────────────────────
 
-FROM ROOT (index.html):
-  Styles:  src/styles/filename.css
-  Scripts: src/scripts/filename.js
-  Images:  src/assets/images/filename.jpg
-
-FROM src/pages/ (HTML files):
-  Styles:  ../../styles/filename.css
-  Scripts: ../../scripts/filename.js
-  Images:  ../../assets/images/filename.jpg
-
-FROM src/styles/ (CSS files):
-  Images:  ../assets/images/filename.jpg
-
-FROM src/scripts/ (JS files):
-  Images:  ../assets/images/filename.jpg
+FROM ROOT (HTML files in `Frontend/`):
+  Styles:  css/filename.css
+  Scripts: js/filename.js
+  Images:  images/filename.jpg
 
 ═══════════════════════════════════════════════════════════════
 
