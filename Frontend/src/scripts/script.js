@@ -21,8 +21,11 @@ document.addEventListener('DOMContentLoaded', function() {
         body.classList.remove('sinhala-mode');
         body.classList.remove('tamil-mode');
     } else {
-        // 1.3 IF NEW USER: Show Popup
-        createPopup();
+        // 1.3 IF NEW USER: Show Popup (only if not already showing)
+        // Check if modal already exists to prevent duplicates
+        if (!document.getElementById('languageModal')) {
+            createPopup();
+        }
     }
 
     // 1.4 INJECT FOOTER & AUTH MENU
@@ -93,6 +96,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // --- CREATE POPUP ---
 function createPopup() {
+    // Double-check localStorage is actually empty (prevent race conditions)
+    const savedLang = localStorage.getItem('siteLang');
+    if (savedLang) {
+        // Language was already set, don't show popup
+        applyLanguage(savedLang);
+        return;
+    }
+    
+    // Only create if it doesn't already exist
+    if (document.getElementById('languageModal')) {
+        return;
+    }
+    
     const modal = document.createElement('div');
     modal.id = 'languageModal';
     modal.className = 'lang-modal';
@@ -106,29 +122,34 @@ function createPopup() {
             </h2>
             <button class="lang-btn btn-en" onclick="setLanguage('en')">English</button>
             <button class="lang-btn btn-si" onclick="setLanguage('si')"><span style="font-family: 'Yaldevi', 'Noto Sans Sinhala', sans-serif;">සිංහල</span></button>
-            <button class="lang-btn btn-ta" onclick="setLanguage('ta')">தமிழ்</button>
+            <button class="lang-btn btn-ta" onclick="setLanguage('ta')">தමிழ්</button>
         </div>
     `;
     document.body.appendChild(modal);
 }
 
-// --- SET LANGUAGE FUNCTION ---
-function setLanguage(lang) {
+// --- APPLY LANGUAGE (helper function) ---
+function applyLanguage(lang) {
     const body = document.body;
-    
     body.classList.remove('sinhala-mode');
     body.classList.remove('tamil-mode');
-
+    
     if (lang === 'si') {
         body.classList.add('sinhala-mode');
-        localStorage.setItem('siteLang', 'si');
     } else if (lang === 'ta') {
         body.classList.add('tamil-mode');
-        localStorage.setItem('siteLang', 'ta');
-    } else {
-        localStorage.setItem('siteLang', 'en');
     }
+}
 
+// --- SET LANGUAGE FUNCTION ---
+function setLanguage(lang) {
+    // Save to localStorage FIRST to ensure persistence
+    localStorage.setItem('siteLang', lang);
+    
+    // Apply language to current page
+    applyLanguage(lang);
+
+    // Remove modal
     const modal = document.getElementById('languageModal');
     if (modal) modal.remove();
 }
