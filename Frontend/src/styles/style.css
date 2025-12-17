@@ -279,8 +279,9 @@ main {
 }
 
 .team-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 20px;
     /* Make all grid cells equal height so cards line up */
     align-items: stretch;
@@ -288,6 +289,8 @@ main {
 }
 
 .developer-card {
+    flex: 1 1 250px;
+    max-width: 300px;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);

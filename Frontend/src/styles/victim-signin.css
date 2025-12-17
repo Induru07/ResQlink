@@ -26,7 +26,7 @@ body {
     justify-content: flex-start;
     align-items: center;
     padding: 12px 16px;
-    background: rgba(42, 82, 152, 0.85);
+    background: rgba(23, 57, 115, 0.85);
     backdrop-filter: blur(6px);
     z-index: 1000;
 }
@@ -52,7 +52,7 @@ body {
 }
 
 .header { 
-    background: #2a5298; 
+    background: #0a1e42; 
     color: white; 
     padding: 25px; 
     text-align: center; 
@@ -93,13 +93,13 @@ input {
 
 input:focus {
     outline: none;
-    border-color: #2a5298;
+    border-color: #142a51;
 }
 
 .btn { 
     width: 100%; 
     padding: 12px; 
-    background: #2a5298; 
+    background: #132f5f; 
     color: white; 
     border: none; 
     border-radius: 5px; 
@@ -110,7 +110,7 @@ input:focus {
 }
 
 .btn:hover {
-    background: #1e3f5a;
+    background: #16354e;
 }
 
 .alert { 
@@ -139,7 +139,7 @@ input:focus {
 }
 
 .form-footer a {
-    color: #2a5298;
+    color: #0e264f;
     text-decoration: none;
     font-size: 14px;
 }
