@@ -279,12 +279,18 @@ main {
 }
 
 .team-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 20px;
+    /* Make all grid cells equal height so cards line up */
+    align-items: stretch;
+    grid-auto-rows: 1fr;
 }
 
 .developer-card {
+    flex: 1 1 250px;
+    max-width: 300px;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -295,6 +301,10 @@ main {
     transition: transform 0.3s, background 0.3s;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     cursor: pointer;
+    /* Ensure each card fills its grid cell and content can be spaced vertically */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .developer-card:hover {
@@ -319,7 +329,8 @@ main {
 .click-hint {
     font-size: 0.7rem;
     color: rgba(255,255,255,0.5);
-    margin-top: 10px;
+    /* Push hint to bottom so card content aligns consistently */
+    margin-top: auto;
 }
 
 /* =========================================
@@ -352,10 +363,11 @@ main {
 
 .modal-inner {
     background: #111;
-    padding: 30px;
+    padding: 20px;
     border-radius: 13px;
     text-align: center;
     color: white;
+    box-sizing: border-box;
 }
 
 @keyframes popIn {
@@ -370,7 +382,59 @@ main {
     object-fit: cover;
     border: 3px solid #00d2ff;
     margin-bottom: 20px;
+    margin-top: 20px;
     box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
+}
+
+/* Social icon sizing inside the modal */
+.modal-icons {
+    /* FORCE small gap only */
+    margin-top: 10px !important; 
+    margin-bottom: 0px;
+    
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+.modal-icons a {
+    display: inline-block;
+    width: auto; /* let the image size determine the clickable area */
+    height: auto;
+    border-radius: 6px;
+    overflow: visible;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+.modal-icons img {
+    width: 100px;
+    height:40px;
+    margin-top: 25px;
+    margin-bottom: 0px;
+    cursor: pointer;
+    transform: scale(0.85); /* default slightly smaller */
+}
+
+.modal-icons a:focus img {
+    transform: scale(1); /* full size on hover/focus */
+}
+
+/* Modal description boxed styling (as requested) */
+#modalDesc {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    display: block;
+    width: 100%;
+    color: #b5b5b5;
+    font-size: 0.75rem;
+    line-height: 1.6;
+
+    /* FORCE margin to zero to test */
+    margin-top: 20px;
+    margin-bottom: 0px !important; 
 }
 
 .close-btn {
@@ -699,4 +763,70 @@ body.tamil-mode .lang-si {
         padding-left: 30px;
         border-bottom: 1px solid rgba(255,255,255,0.05);
     }
+}
+
+/* =========================================
+   STATS DASHBOARD
+   ========================================= */
+.hero-section {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.hero-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #004d66;
+}
+
+.stats-container {
+    padding: 40px 20px;
+    background-color: #fff;
+    text-align: center;
+}
+
+.stats-container h2 {
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.stat-card {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card h3 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #004d66;
+}
+
+.stat-card p {
+    color: #666;
+    font-weight: bold;
+}
+
+.stat-card.danger h3 {
+    color: #e74c3c;
+}
+
+.stat-card.success h3 {
+    color: #27ae60;
 }

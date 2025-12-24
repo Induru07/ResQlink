@@ -7,13 +7,22 @@
 }
 
 body { 
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+    background: linear-gradient(135deg, #004d66 0%, #002633 100%); 
     min-height: 100vh; 
     display: flex; 
     justify-content: center; 
     align-items: center; 
     padding: 20px; 
     padding-top: 80px; 
+}
+
+.header-banner-container {
+    width: 100%;
+    background-color: #004d66; 
+    line-height: 0; /* Removes gap below image */
+    z-index: 10;
+    position: relative;
+    margin-bottom: 0;
 }
 
 .compact-nav { 

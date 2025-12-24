@@ -41,9 +41,9 @@
                 </button>
                 
                 <ul class="nav-links" id="nav-links">
-                    <li><a href="../../index.html" class="active"><span class="lang-en">Home</span><span class="lang-si">මුල් පිටුව</span><span class="lang-ta">முகப்பு</span></a></li>
+                    <li><a href="../../index.html" ><span class="lang-en">Home</span><span class="lang-si">මුල් පිටුව</span><span class="lang-ta">முகப்பு</span></a></li>
                     <li><a href="datamap.html"><span class="lang-en">Data Map</span><span class="lang-si">දත්ත සිතියම</span><span class="lang-ta">தரவு வரைபடம்</span></a></li>
-                    <li><a href="about.html"><span class="lang-en">About</span><span class="lang-si">අප ගැන</span><span class="lang-ta">எங்களைப் பற்றி</span></a></li>
+                    <li><a href="about.html" class="active"><span class="lang-en">About</span><span class="lang-si">අප ගැන</span><span class="lang-ta">எங்களைப் பற்றி</span></a></li>
 
                     <li class="auth-dropdown-container" id="auth-section">
                         </li>
@@ -63,31 +63,62 @@
             
             <div class="team-grid">
                 <!-- Added onclick event to trigger the modal -->
-                <div class="developer-card" onclick="openModal('Adeesha W. G. I', 'images/induru.jpg')">
+                <div class="developer-card" onclick="openModal(
+                    'Adeesha W. G. I',
+                    '../assets/images/induru.jpg',
+                    'Backend Developer',
+                    'CSE Undergraduate at the University of Moratuwa. Adeesha powers the ResQlink platform using Node.js and MongoDB, driven by a passion for robotics, machine learning, and engineering solutions that save lives.',
+                    'https://www.linkedin.com/in/induru-adeesha-85b019343',
+                    'https://www.github.com/induru07')">
                     <div class="dev-role">Backend Developer</div>
                     <div class="dev-name">Adeesha W. G. I</div>
-                    <div class="click-hint">(Click to view)</div>
+                    <div class="click-hint">(Click to view)</div>   
+
                 </div>
 
-                <div class="developer-card" onclick="openModal('Jayasinghe M. D. S. C', 'images/chamath.jpg')">
+                <div class="developer-card" onclick="openModal(
+                    'Chamath Jayasinghe',
+                    '../assets/images/chamath.jpg',
+                    'Frontend Developer & Graphic Designer',
+                    'Focused on making the site visually attractive, user-friendly, and easy to understand.I\'m Focused on designing visually appealing, user-friendly, and intuitive digital experiences 🎨. Holds an NVQ Level 4 Certification in Graphic Design and is currently an undergraduate in Computer Science & Engineering at the University of Moratuwa 🎓, with a strong interest in Machine Learning and intelligent systems 🤖.',
+                    'https://www.linkedin.com/in/mdscj',
+                    'https://github.com/MDSCJ')">
                     <div class="dev-role">Frontend Developer</div>
                     <div class="dev-name">Jayasinghe M. D. S. C</div>
                     <div class="click-hint">(Click to view)</div>
                 </div>
 
-                <div class="developer-card" onclick="openModal('Wickramarathna W. W. N. D.', 'images/devindi.jpg')">
+                <div class="developer-card" onclick="openModal(
+                    'Devindi Wickramarathna',
+                    '../assets/images/devindi.jpg',
+                    'Developer',
+                    'Part of the core team ensuring the Flood Management System runs smoothly.',
+                    'https://www.linkedin.com/in/devindi-wickramarathna-076609342?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app',
+                    'https://github.com/DevindiWickramarathna')">
                     <div class="dev-role">Developer</div>
                     <div class="dev-name">Wickramarathna W. W. N. D.</div>
                     <div class="click-hint">(Click to view)</div>
                 </div>
 
-                <div class="developer-card" onclick="openModal('Rajapaksha W. T. D', 'images/thisandi.jpg')">
+                <div class="developer-card" onclick="openModal(
+                    'Rajapaksha W. T. D',
+                    '../assets/images/thisandi.jpg',
+                    'Frontend Developer',
+                    'I am a BSc (Hons) Engineering undergraduate with an interest in artificial intelligence, web development, robotics and Python programming.',
+                    'https://www.linkedin.com/in/thisandi-rajapaksha-80b289330',
+                    'https://github.com/thisandirajapaksha')">
                     <div class="dev-role">Developer</div>
                     <div class="dev-name">Rajapaksha W. T. D</div>
                     <div class="click-hint">(Click to view)</div>
                 </div>
 
-                <div class="developer-card" onclick="openModal('Abeykoon T. B', 'images/thiseni.jpg')">
+                <div class="developer-card" onclick="openModal(
+                    'Abeykoon T. B',
+                    '../assets/images/thiseni.jpg',
+                    'Frontend Developer',
+                    'I am a BSc (Hons) Engineering undergraduate with an interest in artificial intelligence,web development , robotics and Python programming. I enjoy learning new technologies, solving problems, and applying my skills to real-world projects.',
+                    'https://www.linkedin.com/in/thisandi-rajapaksha-80b289330',
+                    'https://github.com/thisandirajapaksha')">
                     <div class="dev-role">Developer</div>
                     <div class="dev-name">Abeykoon T. B</div>
                     <div class="click-hint">(Click to view)</div>
@@ -103,10 +134,16 @@
             <div class="modal-inner">
                 <img id="modalImg" class="modal-img" src="" alt="Developer Photo">
                 <h2 id="modalName" style="margin-bottom: 10px;">Name</h2>
-                <p style="color: #aaa;">Full Stack Developer</p>
-                <p style="font-size: 0.9rem; margin-top: 15px; color: #888;">
-                    Part of the core team ensuring the Flood Management System runs smoothly.
-                </p>
+                <p id="modalRole" style="color: #aaa;"></p>
+                <p id="modalDesc" style="font-size: 0.9rem; margin-top: 15px; color: #888;"></p>
+                <div class="modal-icons">
+                    <a id="modalLinkedIn" href="#" target="_blank" aria-label="LinkedIn">
+                        <img src="../assets/images/linkedin.png" alt="LinkedIn">
+                    </a>
+                    <a id="modalGithub" href="#" target="_blank" aria-label="GitHub">
+                        <img src="../assets/images/github.png" alt="GitHub">
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -118,12 +155,35 @@
         const modal = document.getElementById("profileModal");
         const modalImg = document.getElementById("modalImg");
         const modalName = document.getElementById("modalName");
+        const modalRole = document.getElementById("modalRole");
+        const modalDesc = document.getElementById("modalDesc");
+        const modalLinkedIn = document.getElementById("modalLinkedIn");
+        const modalGithub = document.getElementById("modalGithub");
 
-        function openModal(name, imgSrc) {
+        function openModal(name, imgSrc, role, desc, linkedin, github) {
             modal.style.display = "flex";
-            modalName.innerText = name;
-            modalImg.src = imgSrc;
+            modalName.innerText = name || '';
+            modalImg.src = imgSrc || '';
+            modalRole.innerText = role || '';
+            modalDesc.innerText = desc || '';
+
+            if (linkedin && linkedin !== '#') {
+                modalLinkedIn.href = linkedin;
+                modalLinkedIn.style.display = 'inline-block';
+            } else {
+                modalLinkedIn.href = '#';
+                modalLinkedIn.style.display = 'none';
+            }
+
+            if (github && github !== '#') {
+                modalGithub.href = github;
+                modalGithub.style.display = 'inline-block';
+            } else {
+                modalGithub.href = '#';
+                modalGithub.style.display = 'none';
+            }
         }
+
 
         function closeModal() {
             modal.style.display = "none";
@@ -143,10 +203,12 @@
 
         let width, height;
         let particles = [];
-        const particleCount = 200; // Slightly fewer for better gradient performance
+        const maxParticles = 200; // Maximum particles on screen at once
         
         let gravX = 0;
         let gravY = 1;
+        let lastSpawnTime = Date.now();
+        const spawnRate = 50; // Spawn a new particle every 50ms for continuous flow
 
         function resize() {
             width = canvas.width = canvas.parentElement.clientWidth;
@@ -161,18 +223,36 @@
 
         class Particle {
             constructor() {
-                this.reset();
+                this.maxLife = 10000; // 10 seconds in milliseconds
+                this.spawn();
             }
 
-            reset() {
+            spawn() {
+                // Spawn from top of screen for continuous rain effect
                 this.x = Math.random() * width;
-                this.y = Math.random() * height;
+                this.y = -20; // Start slightly above the viewport
                 this.vx = (Math.random() - 0.5) * 2;
-                this.vy = (Math.random() - 0.5) * 2;
-                this.radius = Math.random() * 6 + 4; // Larger drops
+                this.vy = (Math.random() * 2) + 1; // Initial downward velocity (rain falling)
+                this.initialRadius = Math.random() * 6 + 4; // Larger drops
+                this.radius = this.initialRadius;
+                this.createdAt = Date.now(); // Track when particle was created
+            }
+
+            isAlive() {
+                const age = Date.now() - this.createdAt;
+                return age <= this.maxLife;
             }
 
             update() {
+                // Calculate shrinking based on age (shrink in last 2 seconds)
+                const age = Date.now() - this.createdAt;
+                const agePercent = age / this.maxLife;
+                if (agePercent > 0.8) {
+                    // Shrink in the last 2 seconds (20% of 10 seconds)
+                    const shrinkPercent = (agePercent - 0.8) / 0.2; // 0 to 1
+                    this.radius = this.initialRadius * (1 - shrinkPercent);
+                }
+
                 this.vx += gravX * 0.1; 
                 this.vy += gravY * 0.1;
                 this.vx *= 0.98;
@@ -187,6 +267,15 @@
             }
 
             draw() {
+                // Calculate opacity based on age (fade out in last 2 seconds)
+                const age = Date.now() - this.createdAt;
+                const agePercent = age / this.maxLife;
+                let opacity = 1;
+                if (agePercent > 0.8) {
+                    const fadePercent = (agePercent - 0.8) / 0.2; // 0 to 1
+                    opacity = 1 - fadePercent; // Fade from 1 to 0
+                }
+
                 // WATER DROP EFFECT: Radial Gradient
                 // Center is bright white (reflection), edges are transparent blue
                 const gradient = ctx.createRadialGradient(
@@ -199,13 +288,13 @@
                 );
 
                 // 1. Specular highlight (shiny white dot)
-                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+                gradient.addColorStop(0, `rgba(255, 255, 255, ${0.9 * opacity})`);
                 // 2. Light blue body
-                gradient.addColorStop(0.2, 'rgba(135, 206, 235, 0.6)');
+                gradient.addColorStop(0.2, `rgba(135, 206, 235, ${0.6 * opacity})`);
                 // 3. Darker blue edge
-                gradient.addColorStop(0.5, 'rgba(0, 119, 190, 0.4)');
+                gradient.addColorStop(0.5, `rgba(0, 119, 190, ${0.4 * opacity})`);
                 // 4. Fade out completely at edge
-                gradient.addColorStop(1, 'rgba(0, 119, 190, 0)');
+                gradient.addColorStop(1, `rgba(0, 119, 190, 0)`);
 
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
@@ -219,16 +308,31 @@
             }
         }
 
-        for(let i = 0; i < particleCount; i++) {
+        // Spawn initial particles
+        for(let i = 0; i < 20; i++) {
             particles.push(new Particle());
         }
 
         function animate() {
             ctx.clearRect(0, 0, width, height);
             
-            particles.forEach(p => {
-                p.update();
-                p.draw();
+            // Spawn new particles continuously at a steady rate
+            const now = Date.now();
+            if (now - lastSpawnTime > spawnRate) {
+                if (particles.length < maxParticles) {
+                    particles.push(new Particle());
+                    lastSpawnTime = now;
+                }
+            }
+
+            // Update and remove dead particles
+            particles = particles.filter(p => {
+                if (p.isAlive()) {
+                    p.update();
+                    p.draw();
+                    return true;
+                }
+                return false; // Remove dead particles
             });
 
             requestAnimationFrame(animate);

@@ -70,13 +70,48 @@
     
 
     <main>
-        <div class="placeholder-content">
-            <p><strong>[Main content goes here]</strong></p>
-            <p>The header above should now display your full flood image.</p>
-        </div>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>Connecting Help to Those in Need</h1>
+                <p>ResQLink is a centralized platform for flood management, coordinating victims, contributors, and distributors for efficient relief.</p>
+            </div>
+        </section>
+
+        <!-- Stats Dashboard -->
+        <section class="stats-container">
+            <h2>Live Impact Dashboard</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="stat-total-users"></h3>
+                    <p>Total Users</p>
+                </div>
+                <div class="stat-card danger">
+                    <h3 id="stat-victims-danger">0</h3>
+                    <p>Victims in Danger</p>
+                </div>
+                <div class="stat-card success">
+                    <h3 id="stat-victims-helped">0</h3>
+                    <p>Victims Helped</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-total-victims">0</h3>
+                    <p>Total Victims</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-total-contributors">0</h3>
+                    <p>Contributors</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-collection-points">0</h3>
+                    <p>Collection Points</p>
+                </div>
+            </div>
+        </section>
     </main>
 
     <div id="dynamic-footer"></div>
+<script src="src/scripts/config.js"></script>
 <script src="src/scripts/script.js"></script>
 </body>
 </html>
