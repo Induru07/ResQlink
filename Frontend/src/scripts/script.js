@@ -21,18 +21,14 @@ document.addEventListener('DOMContentLoaded', function() {
         body.classList.remove('sinhala-mode');
         body.classList.remove('tamil-mode');
     } else {
-        // 1.3 IF NEW USER: Show Popup (only if not already showing)
-        // Check if modal already exists to prevent duplicates
-        if (!document.getElementById('languageModal')) {
-            createPopup();
-        }
+        // 1.3 IF NEW USER: Show Popup
+        createPopup();
     }
 
     // 1.4 INJECT FOOTER & AUTH MENU
     injectFooter();
     updateAuthMenu(); // <--- Initialize the Auth Menu
     applyRoleNavigation(); // <--- Add role-based tabs
-    fetchStats(); // <--- Fetch Live Stats
 
     // =========================================================
     // 2. MOBILE MENU LOGIC
@@ -96,19 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // --- CREATE POPUP ---
 function createPopup() {
-    // Double-check localStorage is actually empty (prevent race conditions)
-    const savedLang = localStorage.getItem('siteLang');
-    if (savedLang) {
-        // Language was already set, don't show popup
-        applyLanguage(savedLang);
-        return;
-    }
-    
-    // Only create if it doesn't already exist
-    if (document.getElementById('languageModal')) {
-        return;
-    }
-    
     const modal = document.createElement('div');
     modal.id = 'languageModal';
     modal.className = 'lang-modal';
@@ -122,34 +105,29 @@ function createPopup() {
             </h2>
             <button class="lang-btn btn-en" onclick="setLanguage('en')">English</button>
             <button class="lang-btn btn-si" onclick="setLanguage('si')"><span style="font-family: 'Yaldevi', 'Noto Sans Sinhala', sans-serif;">සිංහල</span></button>
-            <button class="lang-btn btn-ta" onclick="setLanguage('ta')">தමிழ්</button>
+            <button class="lang-btn btn-ta" onclick="setLanguage('ta')">தமிழ்</button>
         </div>
     `;
     document.body.appendChild(modal);
 }
 
-// --- APPLY LANGUAGE (helper function) ---
-function applyLanguage(lang) {
-    const body = document.body;
-    body.classList.remove('sinhala-mode');
-    body.classList.remove('tamil-mode');
-    
-    if (lang === 'si') {
-        body.classList.add('sinhala-mode');
-    } else if (lang === 'ta') {
-        body.classList.add('tamil-mode');
-    }
-}
-
 // --- SET LANGUAGE FUNCTION ---
 function setLanguage(lang) {
-    // Save to localStorage FIRST to ensure persistence
-    localStorage.setItem('siteLang', lang);
+    const body = document.body;
     
-    // Apply language to current page
-    applyLanguage(lang);
+    body.classList.remove('sinhala-mode');
+    body.classList.remove('tamil-mode');
 
-    // Remove modal
+    if (lang === 'si') {
+        body.classList.add('sinhala-mode');
+        localStorage.setItem('siteLang', 'si');
+    } else if (lang === 'ta') {
+        body.classList.add('tamil-mode');
+        localStorage.setItem('siteLang', 'ta');
+    } else {
+        localStorage.setItem('siteLang', 'en');
+    }
+
     const modal = document.getElementById('languageModal');
     if (modal) modal.remove();
 }
@@ -421,49 +399,3 @@ document.addEventListener('click', function(event) {
         dropdown.classList.remove('show');
     }
 });
-
-// =========================================================
-// STATS DASHBOARD LOGIC
-// =========================================================
-async function fetchStats() {
-    try {
-        console.log("Fetching stats from:", `${API_URL}/api/general/stats`);
-        const response = await fetch(`${API_URL}/api/general/stats`);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("Stats received:", data);
-        
-        if (data.stats) {
-            animateValue("stat-total-users", 0, data.stats.totalUsers || 0, 2000);
-            animateValue("stat-victims-danger", 0, data.stats.victimsInDanger || 0, 2000);
-            animateValue("stat-victims-helped", 0, data.stats.victimsHelped || 0, 2000);
-            animateValue("stat-total-victims", 0, data.stats.totalVictims || 0, 2000);
-            animateValue("stat-total-contributors", 0, data.stats.totalContributors || 0, 2000);
-            animateValue("stat-collection-points", 0, data.stats.totalCollectionPoints || 0, 2000);
-        }
-    } catch (error) {
-        console.error("Error fetching stats:", error);
-        // Optional: Show error in the UI
-        const cards = document.querySelectorAll('.stat-card h3');
-        cards.forEach(card => card.innerText = "-");
-    }
-}
-
-function animateValue(id, start, end, duration) {
-    const obj = document.getElementById(id);
-    if (!obj) return;
-    let startTimestamp = null;
-    const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        obj.innerHTML = Math.floor(progress * (end - start) + start);
-        if (progress < 1) {
-            window.requestAnimationFrame(step);
-        }
-    };
-    window.requestAnimationFrame(step);
-}
