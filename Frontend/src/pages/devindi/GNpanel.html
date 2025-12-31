@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grama Niladhari Panel | ResQLink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Sidebar Styles */
+        .sidebar { width: 250px; height: 100vh; position: fixed; background: #212529; color: white; padding-top: 20px; transition: all 0.3s; z-index: 1000; }
+        .main-content { margin-left: 250px; padding: 20px; }
+        .nav-link { color: #aaa; padding: 12px 20px; display: block; text-decoration: none; cursor: pointer; }
+        .nav-link:hover, .nav-link.active { background: #343a40; color: white; border-left: 4px solid #0d6efd; }
+        
+        /* Card Styles */
+        .card-victim { border-left: 5px solid #ccc; transition: 0.2s; }
+        .card-victim:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .border-sos { border-left-color: #dc3545; }
+        
+        /* Section Visibility */
+        .content-section { display: none; animation: fadeIn 0.4s; }
+        .content-section.active { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Inventory Badges */
+        .stock-card { border: none; border-radius: 12px; transition: 0.3s; }
+        .stock-card:hover { transform: scale(1.02); }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h4 class="text-center mb-4"><i class="fa-solid fa-life-ring"></i> GN Panel</h4>
+    <nav>
+        <a onclick="showSection('triage', this)" class="nav-link active"><i class="fa-solid fa-users me-2"></i> Victim Triage</a>
+        <a onclick="showSection('stock', this)" class="nav-link"><i class="fa-solid fa-box-open me-2"></i> Relief Stock</a>
+        <a onclick="showSection('report', this)" class="nav-link"><i class="fa-solid fa-bullhorn me-2"></i> Report Incident</a>
+        <hr class="border-secondary">
+        <a href="admin-auth.html" class="nav-link text-danger"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a>
+    </nav>
+</div>
+
+<div class="main-content">
+    
+    <header class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
+        <div>
+            <h5 class="m-0 fw-bold text-secondary">Area: 374-B (Kaduwela North)</h5>
+            <small class="text-muted">Status: <span class="text-success fw-bold">Active Flood Zone</span></small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary p-2">Officer: Perera</span>
+            <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-bell"></i> 3</button>
+        </div>
+    </header>
+
+    <div id="section-triage" class="content-section active">
+        <h4 class="mb-3">Victim Management</h4>
+        
+        <ul class="nav nav-pills mb-3">
+            <li class="nav-item"><button class="nav-link active bg-danger text-white me-2">Critical SOS (5)</button></li>
+            <li class="nav-item"><button class="nav-link bg-white text-dark border me-2">High Risk (12)</button></li>
+            <li class="nav-item"><button class="nav-link bg-white text-dark border">Needs Food (150)</button></li>
+        </ul>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card p-3 card-victim border-sos bg-white shadow-sm">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="fw-bold">Nimal Siripala</h6>
+                        <span class="badge bg-danger">SOS</span>
+                    </div>
+                    <small class="text-muted">NIC: 851234567V</small>
+                    <p class="small mt-2 mb-2"><i class="fa-solid fa-location-dot text-danger"></i> Roof of House 45, Temple Rd</p>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-sm btn-danger"><i class="fa-solid fa-ship"></i> Request Boat</button>
+                        <button class="btn btn-sm btn-outline-secondary">Verify</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card p-3 card-victim border-sos bg-white shadow-sm">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="fw-bold">Kamala Devi</h6>
+                        <span class="badge bg-danger">Medical</span>
+                    </div>
+                    <small class="text-muted">NIC: 921234567V</small>
+                    <p class="small mt-2 mb-2"><i class="fa-solid fa-heart-pulse text-danger"></i> Diabetic - Needs Insulin</p>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-sm btn-warning text-dark"><i class="fa-solid fa-user-doctor"></i> Request Medic</button>
+                        <button class="btn btn-sm btn-outline-secondary">Verify</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-stock" class="content-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Inventory Management</h4>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#requestStockModal">
+                <i class="fa-solid fa-plus"></i> Request Supplies from DS
+            </button>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card stock-card bg-primary text-white p-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-0">120</h2>
+                            <small>Rice Packs (5kg)</small>
+                        </div>
+                        <i class="fa-solid fa-bowl-rice fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stock-card bg-info text-white p-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-0">500L</h2>
+                            <small>Drinking Water</small>
+                        </div>
+                        <i class="fa-solid fa-bottle-water fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stock-card bg-warning text-dark p-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-0">45</h2>
+                            <small>First Aid Kits</small>
+                        </div>
+                        <i class="fa-solid fa-kit-medical fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stock-card bg-success text-white p-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-0">100</h2>
+                            <small>Blankets</small>
+                        </div>
+                        <i class="fa-solid fa-mattress-pillow fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold">Recent Distributions</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Time</th>
+                            <th>Family Representative</th>
+                            <th>Items Given</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>10:30 AM</td>
+                            <td>S. Perera (NIC: 88...)</td>
+                            <td>2x Rice, 4x Water</td>
+                            <td><span class="badge bg-secondary">Logged</span></td>
+                        </tr>
+                        <tr>
+                            <td>11:15 AM</td>
+                            <td>K. Silva (NIC: 76...)</td>
+                            <td>1x First Aid, 2x Blankets</td>
+                            <td><span class="badge bg-secondary">Logged</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-report" class="content-section">
+        <h4 class="mb-3">Report Field Incident</h4>
+        <p class="text-muted">Use this form to report infrastructure damage or hazards to the Divisional Secretariat.</p>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Incident Type</label>
+                                <select class="form-select">
+                                    <option>Select Type...</option>
+                                    <option>Road Blockage / Landslide</option>
+                                    <option>Bridge Collapse</option>
+                                    <option>Power Line Down</option>
+                                    <option>Dyke Breach</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Location Description</label>
+                                <input type="text" class="form-control" placeholder="e.g., Near the 3rd mile post, Main Street">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Severity Level</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="severity" id="low">
+                                        <label class="form-check-label" for="low">Low (Monitor)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="severity" id="high" checked>
+                                        <label class="form-check-label text-danger fw-bold" for="high">High (Immediate Action)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Upload Photo (Evidence)</label>
+                                <input type="file" class="form-control">
+                                <div class="form-text">Please upload a clear photo if safe to do so.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Additional Notes</label>
+                                <textarea class="form-control" rows="3" placeholder="Describe the situation..."></textarea>
+                            </div>
+
+                            <button type="button" class="btn btn-danger btn-lg" onclick="alert('Incident Reported to DS!')">
+                                <i class="fa-solid fa-paper-plane"></i> Submit Report
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="alert alert-info">
+                    <h5><i class="fa-solid fa-circle-info"></i> Guide</h5>
+                    <ul class="mb-0 ps-3">
+                        <li>Report <strong>Road Blocks</strong> immediately to clear supply routes.</li>
+                        <li><strong>Power Lines</strong> require CEB coordination.</li>
+                        <li>Do not put yourself in danger to take photos.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="requestStockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request Supplies from DS</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label>Item Type</label>
+                        <select class="form-select">
+                            <option>Dry Rations (Packs)</option>
+                            <option>Drinking Water (Bottles)</option>
+                            <option>Medicine</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Quantity Needed</label>
+                        <input type="number" class="form-control" placeholder="e.g. 100">
+                    </div>
+                    <div class="mb-3">
+                        <label>Urgency</label>
+                        <select class="form-select">
+                            <option>Normal (Next Truck)</option>
+                            <option class="text-danger">Critical (Immediate)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="alert('Request Sent!')">Send Request</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function showSection(sectionId, element) {
+        // 1. Hide all sections
+        document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+        
+        // 2. Show the selected section
+        document.getElementById('section-' + sectionId).classList.add('active');
+        
+        // 3. Update Sidebar Active State
+        document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
