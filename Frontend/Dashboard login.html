@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResQLink Admin Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card-auth {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+        }
+        .auth-header {
+            background: #0d6efd;
+            padding: 25px;
+            text-align: center;
+            color: white;
+        }
+        .nav-pills .nav-link { color: #555; font-weight: 600; }
+        .nav-pills .nav-link.active { background-color: #0d6efd; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card-auth">
+    <div class="auth-header">
+        <h2><i class="fa-solid fa-shield-halved"></i> ResQLink Admin</h2>
+        <p class="mb-0 small">Official Flood Management Portal</p>
+    </div>
+
+    <div class="p-4">
+        <ul class="nav nav-pills nav-fill mb-4" id="authTab" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="login-tab" data-bs-toggle="pill" data-bs-target="#login-panel" type="button">Sign In</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="register-tab" data-bs-toggle="pill" data-bs-target="#register-panel" type="button">Request Access</button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            
+            <div class="tab-pane fade show active" id="login-panel">
+                <form onsubmit="event.preventDefault(); window.location.href='dashboard.html'">
+                    <div class="mb-3">
+                        <label class="form-label">Official Email / NIC</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                            <input type="text" class="form-control" placeholder="admin@gov.lk" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" class="form-control" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2">Access Dashboard</button>
+                    <div class="text-center mt-3">
+                        <a href="#" class="small text-muted">Forgot Password?</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="tab-pane fade" id="register-panel">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Select Role</label>
+                        <select class="form-select" id="roleSelect" onchange="toggleFields()">
+                            <option value="" disabled selected>Select Position...</option>
+                            <option value="GN">Grama Niladhari</option>
+                            <option value="DS">Divisional Secretary</option>
+                            <option value="GOV">Govt / Disaster Center</option>
+                            <option value="DEV">Developer</option>
+                        </select>
+                    </div>
+
+                    <div id="locFields" class="hidden p-3 bg-light border rounded mb-3">
+                        <small class="text-primary fw-bold mb-2 d-block">Assignment Area</small>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="text" class="form-control form-control-sm" placeholder="District">
+                            </div>
+                            <div class="col-6">
+                                <input type="text" class="form-control form-control-sm" placeholder="DS Division">
+                            </div>
+                            <div class="col-12 hidden" id="gnCodeField">
+                                <input type="text" class="form-control form-control-sm" placeholder="GN Division Code (e.g. 374-B)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Upload Official ID</label>
+                        <input type="file" class="form-control form-control-sm" required>
+                    </div>
+
+                    <button type="button" class="btn btn-success w-100 py-2" onclick="alert('Request sent! Please wait for DS approval.')">Submit Request</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Simple logic to show/hide fields based on role
+    function toggleFields() {
+        const role = document.getElementById('roleSelect').value;
+        const locFields = document.getElementById('locFields');
+        const gnCode = document.getElementById('gnCodeField');
+
+        if(role === 'GN' || role === 'DS') {
+            locFields.classList.remove('hidden');
+        } else {
+            locFields.classList.add('hidden');
+        }
+
+        if(role === 'GN') {
+            gnCode.classList.remove('hidden');
+        } else {
+            gnCode.classList.add('hidden');
+        }
+    }
+</script>
+</body>
+</html>
