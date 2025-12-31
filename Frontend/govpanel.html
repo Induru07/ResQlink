@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Center | ResQLink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #eef2f7; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Sidebar */
+        .sidebar { width: 250px; height: 100vh; position: fixed; background: #0f172a; color: white; padding-top: 20px; transition: all 0.3s; z-index: 1000; }
+        .main-content { margin-left: 250px; padding: 20px; }
+        
+        .nav-link { color: #94a3b8; padding: 12px 20px; display: block; text-decoration: none; cursor: pointer; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { background: #1e293b; color: white; border-left: 4px solid #3b82f6; }
+        
+        /* Section Visibility */
+        .content-section { display: none; animation: fadeIn 0.4s; }
+        .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Custom Widgets */
+        .stat-card { border: none; border-radius: 10px; padding: 20px; color: white; transition: 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        
+        .alert-history-item { border-left: 4px solid #dc3545; background: white; margin-bottom: 10px; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h4 class="text-center mb-4 text-uppercase fw-bold" style="letter-spacing: 2px;">DMC National</h4>
+    <nav>
+        <a onclick="showSection('command', this)" class="nav-link active"><i class="fa-solid fa-globe me-2"></i> Command Center</a>
+        <a onclick="showSection('aid', this)" class="nav-link"><i class="fa-solid fa-hand-holding-dollar me-2"></i> Foreign Aid</a>
+        <a onclick="showSection('broadcast', this)" class="nav-link"><i class="fa-solid fa-tower-broadcast me-2"></i> Broadcast Alerts</a>
+        <a onclick="showSection('analytics', this)" class="nav-link"><i class="fa-solid fa-chart-line me-2"></i> Analytics</a>
+        <hr class="border-secondary">
+        <a href="admin-auth.html" class="nav-link text-danger"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a>
+    </nav>
+</div>
+
+<div class="main-content">
+    
+    <header class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0 text-dark">National Disaster Management Center</h3>
+        <span class="badge bg-danger p-2"><i class="fa-solid fa-circle fa-beat me-1"></i> LIVE MONITORING</span>
+    </header>
+
+    <div id="section-command" class="content-section active">
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card bg-primary shadow">
+                    <h3>12,450</h3>
+                    <p class="mb-0">Total Affected</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card bg-danger shadow">
+                    <h3>$4.2M</h3>
+                    <p class="mb-0">Funds Utilized</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card bg-success shadow">
+                    <h3>145</h3>
+                    <p class="mb-0">Safe Camps Active</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card bg-dark shadow">
+                    <h3>12</h3>
+                    <p class="mb-0">Districts Alerted</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4" style="height: 450px;">
+            <div class="card-header bg-white fw-bold">Island-wide Risk Heatmap</div>
+            <div class="card-body d-flex flex-column align-items-center justify-content-center bg-light">
+                <img src="https://via.placeholder.com/600x350?text=Live+Map+Rendering..." class="img-fluid opacity-50 mb-3">
+                <p class="text-muted"><i class="fa-solid fa-satellite"></i> Fetching real-time satellite data from Meteorology Dept...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-aid" class="content-section">
+        <h4 class="mb-4">International Aid Tracker</h4>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white fw-bold">Recent Inflows</div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Source Organization</th>
+                                    <th>Amount / Items</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><i class="fa-solid fa-flag-usa text-primary"></i> USAID</td>
+                                    <td>$1,000,000 (Grant)</td>
+                                    <td><span class="badge bg-success">Received</span></td>
+                                    <td>Today, 10:00 AM</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa-solid fa-flag text-danger"></i> Red Cross Int.</td>
+                                    <td>5000x Medical Kits</td>
+                                    <td><span class="badge bg-warning text-dark">In Customs</span></td>
+                                    <td>Yesterday</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa-brands fa-google text-primary"></i> Google Crisis Fund</td>
+                                    <td>$500,000</td>
+                                    <td><span class="badge bg-success">Received</span></td>
+                                    <td>2 Days ago</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card bg-info text-white p-4 text-center mb-3">
+                    <h1>$1.5M</h1>
+                    <p>Total Pending Clearance</p>
+                </div>
+                <div class="card border-primary p-3">
+                    <h6 class="fw-bold text-primary">Logistics Partner</h6>
+                    <p class="mb-1">World Food Programme (WFP)</p>
+                    <small class="text-muted">Contact: Mr. Anderson (+94 77...)</small>
+                    <button class="btn btn-sm btn-outline-primary mt-2">View Contract</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-broadcast" class="content-section">
+        <h4 class="mb-4">National Emergency Broadcast System</h4>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card border-danger shadow-sm h-100">
+                    <div class="card-header bg-danger text-white fw-bold">
+                        <i class="fa-solid fa-tower-broadcast"></i> Compose New Alert
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Target Region</label>
+                                <select class="form-select">
+                                    <option>Select District...</option>
+                                    <option value="all" class="text-danger fw-bold">ALL ISLAND (EMERGENCY)</option>
+                                    <option>Kalutara</option>
+                                    <option>Galle</option>
+                                    <option>Ratnapura</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Alert Level</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="level" id="warn">
+                                        <label class="form-check-label text-warning fw-bold" for="warn">Warning (Yellow)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="level" id="crit" checked>
+                                        <label class="form-check-label text-danger fw-bold" for="crit">Evacuate (Red)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Message Title</label>
+                                <input type="text" class="form-control" placeholder="e.g., IMMEDIATE EVACUATION - KALUTARA">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Message Content (SMS/App)</label>
+                                <textarea class="form-control" rows="4" placeholder="River levels critical. Move to higher ground immediately..."></textarea>
+                                <div class="form-text">Character count: 0/160</div>
+                            </div>
+                            <button type="button" class="btn btn-danger w-100 py-2 fw-bold" onclick="alert('BROADCAST SENT SUCCESSFULLY!')">
+                                <i class="fa-solid fa-paper-plane"></i> SEND BROADCAST
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h6 class="text-muted mb-3">Recent Broadcast History</h6>
+                
+                <div class="alert-history-item shadow-sm">
+                    <div class="d-flex justify-content-between">
+                        <strong class="text-danger">FLOOD WARNING - RATNAPURA</strong>
+                        <small class="text-muted">Today, 08:30 AM</small>
+                    </div>
+                    <p class="mb-0 small mt-1">Kalu ganga water levels rising rapidly. Residents in low lying areas advised to be vigilant.</p>
+                </div>
+
+                <div class="alert-history-item shadow-sm" style="border-left-color: #ffc107;">
+                    <div class="d-flex justify-content-between">
+                        <strong class="text-dark">Landslide Watch - Kegalle</strong>
+                        <small class="text-muted">Yesterday, 06:00 PM</small>
+                    </div>
+                    <p class="mb-0 small mt-1">NBRO has issued Level 1 landslide warning for Kegalle district.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-analytics" class="content-section">
+        <h4 class="mb-4">Data Analytics & Reports</h4>
+        
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">Casualties vs Rescued (Last 7 Days)</div>
+                    <div class="card-body d-flex align-items-center justify-content-center" style="height: 300px;">
+                        <div class="text-center text-muted">
+                            <i class="fa-solid fa-chart-area fa-3x mb-3"></i>
+                            <p>Chart Rendering Area</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">Resource Utilization by District</div>
+                    <div class="card-body p-0">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>District</th>
+                                    <th>Funds Used</th>
+                                    <th>Efficiency</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Colombo</td>
+                                    <td>$1.2M</td>
+                                    <td><div class="progress" style="height: 10px;"><div class="progress-bar bg-success" style="width: 80%"></div></div></td>
+                                </tr>
+                                <tr>
+                                    <td>Galle</td>
+                                    <td>$800k</td>
+                                    <td><div class="progress" style="height: 10px;"><div class="progress-bar bg-warning" style="width: 60%"></div></div></td>
+                                </tr>
+                                <tr>
+                                    <td>Matara</td>
+                                    <td>$400k</td>
+                                    <td><div class="progress" style="height: 10px;"><div class="progress-bar bg-danger" style="width: 40%"></div></div></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function showSection(sectionId, element) {
+        // 1. Hide all sections
+        document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+        
+        // 2. Show the selected section
+        document.getElementById('section-' + sectionId).classList.add('active');
+        
+        // 3. Update Sidebar Active State
+        document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+    }
+</script>
+
+</body>
+</html>

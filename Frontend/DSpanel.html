@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divisional Secretary | ResQLink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Sidebar */
+        .sidebar { width: 250px; height: 100vh; position: fixed; background: #1c2331; color: white; padding-top: 20px; transition: all 0.3s; z-index: 1000; }
+        .main-content { margin-left: 250px; padding: 20px; }
+        
+        .nav-link { color: #adb5bd; padding: 12px 20px; display: block; text-decoration: none; cursor: pointer; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { background: #2c3e50; color: white; border-left: 4px solid #00b894; }
+        
+        /* Section Visibility */
+        .content-section { display: none; animation: fadeIn 0.4s; }
+        .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Custom Cards */
+        .stat-card { border: none; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .border-left-success { border-left: 5px solid #00b894; }
+        .border-left-warning { border-left: 5px solid #fdcb6e; }
+        .border-left-danger { border-left: 5px solid #d63031; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h4 class="text-center mb-4"><i class="fa-solid fa-building-columns"></i> DS Panel</h4>
+    <nav>
+        <a onclick="showSection('overview', this)" class="nav-link active"><i class="fa-solid fa-chart-pie me-2"></i> Division Overview</a>
+        <a onclick="showSection('gn-manage', this)" class="nav-link"><i class="fa-solid fa-user-tie me-2"></i> Manage GNs</a>
+        <a onclick="showSection('resources', this)" class="nav-link"><i class="fa-solid fa-truck-monster me-2"></i> Resource Allocation</a>
+        <a onclick="showSection('approvals', this)" class="nav-link"><i class="fa-solid fa-file-contract me-2"></i> Approvals <span class="badge bg-danger ms-2">3</span></a>
+        <hr class="border-secondary">
+        <a href="admin-auth.html" class="nav-link text-danger"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a>
+    </nav>
+</div>
+
+<div class="main-content">
+    
+    <header class="d-flex justify-content-between mb-4 bg-white p-3 rounded shadow-sm">
+        <div>
+            <h5 class="m-0 fw-bold">Kaduwela Divisional Secretariat</h5>
+            <small class="text-muted">Administrator: Mrs. Silva (DS)</small>
+        </div>
+        <div>
+            <button class="btn btn-sm btn-outline-dark me-2"><i class="fa-solid fa-download"></i> Export Report</button>
+            <button class="btn btn-sm btn-danger"><i class="fa-solid fa-tower-broadcast"></i> Declare Emergency</button>
+        </div>
+    </header>
+
+    <div id="section-overview" class="content-section active">
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card bg-white border-left-danger">
+                    <h6 class="text-muted">Active Emergencies</h6>
+                    <h2 class="mb-0 text-danger">3 GN Areas</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card bg-white border-left-warning">
+                    <h6 class="text-muted">Pending Requests</h6>
+                    <h2 class="mb-0 text-warning">12 Items</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card bg-white border-left-success">
+                    <h6 class="text-muted">Resources Deployed</h6>
+                    <h2 class="mb-0 text-success">85%</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h6 class="m-0 fw-bold">Live Grama Niladhari Status</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>GN Division</th>
+                            <th>Officer Name</th>
+                            <th>Status</th>
+                            <th>Active SOS</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>374-B (Malabe North)</td>
+                            <td>Mr. Perera</td>
+                            <td><span class="badge bg-success">Online</span></td>
+                            <td>5</td>
+                            <td><button class="btn btn-sm btn-primary">Contact</button></td>
+                        </tr>
+                        <tr>
+                            <td>375-A (Athurugiriya)</td>
+                            <td>Mrs. Silva</td>
+                            <td><span class="badge bg-secondary">Offline</span></td>
+                            <td>0</td>
+                            <td><button class="btn btn-sm btn-outline-dark">Ping</button></td>
+                        </tr>
+                        <tr>
+                            <td>376-C (Kothalawala)</td>
+                            <td>Mr. Gunaratne</td>
+                            <td><span class="badge bg-danger">Critical</span></td>
+                            <td>12</td>
+                            <td><button class="btn btn-sm btn-danger">Deploy Help</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-gn-manage" class="content-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Grama Niladhari Directory</h4>
+            <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add New GN</button>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <img src="https://via.placeholder.com/60" class="rounded-circle me-3">
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold mb-0">Saman Kumara</h6>
+                            <small class="text-muted">Division: 374-B</small> <br>
+                            <small class="text-success"><i class="fa-solid fa-phone"></i> 077-1234567</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Actions</button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">View Logs</a></li>
+                                <li><a class="dropdown-item text-danger" href="#">Suspend Account</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <img src="https://via.placeholder.com/60" class="rounded-circle me-3">
+                        <div class="flex-grow-1">
+                            <h6 class="fw-bold mb-0">Nimali Perera</h6>
+                            <small class="text-muted">Division: 375-A</small> <br>
+                            <small class="text-success"><i class="fa-solid fa-phone"></i> 071-9876543</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Actions</button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">View Logs</a></li>
+                                <li><a class="dropdown-item text-danger" href="#">Suspend Account</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-resources" class="content-section">
+        <h4 class="mb-3">Heavy Machinery & Logistics</h4>
+        
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-dark text-white text-center p-3">
+                    <h3>05</h3>
+                    <small>Navy Boats Available</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-dark text-white text-center p-3">
+                    <h3>02</h3>
+                    <small>Water Bowsers</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-dark text-white text-center p-3">
+                    <h3>10</h3>
+                    <small>Trucks (Transport)</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-white fw-bold">Deployment Controls</div>
+            <div class="card-body">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Resource</th>
+                            <th>Current Location</th>
+                            <th>Status</th>
+                            <th>Assign To</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="fa-solid fa-ship text-primary"></i> Navy Boat B-01</td>
+                            <td>Malabe Base</td>
+                            <td><span class="badge bg-success">Idle</span></td>
+                            <td>
+                                <select class="form-select form-select-sm">
+                                    <option>Select GN Division...</option>
+                                    <option>374-B (Flood High)</option>
+                                    <option>376-C</option>
+                                </select>
+                            </td>
+                            <td><button class="btn btn-sm btn-primary">Deploy</button></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fa-solid fa-truck text-warning"></i> Bowser W-05</td>
+                            <td>Kothalawala</td>
+                            <td><span class="badge bg-warning text-dark">On Mission</span></td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm" value="Kothalawala" disabled>
+                            </td>
+                            <td><button class="btn btn-sm btn-outline-danger">Recall</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-approvals" class="content-section">
+        <h4 class="mb-3">Pending Approvals</h4>
+        
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <i class="fa-solid fa-user-plus"></i> New GN Account Requests
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>W.A. Silva</strong> (NIC: 851122333V) <br>
+                            <small class="text-muted">Requested for Division: 390-D (Hokandara)</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary">View ID</button>
+                            <button class="btn btn-sm btn-success ms-2">Approve</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <i class="fa-solid fa-boxes-packing"></i> Relief Stock Requests
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Request From</th>
+                            <th>Items</th>
+                            <th>Urgency</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GN Perera (374-B)</td>
+                            <td>100x Rice Packs, 500L Water</td>
+                            <td><span class="badge bg-danger">Critical</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-success">Dispatch</button>
+                                <button class="btn btn-sm btn-outline-danger">Reject</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>GN Silva (375-A)</td>
+                            <td>50x Mats</td>
+                            <td><span class="badge bg-info">Normal</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-success">Dispatch</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function showSection(sectionId, element) {
+        // 1. Hide all sections
+        document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+        
+        // 2. Show the selected section
+        document.getElementById('section-' + sectionId).classList.add('active');
+        
+        // 3. Update Sidebar Active State
+        document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
