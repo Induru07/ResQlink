@@ -56,20 +56,30 @@
         <div class="tab-content">
             
             <div class="tab-pane fade show active" id="login-panel">
-                <form onsubmit="event.preventDefault(); window.location.href='dashboard.html'">
+                <form id="loginForm">
                     <div class="mb-3">
                         <label class="form-label">Official Email / NIC</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
-                            <input type="text" class="form-control" placeholder="admin@gov.lk" required>
+                            <input type="text" class="form-control" id="loginEmail" placeholder="admin@gov.lk" required>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Password</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                            <input type="password" class="form-control" required>
+                            <input type="password" class="form-control" id="loginPassword" required>
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" id="loginRole" required>
+                            <option value="" disabled selected>Select your role...</option>
+                            <option value="DEV">Developer (Root Access)</option>
+                            <option value="GOV">Government / National Center</option>
+                            <option value="DS">Divisional Secretary</option>
+                            <option value="GN">Grama Niladhari</option>
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary w-100 py-2">Access Dashboard</button>
                     <div class="text-center mt-3">
@@ -124,7 +134,17 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../scripts/config.js"></script>
+<script src="../../scripts/adminAPI.js"></script>
 <script>
+    // Check if adminAPI loaded
+    if (typeof adminAPI === 'undefined') {
+        console.error('adminAPI not loaded! Check script paths.');
+        alert('Error: Admin API not loaded. Please check the console.');
+    } else {
+        console.log('adminAPI loaded successfully');
+    }
+    
     // Simple logic to show/hide fields based on role
     function toggleFields() {
         const role = document.getElementById('roleSelect').value;
@@ -143,6 +163,62 @@
             gnCode.classList.add('hidden');
         }
     }
+
+    // Login form handler
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const role = document.getElementById('loginRole').value;
+        
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Authenticating...';
+        
+        try {
+            // Authenticate with backend
+            const response = await adminAPI.login(email, password, role);
+            
+            // Store admin session (already done in adminAPI, but update with full data)
+            localStorage.setItem('adminSession', JSON.stringify({
+                ...response.admin,
+                loginTime: new Date().toISOString()
+            }));
+            
+            // Redirect based on role hierarchy
+            let dashboardPage = '';
+            switch(role) {
+                case 'DEV':
+                    dashboardPage = 'Devpanel.html';
+                    break;
+                case 'GOV':
+                    dashboardPage = 'govpanel.html';
+                    break;
+                case 'DS':
+                    dashboardPage = 'DSpanel.html';
+                    break;
+                case 'GN':
+                    dashboardPage = 'GNpanel.html';
+                    break;
+                default:
+                    throw new Error('Invalid role selected');
+            }
+            
+            window.location.href = dashboardPage;
+            
+        } catch (error) {
+            // Show error message
+            alert('Login failed: ' + error.message);
+            console.error('Login error:', error);
+            
+            // Reset button
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    });
 </script>
 </body>
 </html>

@@ -40,7 +40,7 @@
         <a onclick="showSection('stock', this)" class="nav-link"><i class="fa-solid fa-box-open me-2"></i> Relief Stock</a>
         <a onclick="showSection('report', this)" class="nav-link"><i class="fa-solid fa-bullhorn me-2"></i> Report Incident</a>
         <hr class="border-secondary">
-        <a href="admin-auth.html" class="nav-link text-danger"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a>
+        <a href="#" onclick="event.preventDefault(); localStorage.removeItem('adminSession'); window.location.href='Dashboard login.html';" class="nav-link text-danger"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a>
     </nav>
 </div>
 

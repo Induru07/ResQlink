@@ -38,7 +38,7 @@
         <a onclick="showSection('broadcast', this)" class="nav-link"><i class="fa-solid fa-tower-broadcast me-2"></i> Broadcast Alerts</a>
         <a onclick="showSection('analytics', this)" class="nav-link"><i class="fa-solid fa-chart-line me-2"></i> Analytics</a>
         <hr class="border-secondary">
-        <a href="admin-auth.html" class="nav-link text-danger"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a>
+        <a href="#" onclick="event.preventDefault(); localStorage.removeItem('adminSession'); window.location.href='Dashboard login.html';" class="nav-link text-danger"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a>
     </nav>
 </div>
 

@@ -281,7 +281,7 @@ function updateAuthMenu() {
         if (role === 'victim') dashboardLink = base + 'victimDashboard.html';
         else if (role === 'contributor') dashboardLink = base + 'contributorLog.html';
         else if (role === 'distributor') dashboardLink = base + 'distributorDashboard.html';
-        else if (role === 'admin') dashboardLink = base + 'adminDashboard.html';
+        else if (role === 'admin') dashboardLink = base + 'AdminPages/Dashboard login.html';
 
         const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
 

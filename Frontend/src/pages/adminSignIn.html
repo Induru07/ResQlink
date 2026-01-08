@@ -78,7 +78,7 @@
 
                 // Redirect to admin dashboard after 1 second
                 setTimeout(() => {
-                    window.location.href = 'adminDashboard.html';
+                    window.location.href = 'AdminPages/Dashboard login.html';
                 }, 1000);
             } else {
                 errorMsg.textContent = 'Invalid email or password';
@@ -88,7 +88,7 @@
 
         // Check if already logged in
         if (localStorage.getItem('adminSession')) {
-            window.location.href = 'adminDashboard.html';
+            window.location.href = 'AdminPages/Dashboard login.html';
         }
     </script>
 </body>

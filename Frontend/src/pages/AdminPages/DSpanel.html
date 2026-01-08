@@ -39,7 +39,7 @@
         <a onclick="showSection('resources', this)" class="nav-link"><i class="fa-solid fa-truck-monster me-2"></i> Resource Allocation</a>
         <a onclick="showSection('approvals', this)" class="nav-link"><i class="fa-solid fa-file-contract me-2"></i> Approvals <span class="badge bg-danger ms-2">3</span></a>
         <hr class="border-secondary">
-        <a href="admin-auth.html" class="nav-link text-danger"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a>
+        <a href="#" onclick="event.preventDefault(); localStorage.removeItem('adminSession'); window.location.href='Dashboard login.html';" class="nav-link text-danger"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a>
     </nav>
 </div>
 

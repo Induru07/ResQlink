@@ -28,6 +28,7 @@ app.use('/api/general', require('./routes/homeRoutes'));
 app.use('/api/map', require('./routes/mapRoutes'));
 app.use('/api/needs', require('./routes/needsRoutes'));
 app.use('/api/contributor', require('./routes/contributorRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Health check
 app.get('/health', (_req, res) => {
