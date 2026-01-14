@@ -240,8 +240,7 @@ router.post('/system/logs', verifyAdmin, async (req, res) => {
         
         const logs = await SystemLog.find(query)
             .sort({ timestamp: -1 })
-            .limit(parseInt(limit))
-            .populate('userId', 'email name');
+            .limit(parseInt(limit));
         
         res.json({ logs });
         
@@ -251,28 +250,32 @@ router.post('/system/logs', verifyAdmin, async (req, res) => {
     }
 });
 
-// ============ USER MANAGEMENT (Developer Only) ============
+// ============ USER MANAGEMENT ============
 
 // Get All Users (Admins, Victims, Contributors)
-router.post('/users', verifyAdmin, verifyDeveloper, async (req, res) => {
+router.post('/users', verifyAdmin, async (req, res) => {
     try {
         const { role, status, limit = 100 } = req.query;
         
         let users = [];
         
+        // Only DEV role can access admin data
         if (!role || role === 'admin') {
-            const admins = await Admin.find(status ? { status } : {})
-                .select('-password')
-                .limit(parseInt(limit))
-                .sort({ lastLogin: -1 });
-            
-            users.push(...admins.map(a => ({
-                ...a.toObject(),
-                userType: 'admin',
-                userId: 'adm_' + a._id.toString().slice(-4)
-            })));
+            if (req.admin.role === 'DEV') {
+                const admins = await Admin.find(status ? { status } : {})
+                    .select('-password')
+                    .limit(parseInt(limit))
+                    .sort({ lastLogin: -1 });
+                
+                users.push(...admins.map(a => ({
+                    ...a.toObject(),
+                    userType: 'admin',
+                    userId: 'adm_' + a._id.toString().slice(-4)
+                })));
+            }
         }
         
+        // All admin roles can access victim data (GN, DS, GOV, DEV)
         if (!role || role === 'victim') {
             const victims = await Victim.find({})
                 .limit(parseInt(limit))
@@ -286,6 +289,7 @@ router.post('/users', verifyAdmin, verifyDeveloper, async (req, res) => {
             })));
         }
         
+        // All admin roles can access contributor data
         if (!role || role === 'contributor') {
             const contributors = await Contributor.find({})
                 .limit(parseInt(limit))
@@ -308,18 +312,24 @@ router.post('/users', verifyAdmin, verifyDeveloper, async (req, res) => {
 });
 
 // Update User Status (Ban, Activate, Flag)
-router.put('/users/:id/status', verifyAdmin, verifyDeveloper, async (req, res) => {
+router.put('/users/:id/status', verifyAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const { status, userType } = req.body;
         
         let user;
         
+        // Only DEV can update admin status
         if (userType === 'admin') {
+            if (req.admin.role !== 'DEV') {
+                return res.status(403).json({ error: 'Developer access required to modify admin accounts' });
+            }
             user = await Admin.findByIdAndUpdate(id, { status }, { new: true });
         } else if (userType === 'victim') {
+            // GN, DS, GOV, and DEV can update victim status
             user = await Victim.findByIdAndUpdate(id, { status }, { new: true });
         } else if (userType === 'contributor') {
+            // All roles can update contributor status
             user = await Contributor.findByIdAndUpdate(id, { status }, { new: true });
         }
         
@@ -430,7 +440,7 @@ router.post('/security/block-ip', verifyAdmin, verifyDeveloper, async (req, res)
 // ============ DATABASE OPERATIONS ============
 
 // Get Database Stats
-router.post('/database/stats', verifyAdmin, verifyDeveloper, async (req, res) => {
+router.post('/database/stats', verifyAdmin, async (req, res) => {
     try {
         const mongoose = require('mongoose');
         const db = mongoose.connection.db;
@@ -439,20 +449,45 @@ router.post('/database/stats', verifyAdmin, verifyDeveloper, async (req, res) =>
         const stats = [];
         
         for (const collection of collections) {
-            const collStats = await db.collection(collection.name).stats();
-            stats.push({
-                name: collection.name,
-                count: collStats.count,
-                size: (collStats.size / 1024 / 1024).toFixed(2) + ' MB',
-                avgObjSize: (collStats.avgObjSize / 1024).toFixed(2) + ' KB'
-            });
+            try {
+                // Use aggregation to get collection stats
+                const collectionObj = db.collection(collection.name);
+                const statsResult = await collectionObj.aggregate([
+                    { $collStats: { latencyHistograms: false } }
+                ]).toArray();
+                
+                // Count documents
+                const count = await collectionObj.countDocuments();
+                
+                // Calculate approximate size (fallback method)
+                const stats_obj = statsResult.length > 0 ? statsResult[0] : {};
+                const size = stats_obj.size || 0;
+                const avgObjSize = count > 0 ? (size / count) : 0;
+                
+                stats.push({
+                    name: collection.name,
+                    count: count,
+                    size: (size / 1024 / 1024).toFixed(2) + ' MB',
+                    avgObjSize: (avgObjSize / 1024).toFixed(2) + ' KB'
+                });
+            } catch (collError) {
+                // Fallback for collections that don't support collStats
+                const collectionObj = db.collection(collection.name);
+                const count = await collectionObj.countDocuments();
+                stats.push({
+                    name: collection.name,
+                    count: count,
+                    size: 'N/A',
+                    avgObjSize: 'N/A'
+                });
+            }
         }
         
         res.json({ collections: stats });
         
     } catch (error) {
         console.error('Database stats error:', error);
-        res.status(500).json({ error: 'Server error' });
+        res.status(500).json({ error: 'Failed to retrieve database statistics' });
     }
 });
 

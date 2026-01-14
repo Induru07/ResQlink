@@ -51,7 +51,7 @@
 ### Admin Portal
 | Page | CSS Links | JS Links | Status |
 |------|-----------|----------|--------|
-| src/pages/adminSignIn.html | ../styles/style.css | - | ✅ Connected |
+| src/pages/AdminPages/Dashboard login.html | ../../styles/style.css | ../../scripts/config.js, ../../scripts/adminAPI.js | ✅ Connected |
 | src/pages/adminDashboard.html | ../styles/style.css | ../scripts/script.js, dashboard.js | ✅ Connected |
 
 ### Donor Portal

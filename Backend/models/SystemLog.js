@@ -11,7 +11,7 @@ const SystemLogSchema = new mongoose.Schema({
     source: { type: String, required: true }, // API endpoint, controller, etc.
     statusCode: { type: Number },
     ipAddress: { type: String },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    userId: { type: mongoose.Schema.Types.ObjectId }, // Flexible reference to any user type
     metadata: { type: mongoose.Schema.Types.Mixed } // Additional data
 });
 

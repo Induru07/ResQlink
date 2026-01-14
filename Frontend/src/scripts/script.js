@@ -3,6 +3,10 @@ const API_URL = window.API_BASE || 'http://localhost:5000';
 document.addEventListener('DOMContentLoaded', function() {
     
     // =========================================================
+    // =========================================================
+    // 6. HOME STATS (Live Impact Dashboard)
+    // =========================================================
+    loadHomeStats();
     // 1. LANGUAGE & FOOTER SETUP
     // =========================================================
     
@@ -328,7 +332,7 @@ function updateAuthMenu() {
                 <a href="${base}distributorSignIn.html">
                     <span class="lang-en">Distributor - Sign In</span>
                 </a>
-                <a href="${base}adminSignIn.html">
+                <a href="${base}AdminPages/Dashboard%20login.html">
                     <span class="lang-en">Admin - Sign In</span>
                 </a>
             </div>
@@ -399,3 +403,41 @@ document.addEventListener('click', function(event) {
         dropdown.classList.remove('show');
     }
 });
+
+// Fetch and render home page stats if the widgets exist
+async function loadHomeStats() {
+    const elTotalUsers = document.getElementById('stat-total-users');
+    const elVictimsDanger = document.getElementById('stat-victims-danger');
+    const elVictimsHelped = document.getElementById('stat-victims-helped');
+    const elTotalVictims = document.getElementById('stat-total-victims');
+    const elTotalContributors = document.getElementById('stat-total-contributors');
+    const elCollectionPoints = document.getElementById('stat-collection-points');
+
+    // If not on the homepage with stats, skip
+    if (!elTotalUsers && !elVictimsDanger && !elVictimsHelped && !elTotalVictims && !elTotalContributors && !elCollectionPoints) {
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/api/general/stats`);
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        const data = await res.json();
+        const s = (data && data.stats) || {};
+
+        if (elTotalUsers) elTotalUsers.textContent = s.totalUsers ?? 0;
+        if (elVictimsDanger) elVictimsDanger.textContent = s.victimsInDanger ?? 0;
+        if (elVictimsHelped) elVictimsHelped.textContent = s.victimsHelped ?? 0;
+        if (elTotalVictims) elTotalVictims.textContent = s.totalVictims ?? 0;
+        if (elTotalContributors) elTotalContributors.textContent = s.totalContributors ?? 0;
+        if (elCollectionPoints) elCollectionPoints.textContent = s.totalCollectionPoints ?? 0;
+    } catch (err) {
+        console.error('Failed to load home stats:', err);
+        // Gracefully show zeros if request fails
+        if (elTotalUsers) elTotalUsers.textContent = '0';
+        if (elVictimsDanger) elVictimsDanger.textContent = '0';
+        if (elVictimsHelped) elVictimsHelped.textContent = '0';
+        if (elTotalVictims) elTotalVictims.textContent = '0';
+        if (elTotalContributors) elTotalContributors.textContent = '0';
+        if (elCollectionPoints) elCollectionPoints.textContent = '0';
+    }
+}

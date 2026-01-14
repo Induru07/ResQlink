@@ -200,7 +200,8 @@ class AdminAPI {
             const params = new URLSearchParams({ hours });
             if (eventType) params.append('eventType', eventType);
 
-            const responsPOST',
+            const response = await fetch(`${API_BASE_URL}/admin/security/logs?${params}`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -228,8 +229,7 @@ class AdminAPI {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ adminId: this.adminSession?.id })   'Content-Type': 'application/json',
-                }
+                body: JSON.stringify({ adminId: this.adminSession?.id })
             });
 
             const data = await response.json();
@@ -276,13 +276,13 @@ class AdminAPI {
     // ============ DATABASE OPERATIONS ============
 
     async getDatabaseStats() {
-        try {POST',
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/database/stats`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ adminId: this.adminSession?.id })eaders: {
-                    'Content-Type': 'application/json',
-                }
+                body: JSON.stringify({ adminId: this.adminSession?.id })
             });
 
             const data = await response.json();

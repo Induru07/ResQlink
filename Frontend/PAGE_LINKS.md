@@ -20,7 +20,7 @@
 - `src/pages/contributorLog.html` - Contribution log
 
 #### Admin Pages
-- `src/pages/adminSignIn.html` - Admin login
+- `src/pages/AdminPages/Dashboard login.html` - Admin login
 - `src/pages/adminDashboard.html` - Admin dashboard
 
 #### Donor Pages
@@ -38,7 +38,7 @@
 ```html
 <a href="src/pages/victimDashboard.html">Victim Dashboard</a>
 <a href="src/pages/datamap.html">Data Map</a>
-<a href="src/pages/adminSignIn.html">Admin Login</a>
+<a href="src/pages/AdminPages/Dashboard%20login.html">Admin Login</a>
 ```
 
 ### From any src/pages/ file
@@ -67,7 +67,7 @@ index.html (ROOT)
 │   │   └── contributorLog.html
 │   │
 │   ├── Admin Portal
-│   │   ├── adminSignIn.html
+│   │   ├── AdminPages/Dashboard login.html
 │   │   └── adminDashboard.html
 │   │
 │   ├── Donor Portal
