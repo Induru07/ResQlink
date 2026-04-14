@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divisional Secretary | ResQLink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Sidebar */
+        .sidebar { width: 250px; height: 100vh; position: fixed; background: #1c2331; color: white; padding-top: 20px; transition: all 0.3s; z-index: 1000; }
+        .main-content { margin-left: 250px; padding: 20px; }
+        
+        .nav-link { color: #adb5bd; padding: 12px 20px; display: block; text-decoration: none; cursor: pointer; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { background: #2c3e50; color: white; border-left: 4px solid #00b894; }
+        
+        /* Section Visibility */
+        .content-section { display: none; animation: fadeIn 0.4s; }
+        .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Custom Cards */
+        .stat-card { border: none; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .border-left-success { border-left: 5px solid #00b894; }
+        .border-left-warning { border-left: 5px solid #fdcb6e; }
+        .border-left-danger { border-left: 5px solid #d63031; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h4 class="text-center mb-4"><i class="fa-solid fa-building-columns"></i> DS Panel</h4>
+    <nav>
+        <a onclick="showSection('overview', this)" class="nav-link active"><i class="fa-solid fa-chart-pie me-2"></i> Division Overview</a>
+        <a onclick="showSection('gn-manage', this)" class="nav-link"><i class="fa-solid fa-user-tie me-2"></i> Manage GNs</a>
+        <a onclick="showSection('resources', this)" class="nav-link"><i class="fa-solid fa-truck-monster me-2"></i> Resource Allocation</a>
+        <a onclick="showSection('approvals', this)" class="nav-link"><i class="fa-solid fa-file-contract me-2"></i> Approvals <span class="badge bg-danger ms-2">3</span></a>
+        <hr class="border-secondary">
+        <a href="#" onclick="event.preventDefault(); localStorage.removeItem('adminSession'); window.location.href='Dashboard login.html';" class="nav-link text-danger"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a>
+    </nav>
+</div>
+
+<div class="main-content">
+    
+    <header class="d-flex justify-content-between mb-4 bg-white p-3 rounded shadow-sm">
+        <div>
+            <h5 class="m-0 fw-bold">Kaduwela Divisional Secretariat</h5>
+            <small class="text-muted">Administrator: Mrs. Silva (DS)</small>
+        </div>
+        <div>
+            <button class="btn btn-sm btn-outline-dark me-2"><i class="fa-solid fa-download"></i> Export Report</button>
+            <button class="btn btn-sm btn-danger"><i class="fa-solid fa-tower-broadcast"></i> Declare Emergency</button>
+        </div>
+    </header>
+
+    <div id="section-overview" class="content-section active">
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card bg-white border-left-danger">
+                    <h6 class="text-muted">Active Emergencies</h6>
+                    <h2 class="mb-0 text-danger" id="stat-emergencies">0</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card bg-white border-left-warning">
+                    <h6 class="text-muted">Total Victims</h6>
+                    <h2 class="mb-0 text-warning" id="stat-victims">0</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card bg-white border-left-success">
+                    <h6 class="text-muted">GN Officers</h6>
+                    <h2 class="mb-0 text-success" id="stat-gns">0</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h6 class="m-0 fw-bold">Live Grama Niladhari Status</h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>GN Division</th>
+                            <th>Officer Name</th>
+                            <th>Status</th>
+                            <th>Active SOS</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">Loading GN officers...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-gn-manage" class="content-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Grama Niladhari Directory</h4>
+            <button class="btn btn-primary" onclick="alert('Add new GN functionality coming soon')">
+                <i class="fa-solid fa-plus"></i> Add New GN
+            </button>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold">
+                <i class="fa-solid fa-users"></i> GN Officers in Division
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>GN Division Code</th>
+                            <th>Officer Name</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">Loading GN officers...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-resources" class="content-section">
+        <h4 class="mb-3">Heavy Machinery & Logistics</h4>
+        
+        <div class="alert alert-info">
+            <i class="fa-solid fa-info-circle"></i> Resource allocation module coming soon. Contact central command for immediate deployments.
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-white fw-bold">Deployment Controls</div>
+            <div class="card-body">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Resource</th>
+                            <th>Current Location</th>
+                            <th>Status</th>
+                            <th>Assign To</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No resources available for deployment</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="section-approvals" class="content-section">
+        <h4 class="mb-3">Pending Approvals</h4>
+        
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <i class="fa-solid fa-user-plus"></i> New GN Account Requests
+            </div>
+            <div class="card-body">
+                <ul class="list-group" id="gn-requests-list">
+                    <li class="list-group-item text-center text-muted">
+                        No pending GN account requests
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <i class="fa-solid fa-boxes-packing"></i> Relief Stock Requests
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Request From</th>
+                            <th>Items</th>
+                            <th>Urgency</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stock-requests-list">
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No pending stock requests</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../scripts/config.js"></script>
+<script src="../../scripts/adminAPI.js"></script>
+<script>
+    let dsAdminData = null;
+    let allGNs = [];
+    let allVictims = [];
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('DS Panel loaded');
+        
+        // Check authentication
+        const adminSession = localStorage.getItem('adminSession');
+        if (!adminSession) {
+            window.location.href = 'Dashboard login.html';
+            return;
+        }
+
+        dsAdminData = JSON.parse(adminSession);
+        
+        // Verify this is a DS role
+        if (dsAdminData.role !== 'DS') {
+            alert('Access denied: DS role required');
+            window.location.href = 'Dashboard login.html';
+            return;
+        }
+        
+        // Load all data
+        loadAdminInfo();
+        loadGNOfficers();
+        loadStatistics();
+    });
+
+    function loadAdminInfo() {
+        if (dsAdminData) {
+            const headerTitle = document.querySelector('header h5');
+            const headerSubtitle = document.querySelector('header small');
+            
+            if (headerTitle) {
+                headerTitle.textContent = `${dsAdminData.dsDivision || 'Kaduwela'} Divisional Secretariat`;
+            }
+            if (headerSubtitle) {
+                headerSubtitle.textContent = `Administrator: ${dsAdminData.name || 'DS Officer'} (DS)`;
+            }
+        }
+    }
+
+    async function loadGNOfficers() {
+        try {
+            const data = await adminAPI.getAllUsers('admin');
+            
+            if (data.users && data.users.length > 0) {
+                // Filter only GN officers in this DS division
+                allGNs = data.users.filter(u => 
+                    u.role === 'GN' && 
+                    u.dsDivision === dsAdminData.dsDivision
+                );
+                
+                // Update GN count in stats
+                document.getElementById('stat-gns').textContent = allGNs.length;
+                
+                displayGNOfficers();
+            }
+        } catch (error) {
+            console.error('Error loading GN officers:', error);
+        }
+    }
+
+    function displayGNOfficers() {
+        const tbody = document.querySelector('#section-gn-manage tbody');
+        if (!tbody) return;
+        
+        tbody.innerHTML = '';
+        
+        if (allGNs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No GN officers registered yet</td></tr>';
+            return;
+        }
+        
+        allGNs.forEach(gn => {
+            const statusBadge = gn.status === 'active' ? 
+                '<span class="badge bg-success">Active</span>' : 
+                '<span class="badge bg-secondary">Inactive</span>';
+            
+            const verifiedBadge = gn.verified ? 
+                '<i class="fa-solid fa-check-circle text-success"></i>' : 
+                '<i class="fa-solid fa-exclamation-circle text-warning"></i>';
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${gn.gnDivisionCode || 'N/A'}</td>
+                <td>${gn.name} ${verifiedBadge}</td>
+                <td>${gn.email}</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="viewGNDetails('${gn._id}')">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    async function loadStatistics() {
+        try {
+            const victimsData = await adminAPI.getAllUsers('victim');
+            const contributorsData = await adminAPI.getAllUsers('contributor');
+            
+            if (victimsData.users) {
+                allVictims = victimsData.users;
+                
+                // Count active emergencies (flagged victims)
+                const emergencies = allVictims.filter(v => v.status === 'flagged').length;
+                
+                // Update stat cards
+                document.getElementById('stat-emergencies').textContent = emergencies;
+                document.getElementById('stat-victims').textContent = allVictims.length;
+                document.getElementById('stat-gns').textContent = allGNs.length;
+            }
+            
+            // Update live GN status table
+            updateLiveGNStatus();
+            
+        } catch (error) {
+            console.error('Error loading statistics:', error);
+        }
+    }
+
+    function updateLiveGNStatus() {
+        const tbody = document.querySelector('#section-overview tbody');
+        if (!tbody) return;
+        
+        tbody.innerHTML = '';
+        
+        if (allGNs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No GN officers available</td></tr>';
+            return;
+        }
+        
+        allGNs.forEach(gn => {
+            // Count victims in this GN division (simplified - in production, filter by location)
+            const sosCount = Math.floor(Math.random() * 10); // Placeholder
+            
+            const statusBadge = gn.status === 'active' ? 
+                '<span class="badge bg-success">Active</span>' : 
+                '<span class="badge bg-secondary">Offline</span>';
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${gn.gnDivisionCode || 'N/A'}</td>
+                <td>${gn.name}</td>
+                <td>${statusBadge}</td>
+                <td><span class="badge bg-danger">${sosCount}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="contactGN('${gn._id}')">
+                        <i class="fa-solid fa-phone"></i> Contact
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function viewGNDetails(gnId) {
+        const gn = allGNs.find(g => g._id === gnId);
+        if (gn) {
+            alert(`GN Officer Details:\n\nName: ${gn.name}\nEmail: ${gn.email}\nDivision: ${gn.gnDivisionCode}\nDistrict: ${gn.district}\nStatus: ${gn.status}\nVerified: ${gn.verified ? 'Yes' : 'No'}`);
+        }
+    }
+
+    function contactGN(gnId) {
+        const gn = allGNs.find(g => g._id === gnId);
+        if (gn) {
+            alert(`Contacting ${gn.name} at ${gn.email}`);
+        }
+    }
+
+    function showSection(sectionId, element) {
+        // 1. Hide all sections
+        document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+        
+        // 2. Show the selected section
+        document.getElementById('section-' + sectionId).classList.add('active');
+        
+        // 3. Update Sidebar Active State
+        document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+    }
+</script>
+
+</body>
+</html>

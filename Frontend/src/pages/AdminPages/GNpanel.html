@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grama Niladhari Panel | ResQLink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Sidebar Styles */
+        .sidebar { width: 250px; height: 100vh; position: fixed; background: #212529; color: white; padding-top: 20px; transition: all 0.3s; z-index: 1000; }
+        .main-content { margin-left: 250px; padding: 20px; }
+        .nav-link { color: #aaa; padding: 12px 20px; display: block; text-decoration: none; cursor: pointer; }
+        .nav-link:hover, .nav-link.active { background: #343a40; color: white; border-left: 4px solid #0d6efd; }
+        
+        /* Card Styles */
+        .card-victim { border-left: 5px solid #ccc; transition: 0.2s; }
+        .card-victim:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .border-sos { border-left-color: #dc3545; }
+        
+        /* Section Visibility */
+        .content-section { display: none; animation: fadeIn 0.4s; }
+        .content-section.active { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Inventory Badges */
+        .stock-card { border: none; border-radius: 12px; transition: 0.3s; }
+        .stock-card:hover { transform: scale(1.02); }
+        
+        /* Loading State */
+        .loading { color: #999; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h4 class="text-center mb-4"><i class="fa-solid fa-life-ring"></i> GN Panel</h4>
+    <nav>
+        <a onclick="showSection('triage', this)" class="nav-link active"><i class="fa-solid fa-users me-2"></i> Victim Triage</a>
+        <a onclick="showSection('stock', this)" class="nav-link"><i class="fa-solid fa-box-open me-2"></i> Relief Stock</a>
+        <a onclick="showSection('report', this)" class="nav-link"><i class="fa-solid fa-bullhorn me-2"></i> Report Incident</a>
+        <hr class="border-secondary">
+        <a href="#" onclick="event.preventDefault(); localStorage.removeItem('adminSession'); window.location.href='Dashboard login.html';" class="nav-link text-danger"><i class="fa-solid fa-sign-out-alt me-2"></i> Logout</a>
+    </nav>
+</div>
+
+<div class="main-content">
+    
+    <header class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
+        <div>
+            <h5 class="m-0 fw-bold text-secondary" id="header-area">Area: Loading...</h5>
+            <small class="text-muted">Status: <span class="text-success fw-bold" id="header-status">Active Flood Zone</span></small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary p-2" id="header-officer">Officer: Loading...</span>
+            <button class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-bell"></i> <span id="notification-count">0</span></button>
+        </div>
+    </header>
+
+    <!-- Victim Triage Section -->
+    <div id="section-triage" class="content-section active">
+        <h4 class="mb-3">Victim Management</h4>
+        
+        <ul class="nav nav-pills mb-3" id="victim-filter">
+            <li class="nav-item"><button class="nav-link active bg-danger text-white me-2" onclick="filterVictims('sos')">Critical SOS (<span id="sos-count">0</span>)</button></li>
+            <li class="nav-item"><button class="nav-link bg-white text-dark border me-2" onclick="filterVictims('high')">High Risk (<span id="high-count">0</span>)</button></li>
+            <li class="nav-item"><button class="nav-link bg-white text-dark border" onclick="filterVictims('all')">All Victims (<span id="all-count">0</span>)</button></li>
+        </ul>
+
+        <div class="row g-3" id="victims-container">
+            <div class="col-12 text-center text-muted">Loading victims...</div>
+        </div>
+    </div>
+
+    <!-- Relief Stock Section -->
+    <div id="section-stock" class="content-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Inventory Management</h4>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#requestStockModal">
+                <i class="fa-solid fa-plus"></i> Request Supplies from DS
+            </button>
+        </div>
+
+        <div class="row g-3 mb-4" id="inventory-container">
+            <div class="col-12 text-center text-muted">Loading inventory...</div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold">Recent Distributions</div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Time</th>
+                            <th>Family Representative</th>
+                            <th>Items Given</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="distributions-table">
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Loading distributions...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Incident Section -->
+    <div id="section-report" class="content-section">
+        <h4 class="mb-3">Report Field Incident</h4>
+        <p class="text-muted">Use this form to report infrastructure damage or hazards to the Divisional Secretariat.</p>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <form id="reportForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Incident Type</label>
+                                <select class="form-select" id="incidentType" required>
+                                    <option value="">Select Type...</option>
+                                    <option value="road_blockage">Road Blockage / Landslide</option>
+                                    <option value="bridge_collapse">Bridge Collapse</option>
+                                    <option value="power_down">Power Line Down</option>
+                                    <option value="dyke_breach">Dyke Breach</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Location Description</label>
+                                <input type="text" class="form-control" id="location" placeholder="e.g., Near the 3rd mile post, Main Street" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Severity Level</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="severity" id="low" value="low">
+                                        <label class="form-check-label" for="low">Low (Monitor)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="severity" id="high" value="high" checked>
+                                        <label class="form-check-label text-danger fw-bold" for="high">High (Immediate Action)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Additional Notes</label>
+                                <textarea class="form-control" id="notes" rows="3" placeholder="Describe the situation..."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fa-solid fa-paper-plane"></i> Submit Report
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="alert alert-info">
+                    <h5><i class="fa-solid fa-circle-info"></i> Guide</h5>
+                    <ul class="mb-0 ps-3">
+                        <li>Report <strong>Road Blocks</strong> immediately to clear supply routes.</li>
+                        <li><strong>Power Lines</strong> require CEB coordination.</li>
+                        <li>Do not put yourself in danger to take photos.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Request Stock Modal -->
+<div class="modal fade" id="requestStockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Request Supplies from DS</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="requestStockForm">
+                    <div class="mb-3">
+                        <label>Item Type</label>
+                        <select class="form-select" id="itemType" required>
+                            <option value="">Select Item...</option>
+                            <option value="rice">Dry Rations (Rice Packs)</option>
+                            <option value="water">Drinking Water (Bottles)</option>
+                            <option value="medicine">Medicine</option>
+                            <option value="first_aid">First Aid Kits</option>
+                            <option value="blankets">Blankets</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Quantity Needed</label>
+                        <input type="number" class="form-control" id="quantity" placeholder="e.g. 100" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Urgency</label>
+                        <select class="form-select" id="urgency" required>
+                            <option value="normal">Normal (Next Truck)</option>
+                            <option value="critical">Critical (Immediate)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitStockRequest()">Send Request</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../scripts/config.js"></script>
+<script src="../../scripts/adminAPI.js"></script>
+<script>
+    let gnAdminData = null;
+    let allVictims = [];
+    let currentFilter = 'sos';
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        console.log('GN Panel loaded');
+        
+        // Check authentication
+        const adminSession = localStorage.getItem('adminSession');
+        if (!adminSession) {
+            window.location.href = 'Dashboard login.html';
+            return;
+        }
+
+        gnAdminData = JSON.parse(adminSession);
+        
+        // Load admin info in header
+        loadAdminInfo();
+        
+        // Load data
+        loadVictims();
+        loadInventory();
+        loadDistributions();
+    });
+
+    function loadAdminInfo() {
+        if (gnAdminData) {
+            document.getElementById('header-area').textContent = `Area: ${gnAdminData.gnDivisionCode || '374-B'} (${gnAdminData.dsDivision || 'Kaduwela'})`;
+            document.getElementById('header-officer').textContent = `Officer: ${gnAdminData.name || 'GN Officer'}`;
+        }
+    }
+
+    // Load Victims from Backend
+    async function loadVictims() {
+        try {
+            const data = await adminAPI.getAllUsers('victim');
+            
+            if (data.users && data.users.length > 0) {
+                allVictims = data.users.filter(u => u.userType === 'victim');
+                
+                // Count different statuses
+                const sosCount = allVictims.filter(v => v.status === 'flagged').length;
+                const highCount = allVictims.filter(v => v.status === 'active').length;
+                
+                document.getElementById('sos-count').textContent = sosCount;
+                document.getElementById('high-count').textContent = highCount;
+                document.getElementById('all-count').textContent = allVictims.length;
+                document.getElementById('notification-count').textContent = sosCount;
+                
+                filterVictims('sos');
+            } else {
+                document.getElementById('victims-container').innerHTML = 
+                    '<div class="col-12 text-center text-muted">No victims registered yet</div>';
+            }
+        } catch (error) {
+            console.error('Error loading victims:', error);
+            document.getElementById('victims-container').innerHTML = 
+                '<div class="col-12 text-center text-danger">Error loading victims: ' + error.message + '</div>';
+        }
+    }
+
+    function filterVictims(filterType) {
+        currentFilter = filterType;
+        const container = document.getElementById('victims-container');
+        container.innerHTML = '';
+        
+        let filtered = allVictims;
+        if (filterType === 'sos') {
+            filtered = allVictims.filter(v => v.status === 'flagged');
+        } else if (filterType === 'high') {
+            filtered = allVictims.filter(v => v.status === 'active');
+        }
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="col-12 text-center text-muted">No victims in this category</div>';
+            return;
+        }
+        
+        filtered.forEach(victim => {
+            const statusBadge = victim.status === 'flagged' ? 
+                '<span class="badge bg-danger">SOS</span>' : 
+                '<span class="badge bg-warning text-dark">At Risk</span>';
+            
+            const card = document.createElement('div');
+            card.className = 'col-md-4';
+            card.innerHTML = `
+                <div class="card p-3 card-victim border-sos bg-white shadow-sm">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="fw-bold">${victim.name || victim.email || 'Unknown'}</h6>
+                        ${statusBadge}
+                    </div>
+                    <small class="text-muted">ID: ${victim.userId || 'N/A'}</small>
+                    <p class="small mt-2 mb-2"><i class="fa-solid fa-location-dot text-danger"></i> ${victim.address || 'Address not provided'}</p>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-sm btn-primary" onclick="alert('Send assistance - Victim ID: ${victim._id}')">
+                            <i class="fa-solid fa-hand-holding-heart"></i> Send Assistance
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="alert('Verify - Victim ID: ${victim._id}')">Verify</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // Load Inventory from Backend
+    async function loadInventory() {
+        try {
+            const data = await adminAPI.getDatabaseStats();
+            
+            // Mock inventory data - in production, you'd have a separate inventory endpoint
+            const inventory = [
+                { name: 'Rice Packs (5kg)', count: 120, icon: 'fa-bowl-rice', color: 'primary' },
+                { name: 'Drinking Water', count: '500L', icon: 'fa-bottle-water', color: 'info' },
+                { name: 'First Aid Kits', count: 45, icon: 'fa-kit-medical', color: 'warning' },
+                { name: 'Blankets', count: 100, icon: 'fa-mattress-pillow', color: 'success' }
+            ];
+            
+            const container = document.getElementById('inventory-container');
+            container.innerHTML = '';
+            
+            inventory.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'col-md-3';
+                card.innerHTML = `
+                    <div class="card stock-card bg-${item.color} text-${item.color === 'warning' ? 'dark' : 'white'} p-3 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2 class="mb-0">${item.count}</h2>
+                                <small>${item.name}</small>
+                            </div>
+                            <i class="fa-solid ${item.icon} fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+        } catch (error) {
+            console.error('Error loading inventory:', error);
+            document.getElementById('inventory-container').innerHTML = 
+                '<div class="col-12 text-center text-danger">Error loading inventory</div>';
+        }
+    }
+
+    // Load Recent Distributions
+    async function loadDistributions() {
+        try {
+            // Mock distributions - in production, use real distribution data
+            const tbody = document.getElementById('distributions-table');
+            tbody.innerHTML = `
+                <tr>
+                    <td>${new Date().toLocaleTimeString()}</td>
+                    <td>Recent Distribution</td>
+                    <td>Relief Items</td>
+                    <td><span class="badge bg-success">Logged</span></td>
+                </tr>
+            `;
+        } catch (error) {
+            console.error('Error loading distributions:', error);
+        }
+    }
+
+    // Submit Incident Report
+    document.getElementById('reportForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const report = {
+            type: document.getElementById('incidentType').value,
+            location: document.getElementById('location').value,
+            severity: document.querySelector('input[name="severity"]:checked').value,
+            notes: document.getElementById('notes').value,
+            gnOfficer: gnAdminData.name,
+            gnArea: gnAdminData.gnDivisionCode
+        };
+        
+        try {
+            alert('Incident Report submitted!\nType: ' + report.type + '\nLocation: ' + report.location);
+            document.getElementById('reportForm').reset();
+        } catch (error) {
+            alert('Error submitting report: ' + error.message);
+        }
+    });
+
+    // Submit Stock Request
+    function submitStockRequest() {
+        const request = {
+            itemType: document.getElementById('itemType').value,
+            quantity: document.getElementById('quantity').value,
+            urgency: document.getElementById('urgency').value
+        };
+        
+        if (!request.itemType || !request.quantity) {
+            alert('Please fill all fields');
+            return;
+        }
+        
+        alert('Request Sent!\nItem: ' + request.itemType + '\nQuantity: ' + request.quantity + '\nUrgency: ' + request.urgency);
+        
+        // Reset form
+        document.getElementById('requestStockForm').reset();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('requestStockModal'));
+        modal.hide();
+    }
+
+    function showSection(sectionId, element) {
+        // 1. Hide all sections
+        document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+        
+        // 2. Show the selected section
+        document.getElementById('section-' + sectionId).classList.add('active');
+        
+        // 3. Update Sidebar Active State
+        document.querySelectorAll('.sidebar .nav-link').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+        
+        // 4. Reload data for the section
+        if (sectionId === 'stock') {
+            loadInventory();
+            loadDistributions();
+        } else if (sectionId === 'triage') {
+            loadVictims();
+        }
+    }
+</script>
+
+</body>
+</html>
