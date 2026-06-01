@@ -1,33 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Admin = require('../models/Admin');
 const SystemLog = require('../models/SystemLog');
 const SecurityLog = require('../models/SecurityLog');
-const Victim = require('../models/Victim');
+const VictimAuth = require('../models/VictimAuth');
 const Contributor = require('../models/Contributor');
+const VictimNeeds = require('../models/VictimNeeds');
 const os = require('os');
 
-// Middleware to verify admin role (you should add JWT verification here)
-const verifyAdmin = async (req, res, next) => {
-    // For now, simple check - in production, use JWT
-    const { adminId } = req.body;
-    if (!adminId) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    
-    const admin = await Admin.findById(adminId);
-    if (!admin) {
-        return res.status(401).json({ error: 'Admin not found' });
-    }
-    
-    req.admin = admin;
-    next();
-};
+// Import JWT Middleware
+const { verifyToken, verifyAdmin: verifyAdminRole } = require('../middleware/authMiddleware');
+const { validateEmailMiddleware } = require('../middleware/validationMiddleware');
 
 // Developer-only middleware
 const verifyDeveloper = (req, res, next) => {
-    if (req.admin.role !== 'DEV') {
+    if (req.user.role !== 'DEV') {
         return res.status(403).json({ error: 'Developer access required' });
     }
     next();
@@ -36,7 +25,7 @@ const verifyDeveloper = (req, res, next) => {
 // ============ AUTHENTICATION ============
 
 // Admin Login
-router.post('/login', async (req, res) => {
+router.post('/login', validateEmailMiddleware, async (req, res) => {
     try {
         const { email, password, role } = req.body;
         
@@ -111,8 +100,21 @@ router.post('/login', async (req, res) => {
             userId: admin._id
         });
         
+        // Generate JWT token (7 days expiration)
+        const jwt = require('jsonwebtoken');
+        const token = jwt.sign(
+            { 
+                userId: admin._id, 
+                role: admin.role,
+                email: admin.email 
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+        
         res.json({
             success: true,
+            token,
             admin: {
                 id: admin._id,
                 email: admin.email,
@@ -131,9 +133,14 @@ router.post('/login', async (req, res) => {
 });
 
 // Admin Registration (Request Access)
-router.post('/register', async (req, res) => {
+router.post('/register', validateEmailMiddleware, async (req, res) => {
     try {
         const { email, password, name, role, district, dsDivision, gnDivisionCode } = req.body;
+        
+        // Validate password (at least 6 characters with letters and numbers)
+        if (!password || password.length < 6 || !/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+            return res.status(400).json({ error: 'Password must be at least 6 characters with letters and numbers' });
+        }
         
         // Check if admin already exists
         const existingAdmin = await Admin.findOne({ email });
@@ -160,17 +167,38 @@ router.post('/register', async (req, res) => {
         
         await admin.save();
         
+        // Generate JWT token (7 days expiration)
+        const jwt = require('jsonwebtoken');
+        const token = jwt.sign(
+            { 
+                userId: admin._id, 
+                role: admin.role,
+                email: admin.email 
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+        
         await SystemLog.create({
             level: 'info',
             message: `New admin registration request: ${name} (${role})`,
             source: 'AuthController',
             statusCode: 201,
-            ipAddress: req.ip
+            ipAddress: req.ip,
+            userId: admin._id
         });
         
         res.status(201).json({
             success: true,
-            message: 'Registration request submitted. Awaiting approval.'
+            token,
+            message: 'Registration request submitted. Awaiting approval.',
+            admin: {
+                id: admin._id,
+                email: admin.email,
+                name: admin.name,
+                role: admin.role,
+                district: admin.district
+            }
         });
         
     } catch (error) {
@@ -182,7 +210,7 @@ router.post('/register', async (req, res) => {
 // ============ SYSTEM HEALTH & MONITORING ============
 
 // Get System Health (CPU, Memory, etc.)
-router.post('/system/health', verifyAdmin, async (req, res) => {
+router.post('/system/health', verifyToken, verifyAdminRole, async (req, res) => {
     try {
         const totalMem = os.totalmem();
         const freeMem = os.freemem();
@@ -232,7 +260,7 @@ router.post('/system/health', verifyAdmin, async (req, res) => {
 });
 
 // Get Live System Logs
-router.post('/system/logs', verifyAdmin, async (req, res) => {
+router.post('/system/logs', verifyToken, verifyAdminRole, async (req, res) => {
     try {
         const { limit = 50, level } = req.query;
         
@@ -253,7 +281,7 @@ router.post('/system/logs', verifyAdmin, async (req, res) => {
 // ============ USER MANAGEMENT ============
 
 // Get All Users (Admins, Victims, Contributors)
-router.post('/users', verifyAdmin, async (req, res) => {
+router.post('/users', verifyToken, verifyAdminRole, async (req, res) => {
     try {
         const { role, status, limit = 100 } = req.query;
         
@@ -312,7 +340,7 @@ router.post('/users', verifyAdmin, async (req, res) => {
 });
 
 // Update User Status (Ban, Activate, Flag)
-router.put('/users/:id/status', verifyAdmin, async (req, res) => {
+router.put('/users/:id/status', verifyToken, verifyAdminRole, async (req, res) => {
     try {
         const { id } = req.params;
         const { status, userType } = req.body;
@@ -321,7 +349,7 @@ router.put('/users/:id/status', verifyAdmin, async (req, res) => {
         
         // Only DEV can update admin status
         if (userType === 'admin') {
-            if (req.admin.role !== 'DEV') {
+            if (req.user.role !== 'DEV') {
                 return res.status(403).json({ error: 'Developer access required to modify admin accounts' });
             }
             user = await Admin.findByIdAndUpdate(id, { status }, { new: true });
@@ -342,7 +370,7 @@ router.put('/users/:id/status', verifyAdmin, async (req, res) => {
             message: `User status updated: ${id} -> ${status}`,
             source: 'UserManagement',
             statusCode: 200,
-            userId: req.admin._id,
+            userId: req.user.userId,
             metadata: { targetUser: id, newStatus: status, userType }
         });
         
@@ -357,7 +385,7 @@ router.put('/users/:id/status', verifyAdmin, async (req, res) => {
 // ============ SECURITY MONITORING ============
 
 // Get Security Logs
-router.post('/security/logs', verifyAdmin, verifyDeveloper, async (req, res) => {
+router.post('/security/logs', verifyToken, verifyAdminRole, verifyDeveloper, async (req, res) => {
     try {
         const { hours = 1, eventType } = req.query;
         
@@ -379,7 +407,7 @@ router.post('/security/logs', verifyAdmin, verifyDeveloper, async (req, res) => 
 });
 
 // Get Failed Login Attempts Summary
-router.post('/security/failed-logins', verifyAdmin, verifyDeveloper, async (req, res) => {
+router.post('/security/failed-logins', verifyToken, verifyAdminRole, verifyDeveloper, async (req, res) => {
     try {
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
         
@@ -414,7 +442,7 @@ router.post('/security/failed-logins', verifyAdmin, verifyDeveloper, async (req,
 });
 
 // Block IP Address
-router.post('/security/block-ip', verifyAdmin, verifyDeveloper, async (req, res) => {
+router.post('/security/block-ip', verifyToken, verifyAdminRole, verifyDeveloper, async (req, res) => {
     try {
         const { ipAddress } = req.body;
         
@@ -423,8 +451,8 @@ router.post('/security/block-ip', verifyAdmin, verifyDeveloper, async (req, res)
             ipAddress,
             blocked: true,
             severity: 'high',
-            details: `IP blocked by admin: ${req.admin.name}`,
-            metadata: { blockedBy: req.admin._id }
+            details: `IP blocked by admin: ${req.user.email}`,
+            metadata: { blockedBy: req.user.userId }
         });
         
         // In production, add to firewall/IP blacklist
@@ -440,7 +468,7 @@ router.post('/security/block-ip', verifyAdmin, verifyDeveloper, async (req, res)
 // ============ DATABASE OPERATIONS ============
 
 // Get Database Stats
-router.post('/database/stats', verifyAdmin, async (req, res) => {
+router.post('/database/stats', verifyToken, verifyAdminRole, async (req, res) => {
     try {
         const mongoose = require('mongoose');
         const db = mongoose.connection.db;

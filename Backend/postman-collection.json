@@ -1,0 +1,580 @@
+{
+  "info": {
+    "_postman_id": "resqlink-api-collection",
+    "name": "ResQLink API - Complete",
+    "description": "Complete API collection for ResQLink - Victim, Contributor, and Admin endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Environment Setup",
+      "item": [
+        {
+          "name": "Get Base URL",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Save base URL to environment",
+                  "pm.environment.set('BASE_URL', 'http://localhost:5000');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:5000"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Victim Authentication",
+      "item": [
+        {
+          "name": "Register Victim",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Victim\",\n  \"email\": \"victim@test{{$timestamp}}.com\",\n  \"password\": \"password123\",\n  \"phone\": \"0712345678\",\n  \"district\": \"Matara\",\n  \"address\": \"123 Main Street\",\n  \"nationalID\": \"123456789V\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/auth/victim/register"
+          }
+        },
+        {
+          "name": "Login Victim",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.environment.set('VICTIM_TOKEN', jsonData.token);",
+                  "  pm.environment.set('VICTIM_ID', jsonData.user.victimId);",
+                  "  console.log('Victim Token saved to environment');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"victim@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/auth/victim/login"
+          }
+        },
+        {
+          "name": "Get Victim Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{VICTIM_TOKEN}}"
+              }
+            ],
+            "url": "{{BASE_URL}}/api/auth/victim-profile"
+          }
+        },
+        {
+          "name": "Update Victim Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{VICTIM_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"0712345678\",\n  \"address\": \"Updated Address\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/auth/victim-profile"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Victim Needs",
+      "item": [
+        {
+          "name": "Create Needs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{VICTIM_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"victimId\": \"{{VICTIM_ID}}\",\n  \"items\": {\n    \"shelter\": true,\n    \"medicine\": true,\n    \"dryRations\": true,\n    \"water\": false,\n    \"clothes\": true,\n    \"sanitaryItems\": false,\n    \"cookedFood\": true,\n    \"infantCare\": false,\n    \"medicalSupport\": false\n  },\n  \"specialConditions\": {\n    \"hasDisability\": false,\n    \"isPregnant\": false,\n    \"isElderly\": true,\n    \"hasInfant\": false,\n    \"hasChronicIllness\": true\n  },\n  \"description\": \"Elderly couple with chronic illness, need shelter and medical supplies\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/needs"
+          }
+        },
+        {
+          "name": "Get Needs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{VICTIM_TOKEN}}"
+              }
+            ],
+            "url": "{{BASE_URL}}/api/needs/{{VICTIM_ID}}"
+          }
+        },
+        {
+          "name": "Update Needs",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{VICTIM_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": {\n    \"shelter\": true,\n    \"medicine\": true,\n    \"water\": true\n  },\n  \"description\": \"Updated needs description\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/needs/{{VICTIM_ID}}"
+          }
+        },
+        {
+          "name": "Emergency/SOS",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{VICTIM_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emergencyReason\": \"House flooding, need immediate evacuation assistance\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/needs/{{VICTIM_ID}}/emergency"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contributor Authentication",
+      "item": [
+        {
+          "name": "Register Contributor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Contributor\",\n  \"email\": \"contributor@test{{$timestamp}}.com\",\n  \"password\": \"password123\",\n  \"phone\": \"0787654321\",\n  \"organization\": \"Test Organization\",\n  \"category\": \"NGO\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/contributor/register"
+          }
+        },
+        {
+          "name": "Login Contributor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.environment.set('CONTRIBUTOR_TOKEN', jsonData.token);",
+                  "  pm.environment.set('CONTRIBUTOR_ID', jsonData.user.contributorId);",
+                  "  console.log('Contributor Token saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"contributor@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/contributor/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contributor Collection & Distribution",
+      "item": [
+        {
+          "name": "Log Collection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{CONTRIBUTOR_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contributorId\": \"{{CONTRIBUTOR_ID}}\",\n  \"items\": [\n    {\n      \"category\": \"FOOD\",\n      \"itemName\": \"Rice\",\n      \"quantity\": 100,\n      \"unit\": \"kg\",\n      \"condition\": \"good\"\n    },\n    {\n      \"category\": \"MEDICAL\",\n      \"itemName\": \"Bandages\",\n      \"quantity\": 50,\n      \"unit\": \"packs\",\n      \"condition\": \"good\"\n    }\n  ],\n  \"collectionDate\": \"2024-04-14T10:00:00Z\",\n  \"collectionLocation\": {\n    \"address\": \"Main Donation Center\",\n    \"district\": \"Matara\"\n  },\n  \"donorName\": \"ABC Store\",\n  \"notes\": \"From store donation program\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/contributor/collection"
+          }
+        },
+        {
+          "name": "Get Inventory",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{CONTRIBUTOR_TOKEN}}"
+              }
+            ],
+            "url": "{{BASE_URL}}/api/contributor/inventory/{{CONTRIBUTOR_ID}}"
+          }
+        },
+        {
+          "name": "Log Distribution",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{CONTRIBUTOR_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contributorId\": \"{{CONTRIBUTOR_ID}}\",\n  \"items\": [\n    {\n      \"itemName\": \"Rice\",\n      \"quantity\": 20,\n      \"unit\": \"kg\"\n    },\n    {\n      \"itemName\": \"Bandages\",\n      \"quantity\": 10,\n      \"unit\": \"packs\"\n    }\n  ],\n  \"recipientType\": \"victim\",\n  \"recipientName\": \"John Doe\",\n  \"recipientPhone\": \"0712345678\",\n  \"recipientAddress\": \"123 Main St, Matara\",\n  \"distributionDate\": \"2024-04-14T11:00:00Z\",\n  \"familiesBenefited\": 1,\n  \"individualsBenefited\": 2,\n  \"notes\": \"Family with elderly members\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/contributor/distribution"
+          }
+        },
+        {
+          "name": "Get Distribution History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{CONTRIBUTOR_TOKEN}}"
+              }
+            ],
+            "url": "{{BASE_URL}}/api/contributor/distributions/{{CONTRIBUTOR_ID}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Authentication",
+      "item": [
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.environment.set('ADMIN_TOKEN', jsonData.token);",
+                  "  console.log('Admin Token saved');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\",\n  \"role\": \"DEV\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/admin/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin System Management",
+      "item": [
+        {
+          "name": "System Health",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": "{{BASE_URL}}/api/admin/system/health"
+          }
+        },
+        {
+          "name": "Get System Logs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": "{{BASE_URL}}/api/admin/system/logs?limit=50"
+          }
+        },
+        {
+          "name": "Get Failed Logins",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": "{{BASE_URL}}/api/admin/security/failed-logins"
+          }
+        },
+        {
+          "name": "Get Database Stats",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": "{{BASE_URL}}/api/admin/database/stats"
+          }
+        },
+        {
+          "name": "Get Users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": "{{BASE_URL}}/api/admin/users"
+          }
+        },
+        {
+          "name": "Update User Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"userType\": \"victim\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/admin/users/USER_ID/status"
+          }
+        },
+        {
+          "name": "Block IP Address",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ip\": \"192.168.1.100\",\n  \"reason\": \"Suspicious activity\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/admin/security/block-ip"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public Endpoints",
+      "item": [
+        {
+          "name": "Get Home Statistics",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/api/home/statistics"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error Scenarios",
+      "item": [
+        {
+          "name": "Missing Authorization Header",
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/api/needs/MTR001"
+          }
+        },
+        {
+          "name": "Invalid Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid.token.here"
+              }
+            ],
+            "url": "{{BASE_URL}}/api/needs/MTR001"
+          }
+        },
+        {
+          "name": "Invalid Email Format",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test\",\n  \"email\": \"not-an-email\",\n  \"password\": \"password123\",\n  \"phone\": \"0712345678\",\n  \"district\": \"Matara\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/auth/victim/register"
+          }
+        },
+        {
+          "name": "Weak Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test\",\n  \"email\": \"test@example.com\",\n  \"password\": \"abc\",\n  \"phone\": \"0712345678\",\n  \"district\": \"Matara\"\n}"
+            },
+            "url": "{{BASE_URL}}/api/auth/victim/register"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "VICTIM_TOKEN",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "VICTIM_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "CONTRIBUTOR_TOKEN",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "CONTRIBUTOR_ID",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ADMIN_TOKEN",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

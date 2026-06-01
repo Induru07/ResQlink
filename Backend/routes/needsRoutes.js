@@ -2,11 +2,20 @@ const express = require('express');
 const router = express.Router();
 const VictimNeeds = require('../models/VictimNeeds');
 
-// Create or update needs for a victim
-router.post('/', async (req, res) => {
+// Import Middleware
+const { verifyToken, verifyVictim, verifyAdmin, verifyContributor } = require('../middleware/authMiddleware');
+
+// Create or update needs for a victim - PROTECTED
+router.post('/', verifyToken, verifyVictim, async (req, res) => {
     try {
         const { victimId, items = {}, specialConditions = {}, description, isEmergency, emergencyReason } = req.body;
-        if (!victimId) return res.status(400).json({ msg: 'victimId is required' });
+
+        // Verify ownership
+        if (req.user.victimId !== victimId) {
+            return res.status(403).json({ error: 'You can only update your own needs' });
+        }
+
+        if (!victimId) return res.status(400).json({ error: 'victimId is required' });
 
         // Auto-calculate urgency based on items and conditions
         let urgency = 'moderate';
@@ -52,30 +61,41 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Get needs by victimId
-router.get('/:victimId', async (req, res) => {
+// Get needs by victimId - PROTECTED (victims access own, contributors can search)
+router.get('/:victimId', verifyToken, async (req, res) => {
     try {
         const { victimId } = req.params;
+        
+        // If victim accessing their own needs
+        if (req.user.role === 'victim' && req.user.victimId !== victimId) {
+            return res.status(403).json({ error: 'You can only view your own needs' });
+        }
+
         const needs = await VictimNeeds.findOne({ victimId });
-        if (!needs) return res.status(404).json({ msg: 'No needs found for this victim' });
+        if (!needs) return res.status(404).json({ error: 'No needs found for this victim' });
         res.json(needs);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Update status (admin only - should add auth middleware)
-router.put('/:victimId/status', async (req, res) => {
+// Update status (admin or contributor responding) - PROTECTED
+router.put('/:victimId/status', verifyToken, async (req, res) => {
     try {
         const { victimId } = req.params;
         const { status, respondedBy, responseNotes } = req.body;
 
+        // Only admin or contributors can update status
+        if (req.user.role !== 'admin' && req.user.role !== 'contributor') {
+            return res.status(403).json({ error: 'Only admins or contributors can update needs status' });
+        }
+
         if (!['pending', 'in-progress', 'resolved'].includes(status)) {
-            return res.status(400).json({ msg: 'Invalid status' });
+            return res.status(400).json({ error: 'Invalid status' });
         }
 
         const needs = await VictimNeeds.findOne({ victimId });
-        if (!needs) return res.status(404).json({ msg: 'Needs not found' });
+        if (!needs) return res.status(404).json({ error: 'Needs not found' });
 
         needs.status = status;
         if (respondedBy) needs.respondedBy = respondedBy;
@@ -90,15 +110,20 @@ router.put('/:victimId/status', async (req, res) => {
     }
 });
 
-// Emergency SOS trigger
-router.post('/:victimId/emergency', async (req, res) => {
+// Emergency SOS trigger - PROTECTED
+router.post('/:victimId/emergency', verifyToken, verifyVictim, async (req, res) => {
     try {
         const { victimId } = req.params;
         const { emergencyReason } = req.body;
 
+        // Verify ownership
+        if (req.user.victimId !== victimId) {
+            return res.status(403).json({ error: 'You can only trigger emergency for yourself' });
+        }
+
         const needs = await VictimNeeds.findOne({ victimId });
         if (!needs) {
-            return res.status(404).json({ msg: 'Needs not found. Please create a needs request first.' });
+            return res.status(404).json({ error: 'Needs not found. Please create a needs request first.' });
         }
 
         needs.isEmergency = true;
@@ -108,23 +133,34 @@ router.post('/:victimId/emergency', async (req, res) => {
 
         await needs.save();
 
-        // TODO: Send SMS/notification to admin
+        // TODO: Send SMS/notification to admin & nearby contributors
         res.json({ msg: 'Emergency alert sent', needs });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Get all needs (for admin dashboard)
-router.get('/', async (req, res) => {
+// Get all needs (for admin/contributor dashboard) - PROTECTED
+router.get('/', verifyToken, async (req, res) => {
     try {
-        const { urgency, status } = req.query;
+        // Only admin and contributors can fetch all needs
+        if (req.user.role !== 'admin' && req.user.role !== 'contributor') {
+            return res.status(403).json({ error: 'Only admins and contributors can view all needs' });
+        }
+
+        const { urgency, status, district } = req.query;
         const filter = {};
         if (urgency) filter.urgency = urgency;
         if (status) filter.status = status;
 
-        const needs = await VictimNeeds.find(filter).sort({ urgency: -1, requestDate: -1 });
-        res.json(needs);
+        const needs = await VictimNeeds.find(filter)
+            .populate({
+                path: 'victimId',
+                model: 'VictimAuth',
+                select: 'victimId fullName email district'
+            })
+            .sort({ urgency: -1, requestDate: -1 });
+        res.json({ needs, count: needs.length });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

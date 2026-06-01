@@ -3,6 +3,10 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+// Import Middleware
+const { verifyToken, verifyContributor } = require('../middleware/authMiddleware');
+const { validateEmailMiddleware, validatePhoneMiddleware } = require('../middleware/validationMiddleware');
+
 // Import Models
 const Contributor = require('../models/Contributor');
 const Collection = require('../models/Collection');
@@ -51,7 +55,7 @@ const generateDistributionId = async () => {
 // ========================================
 
 // Register Contributor
-router.post('/register', async (req, res) => {
+router.post('/register', validateEmailMiddleware, validatePhoneMiddleware, async (req, res) => {
     try {
         const {
             role,
@@ -74,6 +78,10 @@ router.post('/register', async (req, res) => {
 
         if (!name || !email || !password || !phone || !role) {
             return res.status(400).json({ msg: 'Missing required fields' });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({ msg: 'Password must be at least 6 characters' });
         }
 
         // Check if email exists
@@ -138,9 +146,13 @@ router.post('/register', async (req, res) => {
 });
 
 // Login Contributor
-router.post('/login', async (req, res) => {
+router.post('/login', validateEmailMiddleware, async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ msg: 'Email and password required' });
+        }
 
         const contributor = await Contributor.findOne({ email });
         if (!contributor) {
@@ -158,7 +170,8 @@ router.post('/login', async (req, res) => {
 
         const token = jwt.sign(
             { id: contributor._id, contributorId: contributor.contributorId, contributorRole: contributor.role, role: 'contributor' },
-            process.env.JWT_SECRET
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
         );
 
         res.json({
@@ -179,9 +192,15 @@ router.post('/login', async (req, res) => {
 });
 
 // Get Contributor Profile
-router.get('/profile/:contributorId', async (req, res) => {
+router.get('/profile/:contributorId', verifyToken, verifyContributor, async (req, res) => {
     try {
         const { contributorId } = req.params;
+        
+        // Verify ownership
+        if (req.user.contributorId !== contributorId) {
+            return res.status(403).json({ error: 'You can only access your own profile' });
+        }
+        
         const contributor = await Contributor.findOne({ contributorId }).select('-password');
         
         if (!contributor) {
@@ -196,9 +215,15 @@ router.get('/profile/:contributorId', async (req, res) => {
 });
 
 // Update Contributor Profile
-router.put('/profile/:contributorId', async (req, res) => {
+router.put('/profile/:contributorId', verifyToken, verifyContributor, validatePhoneMiddleware, async (req, res) => {
     try {
         const { contributorId } = req.params;
+        
+        // Verify ownership
+        if (req.user.contributorId !== contributorId) {
+            return res.status(403).json({ error: 'You can only update your own profile' });
+        }
+        
         const updates = req.body;
         
         // Don't allow updating sensitive fields
@@ -229,7 +254,7 @@ router.put('/profile/:contributorId', async (req, res) => {
 // ========================================
 
 // Log a new collection
-router.post('/collection', async (req, res) => {
+router.post('/collection', verifyToken, verifyContributor, async (req, res) => {
     try {
         const {
             contributorId,
@@ -246,6 +271,11 @@ router.post('/collection', async (req, res) => {
             handoverRef,
             handoverEta
         } = req.body;
+
+        // Verify ownership
+        if (req.user.contributorId !== contributorId) {
+            return res.status(403).json({ error: 'You can only log collections for yourself' });
+        }
 
         if (!contributorId || !items || items.length === 0) {
             return res.status(400).json({ msg: 'Missing required fields' });
@@ -506,9 +536,15 @@ async function addToInventory(contributorId, item, collectionId) {
 }
 
 // Get inventory for a contributor
-router.get('/inventory/:contributorId', async (req, res) => {
+router.get('/inventory/:contributorId', verifyToken, verifyContributor, async (req, res) => {
     try {
         const { contributorId } = req.params;
+        
+        // Verify ownership
+        if (req.user.contributorId !== contributorId) {
+            return res.status(403).json({ error: 'You can only access your own inventory' });
+        }
+        
         const inventory = await Inventory.find({ contributorId }).sort({ category: 1 });
         
         // Calculate totals by category
@@ -572,7 +608,7 @@ router.put('/inventory/:inventoryId', async (req, res) => {
 // ========================================
 
 // Log a distribution
-router.post('/distribution', async (req, res) => {
+router.post('/distribution', verifyToken, verifyContributor, async (req, res) => {
     try {
         const {
             contributorId,
@@ -591,6 +627,11 @@ router.post('/distribution', async (req, res) => {
             fulfilledNeedId,
             notes
         } = req.body;
+
+        // Verify ownership
+        if (req.user.contributorId !== contributorId) {
+            return res.status(403).json({ error: 'You can only log distributions for yourself' });
+        }
 
         if (!contributorId || !items || items.length === 0) {
             return res.status(400).json({ msg: 'Missing required fields' });
@@ -663,9 +704,15 @@ router.post('/distribution', async (req, res) => {
 });
 
 // Get all distributions for a contributor
-router.get('/distribution/:contributorId', async (req, res) => {
+router.get('/distribution/:contributorId', verifyToken, verifyContributor, async (req, res) => {
     try {
         const { contributorId } = req.params;
+        
+        // Verify ownership: contributor can only access their own distributions
+        if (req.user.userId !== contributorId && req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Unauthorized access to distributions' });
+        }
+        
         const distributions = await Distribution.find({ contributorId }).sort({ distributionDate: -1 });
         
         res.json({ distributions, count: distributions.length });
@@ -676,26 +723,33 @@ router.get('/distribution/:contributorId', async (req, res) => {
 });
 
 // Update distribution status
-router.put('/distribution/:distributionId/status', async (req, res) => {
+router.put('/distribution/:distributionId/status', verifyToken, verifyContributor, async (req, res) => {
     try {
         const { distributionId } = req.params;
         const { status, recipientConfirmation } = req.body;
+
+        // Verify ownership: get distribution first to check ownership
+        const distribution = await Distribution.findOne({ distributionId });
+        if (!distribution) {
+            return res.status(404).json({ error: 'Distribution not found' });
+        }
+        
+        // Verify the contributor owns this distribution
+        if (distribution.contributorId !== req.user.userId && req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Unauthorized: cannot update this distribution' });
+        }
 
         const updates = { updatedAt: Date.now() };
         if (status) updates.status = status;
         if (recipientConfirmation !== undefined) updates.recipientConfirmation = recipientConfirmation;
 
-        const distribution = await Distribution.findOneAndUpdate(
+        const updatedDistribution = await Distribution.findOneAndUpdate(
             { distributionId },
             updates,
             { new: true }
         );
 
-        if (!distribution) {
-            return res.status(404).json({ msg: 'Distribution not found' });
-        }
-
-        res.json({ msg: 'Distribution status updated', distribution });
+        res.json({ msg: 'Distribution status updated', distribution: updatedDistribution });
     } catch (err) {
         console.error('Update distribution status error:', err.message);
         res.status(500).json({ error: err.message });
@@ -707,9 +761,14 @@ router.put('/distribution/:distributionId/status', async (req, res) => {
 // ========================================
 
 // Get contributor dashboard stats
-router.get('/stats/:contributorId', async (req, res) => {
+router.get('/stats/:contributorId', verifyToken, verifyContributor, async (req, res) => {
     try {
         const { contributorId } = req.params;
+
+        // Verify ownership
+        if (req.user.contributorId !== contributorId) {
+            return res.status(403).json({ error: 'You can only view your own stats' });
+        }
 
         const contributor = await Contributor.findOne({ contributorId });
         if (!contributor) {

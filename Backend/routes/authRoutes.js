@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt'); // Tool to hide passwords
-const jwt = require('jsonwebtoken'); // Tool to keep users logged in
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+// Import Middleware
+const { verifyToken, verifyVictim, verifyAdmin, verifySupplier } = require('../middleware/authMiddleware');
+const { validateEmailMiddleware, validatePhoneMiddleware } = require('../middleware/validationMiddleware');
 
 // Import the Models
 const VictimAuth = require('../models/VictimAuth');
@@ -24,7 +28,7 @@ const generateVictimId = async (district) => {
 };
 
 // Register Victim -> creates VictimAuth + VictimProfile
-router.post('/victim/register', async (req, res) => {
+router.post('/victim/register', validateEmailMiddleware, validatePhoneMiddleware, async (req, res) => {
     try {
         const {
             name,
@@ -39,15 +43,19 @@ router.post('/victim/register', async (req, res) => {
         } = req.body;
 
         if (!name || !email || !password || !phone || !district) {
-            return res.status(400).json({ msg: 'Missing required fields' });
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({ error: 'Password must be at least 6 characters' });
         }
 
         // Check if email already exists in auth collection
         const existing = await VictimAuth.findOne({ email });
-        if (existing) return res.status(400).json({ msg: 'Email already used' });
+        if (existing) return res.status(400).json({ error: 'Email already registered' });
 
         const victimId = await generateVictimId(district);
-        if (!victimId) return res.status(400).json({ msg: 'Unable to generate victimId' });
+        if (!victimId) return res.status(400).json({ error: 'Unable to generate victimId' });
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -69,7 +77,11 @@ router.post('/victim/register', async (req, res) => {
             location
         });
 
-        return res.json({ msg: 'Victim Account Created Successfully', victimId, authId: authRecord._id });
+        return res.json({ 
+            msg: 'Victim account created successfully', 
+            victimId, 
+            authId: authRecord._id 
+        });
     } catch (err) {
         console.error('Register victim error:', err.message);
         res.status(500).json({ error: err.message });
@@ -77,32 +89,57 @@ router.post('/victim/register', async (req, res) => {
 });
 
 // Login Victim using VictimAuth
-router.post('/victim/login', async (req, res) => {
+router.post('/victim/login', validateEmailMiddleware, async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password required' });
+        }
+
         const user = await VictimAuth.findOne({ email });
-        if (!user) return res.status(400).json({ msg: 'User email not found' });
+        if (!user) return res.status(400).json({ error: 'Invalid credentials' });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ msg: 'Wrong password' });
+        if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
-        const token = jwt.sign({ id: user._id, victimId: user.victimId, role: 'victim' }, process.env.JWT_SECRET);
-        res.json({ token, user: { id: user._id, victimId: user.victimId, name: user.fullName, role: 'victim' } });
+        const token = jwt.sign(
+            { id: user._id, victimId: user.victimId, role: 'victim' },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        res.json({ 
+            token, 
+            user: { 
+                id: user._id, 
+                victimId: user.victimId, 
+                name: user.fullName, 
+                email: user.email,
+                district: user.district,
+                role: 'victim' 
+            } 
+        });
     } catch (err) {
-        console.error('SERVER ERROR:', err.message);
+        console.error('Login victim error:', err.message);
         res.status(500).json({ error: err.message });
     }
 });
 
-// Get full victim profile (auth + profile + needs) by victimId
-router.get('/victim/profile/:victimId', async (req, res) => {
+// Get full victim profile (auth + profile + needs) by victimId - PROTECTED
+router.get('/victim/profile/:victimId', verifyToken, verifyVictim, async (req, res) => {
     try {
         const { victimId } = req.params;
-        if (!victimId) return res.status(400).json({ msg: 'victimId is required' });
 
-        const auth = await VictimAuth.findOne({ victimId });
-        if (!auth) return res.status(404).json({ msg: 'Victim not found' });
+        // Verify ownership
+        if (req.user.victimId !== victimId) {
+            return res.status(403).json({ error: 'You can only access your own profile' });
+        }
+
+        if (!victimId) return res.status(400).json({ error: 'victimId is required' });
+
+        const auth = await VictimAuth.findOne({ victimId }).select('-password');
+        if (!auth) return res.status(404).json({ error: 'Victim not found' });
 
         const profile = await VictimProfile.findOne({ victimId });
         const needs = await VictimNeeds.findOne({ victimId });
@@ -110,6 +147,35 @@ router.get('/victim/profile/:victimId', async (req, res) => {
         res.json({ auth, profile, needs });
     } catch (err) {
         console.error('Fetch victim profile error:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Update victim profile - PROTECTED
+router.put('/victim/profile/:victimId', verifyToken, verifyVictim, validatePhoneMiddleware, async (req, res) => {
+    try {
+        const { victimId } = req.params;
+
+        // Verify ownership
+        if (req.user.victimId !== victimId) {
+            return res.status(403).json({ error: 'You can only update your own profile' });
+        }
+
+        const { phone, address, familyMembers, location, nationalID } = req.body;
+
+        const profile = await VictimProfile.findOneAndUpdate(
+            { victimId },
+            { phone, address, familyMembers, location, nationalID, updatedAt: Date.now() },
+            { new: true }
+        );
+
+        if (!profile) {
+            return res.status(404).json({ error: 'Profile not found' });
+        }
+
+        res.json({ msg: 'Profile updated successfully', profile });
+    } catch (err) {
+        console.error('Update victim profile error:', err.message);
         res.status(500).json({ error: err.message });
     }
 });
@@ -149,40 +215,68 @@ router.get('/victim/search', async (req, res) => {
 // =======================
 
 // Register Supplier
-router.post('/supplier/register', async (req, res) => {
+router.post('/supplier/register', validateEmailMiddleware, validatePhoneMiddleware, async (req, res) => {
     try {
         const { organizationName, email, password, phone } = req.body;
+
+        if (!organizationName || !email || !password || !phone) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({ error: 'Password must be at least 6 characters' });
+        }
         
         const existing = await Supplier.findOne({ email });
-        if (existing) return res.status(400).json({ msg: "Email already used" });
+        if (existing) return res.status(400).json({ error: 'Email already registered' });
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const newSupplier = new Supplier({
-            fullName: organizationName, email, password: hashedPassword, phone
+            fullName: organizationName, 
+            email, 
+            password: hashedPassword, 
+            phone
         });
         await newSupplier.save();
 
-        res.json({ msg: "Supplier Account Created Successfully" });
+        res.json({ msg: 'Supplier account created successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
 // Login Supplier
-router.post('/supplier/login', async (req, res) => {
+router.post('/supplier/login', validateEmailMiddleware, async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password required' });
+        }
         
         const user = await Supplier.findOne({ email });
-        if (!user) return res.status(400).json({ msg: "Supplier not found" });
+        if (!user) return res.status(400).json({ error: 'Invalid credentials' });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
+        if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
-        const token = jwt.sign({ id: user._id, role: 'supplier' }, process.env.JWT_SECRET);
-        res.json({ token, user: { id: user._id, name: user.fullName, role: 'supplier' } });
+        const token = jwt.sign(
+            { id: user._id, role: 'supplier' },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+        
+        res.json({ 
+            token, 
+            user: { 
+                id: user._id, 
+                name: user.fullName, 
+                email: user.email,
+                role: 'supplier' 
+            } 
+        });
 
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -194,30 +288,63 @@ router.post('/supplier/login', async (req, res) => {
 // =======================
 
 // Admin Register (Usually you create the first admin manually, but here is the route)
-router.post('/admin/register', async (req, res) => {
+router.post('/admin/register', validateEmailMiddleware, async (req, res) => {
     try {
         const { name, email, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
+
+        if (!name || !email || !password) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({ error: 'Password must be at least 6 characters' });
+        }
+
+        const existing = await Admin.findOne({ email });
+        if (existing) return res.status(400).json({ error: 'Email already registered' });
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        
         const newAdmin = new Admin({ name, email, password: hashedPassword });
         await newAdmin.save();
-        res.json({ msg: "Admin Created" });
+
+        res.json({ msg: 'Admin account created successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
 // Admin Login
-router.post('/admin/login', async (req, res) => {
+router.post('/admin/login', validateEmailMiddleware, async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password required' });
+        }
+
         const user = await Admin.findOne({ email });
-        if (!user) return res.status(400).json({ msg: "Admin not found" });
+        if (!user) return res.status(400).json({ error: 'Invalid credentials' });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
+        if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
-        const token = jwt.sign({ id: user._id, role: 'admin' }, process.env.JWT_SECRET);
-        res.json({ token, user: { id: user._id, name: user.name, role: 'admin' } });
+        const token = jwt.sign(
+            { id: user._id, role: 'admin' },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        res.json({ 
+            token, 
+            user: { 
+                id: user._id, 
+                name: user.name, 
+                email: user.email,
+                role: 'admin' 
+            } 
+        });
 
     } catch (err) {
         res.status(500).json({ error: err.message });

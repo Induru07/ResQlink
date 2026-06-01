@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Access Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover { background: #5568d3; }
+        .btn-danger { background: #dc3545; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-success { background: #28a745; }
+        .btn-success:hover { background: #218838; }
+        .info { background: #cfe2ff; padding: 10px; border-radius: 5px; color: #084298; margin: 10px 0; }
+        .warning { background: #fff3cd; padding: 10px; border-radius: 5px; color: #856404; margin: 10px 0; }
+        .error { background: #f8d7da; padding: 10px; border-radius: 5px; color: #721c24; margin: 10px 0; }
+        .success { background: #d4edda; padding: 10px; border-radius: 5px; color: #155724; margin: 10px 0; }
+        code { background: #f5f5f5; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        #status-log {
+            background: #222;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 5px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Victim Dashboard - Access Test</h1>
+        
+        <div class="section">
+            <h2>📋 Current Status</h2>
+            <div id="status"></div>
+        </div>
+
+        <div class="section">
+            <h2>1️⃣ Option A: Test Login Flow</h2>
+            <p>Use these test credentials to login:</p>
+            <div class="info">
+                <strong>Email:</strong> <code>testuser@example.com</code><br>
+                <strong>Password:</strong> <code>password123</code>
+            </div>
+            <button class="btn btn-success" onclick="testLogin()">🔑 Test Login</button>
+            <div id="login-status"></div>
+        </div>
+
+        <div class="section">
+            <h2>2️⃣ Option B: Manually Set Session & Go to Dashboard</h2>
+            <p>This will simulate a successful login:</p>
+            
+            <label>Victim ID (optional):</label>
+            <input type="text" id="victimId" placeholder="e.g., 507f1f77bcf86cd799439011" value="">
+            
+            <button class="btn" onclick="setSessionAndGo()">✅ Set Session & Go to Dashboard</button>
+            <div id="session-status"></div>
+        </div>
+
+        <div class="section">
+            <h2>3️⃣ Option C: Direct Access to Dashboard</h2>
+            <p>Try accessing the dashboard directly:</p>
+            <button class="btn btn-success" onclick="window.location.href='src/pages/victimDashboard.html'">
+                📊 Open Dashboard
+            </button>
+        </div>
+
+        <div class="section">
+            <h2>🔍 Troubleshooting</h2>
+            <button class="btn" onclick="checkServers()">🖥️ Check Servers</button>
+            <button class="btn" onclick="refreshPage()">🔄 Refresh Page</button>
+            <button class="btn btn-danger" onclick="clearSessionAndLogout()">🚪 Clear Session</button>
+            <div id="debug-status"></div>
+        </div>
+
+        <div class="section">
+            <h2>📊 Console Output</h2>
+            <div id="status-log"></div>
+            <button class="btn" onclick="document.getElementById('status-log').innerHTML = ''">Clear Log</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000';
+        
+        // Add to log
+        function log(msg, type = 'info') {
+            const logEl = document.getElementById('status-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'red' : type === 'success' ? 'lime' : 'white';
+            logEl.innerHTML += `<div style="color: ${color}">[${timestamp}] ${msg}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(`[${timestamp}] ${msg}`);
+        }
+
+        // Update status
+        function updateStatus() {
+            const token = localStorage.getItem('token');
+            const victimId = localStorage.getItem('victimId');
+            const user = localStorage.getItem('user');
+            
+            const status = document.getElementById('status');
+            status.innerHTML = `
+                <p><strong>Token:</strong> ${token ? '✅ Found' : '❌ Missing'}</p>
+                <p><strong>Victim ID:</strong> ${victimId ? '✅ ' + victimId : '❌ Missing'}</p>
+                <p><strong>User Data:</strong> ${user ? '✅ Found' : '❌ Missing'}</p>
+                <p><strong>Backend URL:</strong> ${API_BASE}</p>
+            `;
+
+            if (token && victimId) {
+                status.innerHTML += '<p style="color: green; font-weight: bold;">✅ Ready to access dashboard!</p>';
+            } else {
+                status.innerHTML += '<p style="color: orange; font-weight: bold;">⚠️ Missing authentication data. Login or set session first.</p>';
+            }
+        }
+
+        // Test login
+        async function testLogin() {
+            const statusEl = document.getElementById('login-status');
+            statusEl.innerHTML = '<p class="warning">🔄 Testing login...</p>';
+            
+            try {
+                log('Testing login endpoint...', 'info');
+                
+                const response = await fetch(`${API_BASE}/api/victim/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'testuser@example.com',
+                        password: 'password123'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Login successful!', 'success');
+                    log(`Token: ${data.token.substring(0, 20)}...`, 'success');
+                    log(`Victim ID: ${data.user.victimId}`, 'success');
+                    
+                    // Store data
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('victimId', data.user.victimId);
+                    localStorage.setItem('userRole', 'victim');
+                    
+                    statusEl.innerHTML = `
+                        <p class="success">✅ Login successful!</p>
+                        <p>Name: ${data.user.name}</p>
+                        <p><button class="btn btn-success" onclick="window.location.href='src/pages/victimDashboard.html'">
+                            Now Go to Dashboard →
+                        </button></p>
+                    `;
+                    updateStatus();
+                } else {
+                    const error = await response.json();
+                    log(`❌ Login failed: ${response.status} - ${error.msg}`, 'error');
+                    statusEl.innerHTML = `<p class="error">❌ Login failed: ${error.msg || 'Unknown error'}</p>`;
+                }
+            } catch (err) {
+                const errMsg = `Network error: ${err.message}`;
+                log(errMsg, 'error');
+                statusEl.innerHTML = `<p class="error">❌ ${errMsg}</p>`;
+            }
+        }
+
+        // Set session manually
+        function setSessionAndGo() {
+            const victimId = document.getElementById('victimId').value || 'testuser123';
+            
+            // Create fake user data
+            const userData = {
+                id: 'user123',
+                name: 'Test Victim',
+                email: 'testuser@example.com',
+                victimId: victimId,
+                role: 'victim'
+            };
+
+            // Create fake token (not valid for API, but works for page load)
+            const fakeToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0dXNlcjEyMyIsInJvbGUiOiJ2aWN0aW0iLCJpYXQiOjE3MDQwMDAwMDB9.test_token_for_testing';
+
+            // Set in localStorage
+            localStorage.setItem('token', fakeToken);
+            localStorage.setItem('user', JSON.stringify(userData));
+            localStorage.setItem('victimId', victimId);
+            localStorage.setItem('userRole', 'victim');
+
+            log(`✅ Session set for victim: ${victimId}`, 'success');
+            
+            const statusEl = document.getElementById('session-status');
+            statusEl.innerHTML = `<p class="success">✅ Session configured. Redirecting to dashboard...</p>`;
+            
+            setTimeout(() => {
+                window.location.href = 'src/pages/victimDashboard.html';
+            }, 1500);
+        }
+
+        // Check servers
+        async function checkServers() {
+            const statusEl = document.getElementById('debug-status');
+            statusEl.innerHTML = '<p class="warning">🔄 Checking servers...</p>';
+            
+            let backendOk = false;
+            let results = '';
+
+            try {
+                log('Checking backend server...', 'info');
+                const response = await fetch(`${API_BASE}/api/statistics`);
+                if (response.ok) {
+                    backendOk = true;
+                    log('✅ Backend server OK (port 5000)', 'success');
+                    results += '<p class="success">✅ Backend server is running (port 5000)</p>';
+                } else {
+                    log(`⚠️ Backend responded with status ${response.status}`, 'warning');
+                    results += '<p class="warning">⚠️ Backend server responded but with error status</p>';
+                }
+            } catch (err) {
+                log(`❌ Backend not accessible: ${err.message}`, 'error');
+                results += '<p class="error">❌ Backend server NOT running (port 5000)</p>';
+                results += '<p class="error">Start with: <code>cd Backend && npm start</code></p>';
+            }
+
+            // Frontend is accessible if this page loads
+            log('✅ Frontend server OK (port 8080)', 'success');
+            results += '<p class="success">✅ Frontend server is running (port 8080)</p>';
+
+            statusEl.innerHTML = results;
+        }
+
+        // Clear session
+        function clearSessionAndLogout() {
+            localStorage.clear();
+            log('✅ Session cleared', 'success');
+            document.getElementById('debug-status').innerHTML = '<p class="success">✅ Session cleared. Redirecting to login...</p>';
+            setTimeout(() => {
+                window.location.href = 'src/pages/victimSignIn.html';
+            }, 1500);
+        }
+
+        // Refresh page
+        function refreshPage() {
+            location.reload();
+        }
+
+        // Initialize
+        window.onload = function() {
+            log('Test page loaded', 'success');
+            log(`API Base URL: ${API_BASE}`, 'info');
+            updateStatus();
+            checkServers();
+        };
+    </script>
+</body>
+</html>

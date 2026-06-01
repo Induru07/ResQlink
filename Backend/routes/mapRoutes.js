@@ -1,13 +1,18 @@
 const express = require('express');
 const router = express.Router();
+
+// Import Middleware
+const { verifyToken } = require('../middleware/authMiddleware');
+
+// Import Models
 const VictimAuth = require('../models/VictimAuth');
 const VictimProfile = require('../models/VictimProfile');
 const VictimNeeds = require('../models/VictimNeeds');
 const CollectionPoint = require('../models/CollectionPoint');
 
 // @route   GET /api/map/data
-// @desc    Send victim locations + contact + needs to the map
-router.get('/data', async (req, res) => {
+// @desc    Send victim locations + contact + needs to the map (Protected - authenticated users only)
+router.get('/data', verifyToken, async (req, res) => {
     try {
         // 1. Get auth, profiles, needs, and collections
         const [authList, profiles, needsList, collectionPoints] = await Promise.all([

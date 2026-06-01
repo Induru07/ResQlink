@@ -1,11 +1,25 @@
-// Contributor Dashboard JS
+// Contributor Dashboard JS - Updated with proper auth
 const API = window.API_BASE || 'http://localhost:5000';
 let contributorId = localStorage.getItem('contributorId');
+let token = localStorage.getItem('token');
 let inventory = [];
 
 // Check authentication
-if (!contributorId) {
+if (!contributorId || !token) {
     window.location.href = 'contributorSignIn.html';
+}
+
+// Helper: Make authenticated fetch
+async function authenticatedFetch(url, options = {}) {
+    const token = localStorage.getItem('token');
+    return fetch(url, {
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            ...options.headers
+        }
+    });
 }
 
 // Initialize dashboard
@@ -22,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Load contributor stats
 async function loadStats() {
     try {
-        const res = await fetch(`${API}/api/contributor/stats/${contributorId}`);
+        const res = await authenticatedFetch(`${API}/api/contributor/stats/${contributorId}`);
         const data = await res.json();
         
         if (res.ok) {
@@ -30,6 +44,8 @@ async function loadStats() {
                 `Welcome back, ${data.contributor.name}! (${contributorId})`;
             
             renderStatsCards(data.stats);
+        } else {
+            console.error('Stats error:', data.error);
         }
     } catch (err) {
         console.error('Error loading stats:', err);
@@ -73,7 +89,7 @@ function renderStatsCards(stats) {
 // Load inventory
 async function loadInventory() {
     try {
-        const res = await fetch(`${API}/api/contributor/inventory/${contributorId}`);
+        const res = await authenticatedFetch(`${API}/api/contributor/inventory/${contributorId}`);
         const data = await res.json();
         
         if (res.ok) {
@@ -91,7 +107,7 @@ async function loadCollectionPoints() {
     try {
         const district = document.getElementById('collectionDistrict')?.value || '';
         const url = district ? `${API}/api/contributor/collection-points?district=${encodeURIComponent(district)}` : `${API}/api/contributor/collection-points`;
-        const res = await fetch(url);
+        const res = await authenticatedFetch(url);
         const data = await res.json();
         if (res.ok) {
             const select = document.getElementById('handoverCollectionPoint');
@@ -195,9 +211,8 @@ function setupCreateCollectionPoint() {
         }
 
         try {
-            const res = await fetch(`${API}/api/contributor/collection-point`, {
+            const res = await authenticatedFetch(`${API}/api/contributor/collection-point`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name,
                     managedByContributorId: contributorId,
@@ -280,8 +295,8 @@ function populateDistributionItems(inventory) {
 async function loadHistory() {
     try {
         const [collectionsRes, distributionsRes] = await Promise.all([
-            fetch(`${API}/api/contributor/collection/${contributorId}`),
-            fetch(`${API}/api/contributor/distribution/${contributorId}`)
+            authenticatedFetch(`${API}/api/contributor/collection/${contributorId}`),
+            authenticatedFetch(`${API}/api/contributor/distribution/${contributorId}`)
         ]);
         
         const collections = await collectionsRes.json();
@@ -300,12 +315,12 @@ async function loadHistory() {
 async function loadPointNotifications(){
     try{
         // Get points managed by this contributor
-        const res = await fetch(`${API}/api/contributor/collection-points/${contributorId}`);
+        const res = await authenticatedFetch(`${API}/api/contributor/collection-points/${contributorId}`);
         const data = await res.json();
         const points = data.points || [];
         const allNotifs = [];
         for(const p of points){
-            const r = await fetch(`${API}/api/contributor/notifications/collection-point/${p.collectionPointId}`);
+            const r = await authenticatedFetch(`${API}/api/contributor/notifications/collection-point/${p.collectionPointId}`);
             const d = await r.json();
             (d.notifications||[]).forEach(n=>allNotifs.push({ pointName: p.name, pointId: p.collectionPointId, notif: n }));
         }
@@ -461,9 +476,8 @@ document.getElementById('collection-form')?.addEventListener('submit', async (e)
     };
     
     try {
-        const res = await fetch(`${API}/api/contributor/collection`, {
+        const res = await authenticatedFetch(`${API}/api/contributor/collection`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
         
@@ -547,3 +561,13 @@ document.getElementById('distribution-form')?.addEventListener('submit', async (
         showAlert('distribution-alert', 'Cannot connect to server', 'error');
     }
 });
+
+
+// Logout function
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        localStorage.clear();
+        alert('You have been logged out.');
+        window.location.href = 'contributorSignIn.html';
+    }
+}

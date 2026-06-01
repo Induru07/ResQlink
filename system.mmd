@@ -1,0 +1,48 @@
+flowchart TD
+    %% Define UML Styles
+    classDef umlNode fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef umlComponent fill:#e1f5fe,stroke:#0288d1,stroke-width:1px;
+    classDef umlDatabase fill:#fff3e0,stroke:#f57c00,stroke-width:1px;
+    classDef umlExternal fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1px;
+
+    %% Client Node
+    subgraph Client ["«Device» Client (Browser / Mobile)"]
+        UI["«Component»\nFrontend UI (HTML/CSS/JS)"]:::umlComponent
+        Map["«Component»\nLeaflet.js Map"]:::umlComponent
+    end
+    class Client umlNode;
+
+    %% Hosting Node
+    subgraph Hosting ["«Server» CDN / Static Hosting"]
+        Assets["«Artifact»\nStatic Assets & SPA"]:::umlComponent
+    end
+    class Hosting umlNode;
+
+    %% Application Node
+    subgraph AppServer ["«Server» Node.js Backend Environment"]
+        API["«Component»\nExpress.js REST API"]:::umlComponent
+        Auth["«Component»\nJWT Auth & Bcrypt"]:::umlComponent
+        Router["«Component»\nRoute Controllers"]:::umlComponent
+        
+        API --> Auth
+        Auth --> Router
+    end
+    class AppServer umlNode;
+
+    %% Database Node
+    subgraph DBServer ["«Database Server» MongoDB Atlas"]
+        DB[("«Database»\nResQLink Data")":::umlDatabase
+        ODM["«Component»\nMongoose ODM"]:::umlComponent
+        
+        ODM --> DB
+    end
+    class DBServer umlNode;
+
+    %% External Services
+    OSM["«External Service»\nOpenStreetMap"]:::umlExternal
+
+    %% Relationships
+    UI -. "HTTPS GET" .-> Assets
+    UI == "REST / JSON" ==> API
+    Map -. "Fetch Map Tiles" .-> OSM
+    Router == "Read / Write" ==> ODM
